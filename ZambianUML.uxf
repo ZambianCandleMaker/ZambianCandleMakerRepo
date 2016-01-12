@@ -1,332 +1,632 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="13.3">
-  <zoom_level>10</zoom_level>
+  <zoom_level>7</zoom_level>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>100</x>
-      <y>120</y>
-      <w>210</w>
-      <h>70</h>
+      <x>98</x>
+      <y>28</y>
+      <w>231</w>
+      <h>245</h>
     </coordinates>
-    <panel_attributes>Administrator Activity
+    <panel_attributes>AdministratorActivity
 --
-id: Long="36548"
-[waiting for message]</panel_attributes>
+- GraphPagerAdapter mGPAdapter
+- ViewPager mViewPager
+- HashMap&lt;String, Button&gt; buttonHash
+- DipProfile currProfile
+- HashMap&lt;String, DipProfile&gt; profileCache
+- ControllerMessanger controlMess
+- DBMessanger dbMess
+--
++ void onCreate(Bundle savedInstanceState)
++ void onPause()
++ boolean onCreateOptionsMenu(Menu menu)
++ boolean onOptionsItemSelected(MenuItem item)
++ void displayAddPoint()
++ void displaySave()
++ void displayLoad()
++ void displayGraphSettings()
++ void displayApply()
++ void advanceGraph()
++ void retractGraph()
+- void sendEmergencyStopMessage()
+- void sendPauseMessage()</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>90</x>
-      <y>240</y>
-      <w>210</w>
-      <h>70</h>
+      <x>91</x>
+      <y>714</y>
+      <w>224</w>
+      <h>203</h>
     </coordinates>
     <panel_attributes>OperatorActivity
 --
-+boolean eStopped = false
+- DipProfile currProfile
+- HashMap&lt;String, EditText&gt; editTextHash
+- HashMap&lt;String, Button&gt; buttonHash
+- ControllerMessanger controlMess
+- FloatingActionButton fab
 --
++ void onCreate(Bundle savedInstanceState)
++ void onPause()
++ boolean onCreateOptionsMenu(Menu menu)
++ boolean onOptionsItemSelected(MenuItem item)
++ void displayApplyAll()
++ void sendRaiseMessage(args...)
++ void sendRotateMessage(args...)
++ void sendEmergencyStopMessage()
++ void sendPauseMessage()
++ void displayArduinoMessages()
++ void pauseArduinoMessages()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>448</x>
+      <y>609</y>
+      <w>196</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>MessageSerializer
+--
++ AMessage createRaiseMessage(args...)
++ AMessage createRotateMessage(args...)
 </panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>90</x>
-      <y>480</y>
-      <w>210</w>
+      <x>700</x>
+      <y>644</y>
+      <w>196</w>
       <h>70</h>
     </coordinates>
-    <panel_attributes>GraphViewFragment
+    <panel_attributes>ConcreteMessage
 --
-</panel_attributes>
+- String inStringRaw
+- String inStringProcessed
+- JsonObject passable
+--
++ JsonObject getJsonRep() - specific impl.</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>90</x>
+      <x>98</x>
       <y>350</y>
       <w>210</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>RecentLogsActivity
---
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>90</x>
-      <y>580</y>
-      <w>280</w>
-      <h>110</h>
+      <h>147</h>
     </coordinates>
     <panel_attributes>LoginActivity
 --
-+String username
--String password
+- String username
+- String password
+- Button submissionButton
+- EditText usernameText
+- EditText passwordText
 --
--boolean login(username, password)</panel_attributes>
++ void onCreate(Bundle savedInstanceState)
++ void onPause()
++ boolean onCreateOptionsMenu(Menu menu)
++ boolean login(username, password)
++ void incorrectPassword()
++ void correctPassword()</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>90</x>
-      <y>720</y>
-      <w>280</w>
-      <h>70</h>
+      <x>1134</x>
+      <y>434</y>
+      <w>196</w>
+      <h>105</h>
     </coordinates>
-    <panel_attributes>LoginValidator
+    <panel_attributes>Graph
 --
--boolean isValidName(String username)
--boolean isValidPass(String password)</panel_attributes>
+- String positionPrompt
+- String timePrompt
+- int maxTime
+- int maxDepth
+- List&lt;GraphSections&gt; sections
+--
++ String/int getters/setters
++ void recalculateSections()</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>970</x>
-      <y>120</y>
-      <w>210</w>
-      <h>70</h>
+      <x>1155</x>
+      <y>567</y>
+      <w>161</w>
+      <h>105</h>
     </coordinates>
-    <panel_attributes>DipProfileController
+    <panel_attributes>GraphSection
 --
---</panel_attributes>
+- int startPos
+- int endPos
+- int maxVelocityAllowed
+- List&lt;Point&gt; pointsToDisplay()
+- double positionFactor
+--
++ int/Point/double getters/setters
++ double calculatePositionFactor()</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>640</x>
-      <y>240</y>
-      <w>210</w>
-      <h>70</h>
+      <x>1267</x>
+      <y>161</y>
+      <w>196</w>
+      <h>63</h>
     </coordinates>
-    <panel_attributes>DipProfileCache
+    <panel_attributes>FragmentPagerAdapter
 --
-</panel_attributes>
+--
++ Fragment getItem(int position)
++ int getCount()
++ CharSequence getPageTitle(int position)</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>640</x>
-      <y>350</y>
-      <w>210</w>
-      <h>70</h>
+      <x>924</x>
+      <y>42</y>
+      <w>322</w>
+      <h>77</h>
     </coordinates>
-    <panel_attributes>DipMotor
+    <panel_attributes>GraphFragment
 --
-</panel_attributes>
+- GraphSection mGraphSection
+--
++ GraphFragment newInstance(GraphSection gS)
++ void onCreate(Bundle savedInstanceState)
++ View onCreateView(LayoutInflater inflater, ViewGroup vG, Bundle sIS)</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>640</x>
-      <y>660</y>
-      <w>210</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>RecentLogsFilter
---
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>640</x>
-      <y>450</y>
-      <w>210</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>OperatorData
---
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>640</x>
-      <y>560</y>
-      <w>210</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>AdvanceMotor
---
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>650</x>
-      <y>70</y>
-      <w>210</w>
-      <h>140</h>
+      <x>1022</x>
+      <y>231</y>
+      <w>203</w>
+      <h>175</h>
     </coordinates>
     <panel_attributes>DipProfile
 --
-float time = 0
-float speed
-float location
+- Graph mGraph
+- double carouselAccel/Deaccel
+- String name
+- Date dateLastSaved
+- String description
+- boolean applied
+- double gapTime
 --
-moveDipper(float time)</panel_attributes>
++ void addPoint(Point newPoint)
++ void setCarouselAccel(double accel)
++ void setTimeBetweenDips(double gapTime)
++ void setMaxPosition(int maxPosition)
++ T getX() (getters for all fields here)
+.....</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>490</x>
+      <y>413</y>
+      <w>196</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>DBSerializer
+--
+--
++ AMessage createSelectMessage(args...)
++ AMessage createUpdateMessage(args...)
++ AMessage createDeleteMessage(args...)
++ AMessage createCreateMessage(args...)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>406</x>
+      <y>511</y>
+      <w>217</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>ControllerMessanger
+--
+- MessageSerializer messSer
+--
++ void messageArduino(String message)
++ void messageAdmin(String message)
++ void messageOperator(String message)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1001</x>
+      <y>448</y>
+      <w>112</w>
+      <h>119</h>
+    </coordinates>
+    <panel_attributes>Point
+--
+- int pID
+- double time
+- double position
+--
++ int getPID()
++ double getTime()
++ double getPosition()
++ void setTime()
++ void setPosition()
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>448</x>
+      <y>308</y>
+      <w>238</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>DBMessanger
+--
+- DBSerializer dbSer
+--
++ void queryToDB(String message)
++ AMessage queryFromDB(String message)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>714</x>
+      <y>518</y>
+      <w>168</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>/AMessage/
+--
+- String inStringRaw
+- JsonObject passable
+--
++ abstract JsonObject getJsonRep()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1281</x>
+      <y>56</y>
+      <w>259</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>Fragment
+--
+--
++ GraphFragment newInstance()
++ void onCreate(Bundle savedInstanceState)
++ View onCreateView(LayoutInflater, ViewGroup, Bundle)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1267</x>
+      <y>287</y>
+      <w>196</w>
+      <h>91</h>
+    </coordinates>
+    <panel_attributes>GraphPagerAdapter
+--
+- List&lt;GraphSection&gt; sections
+- Graph mGraph
+--
++ Fragment getItem(int position)
++ int getCount()
++ CharSequence getPageTitle(int position)
++ void setGraph()</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>840</x>
-      <y>180</y>
-      <w>160</w>
-      <h>100</h>
+      <x>1351</x>
+      <y>217</y>
+      <w>21</w>
+      <h>84</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
-    <additional_attributes>140.0;10.0;140.0;80.0;10.0;80.0</additional_attributes>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>640</x>
-      <y>770</y>
-      <w>210</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>IMessage
---
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>640</x>
-      <y>870</y>
-      <w>210</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>AMessage
---
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>970</x>
-      <y>300</y>
-      <w>210</w>
-      <h>120</h>
-    </coordinates>
-    <panel_attributes>Carousel
---
-boolean isDipping
---
-rotate(boolean)</panel_attributes>
-    <additional_attributes/>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>840</x>
-      <y>370</y>
-      <w>150</w>
-      <h>30</h>
+      <x>1253</x>
+      <y>532</y>
+      <w>21</w>
+      <h>49</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
-    <additional_attributes>10.0;10.0;130.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>970</x>
-      <y>580</y>
-      <w>210</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>MessageSerialUtils
---
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>970</x>
-      <y>470</y>
-      <w>210</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>Machine
---
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>970</x>
-      <y>690</y>
-      <w>210</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>MessageController
---
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>960</x>
-      <y>830</y>
-      <w>210</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>ConcreteClasses
---
-</panel_attributes>
-    <additional_attributes/>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1060</x>
-      <y>640</y>
-      <w>30</w>
-      <h>70</h>
+      <x>1288</x>
+      <y>371</y>
+      <w>21</w>
+      <h>77</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>710</x>
-      <y>410</y>
-      <w>30</w>
-      <h>60</h>
+      <x>1141</x>
+      <y>399</y>
+      <w>21</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>322</x>
+      <y>84</y>
+      <w>616</w>
+      <h>35</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
-    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+    <additional_attributes>860.0;30.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>710</x>
-      <y>510</y>
-      <w>30</w>
-      <h>70</h>
+      <x>1155</x>
+      <y>112</y>
+      <w>161</w>
+      <h>189</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+    <additional_attributes>10.0;10.0;210.0;250.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>322</x>
+      <y>112</y>
+      <w>714</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>1000.0;280.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>322</x>
+      <y>98</y>
+      <w>966</w>
+      <h>203</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>1360.0;270.0;1300.0;170.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1239</x>
+      <y>77</y>
+      <w>56</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>945</x>
+      <y>112</y>
+      <w>224</w>
+      <h>525</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>300.0;730.0;30.0;680.0;30.0;330.0;10.0;330.0;10.0;230.0;30.0;230.0;30.0;110.0;10.0;110.0;10.0;80.0;30.0;80.0;30.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1106</x>
+      <y>546</y>
+      <w>63</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;70.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1043</x>
+      <y>399</y>
+      <w>21</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>196</x>
+      <y>266</y>
+      <w>21</w>
+      <h>98</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>308</x>
+      <y>322</y>
+      <w>728</w>
+      <h>567</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>1020.0;10.0;880.0;10.0;880.0;790.0;10.0;790.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>574</x>
+      <y>364</y>
+      <w>21</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>259</x>
+      <y>546</y>
+      <w>161</w>
+      <h>182</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>210.0;10.0;10.0;240.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>322</x>
+      <y>224</y>
+      <w>140</w>
+      <h>301</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>180.0;410.0;60.0;260.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>532</x>
+      <y>574</y>
+      <w>21</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>322</x>
+      <y>161</y>
+      <w>182</w>
+      <h>161</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>240.0;210.0;240.0;150.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>791</x>
+      <y>574</y>
+      <w>21</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>679</x>
+      <y>343</y>
+      <w>56</w>
+      <h>315</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>60.0;430.0;30.0;360.0;30.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>616</x>
+      <y>539</y>
+      <w>105</w>
+      <h>119</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>130.0;150.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>427</x>
+      <y>574</y>
+      <w>70</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>80.0;220.0;10.0;160.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>266</y>
+      <w>133</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>170.0;90.0;170.0;10.0;90.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>735</x>
+      <y>329</y>
+      <w>70</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>Database</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>462</x>
+      <y>728</y>
+      <w>70</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>Motors</panel_attributes>
+    <additional_attributes/>
   </element>
 </diagram>
