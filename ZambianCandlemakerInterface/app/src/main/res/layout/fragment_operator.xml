@@ -1,0 +1,148 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/operator_view"
+    tools:context="edu.rose_hulman.trottasn.zambiancandlemakerinterface.OperatorFragment">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Apply"
+        android:id="@+id/apply_vert_jog_button"
+        android:layout_alignBottom="@+id/jog_vert_text"
+        android:layout_toEndOf="@+id/vert_units" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Apply"
+        android:id="@+id/apply_rot_jog_button"
+        android:layout_alignBottom="@+id/rot_left"
+        android:layout_toEndOf="@+id/textView2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/jog_vert_prompt"
+        android:text="Vertical Jog"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Rotational Jog"
+        android:id="@+id/jog_rot_prompt"
+        android:layout_above="@+id/apply_rot_jog_button"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Apply"
+        android:id="@+id/apply_dips_button"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/dips_per_rev_text" />
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:id="@+id/vert_up"
+        android:background="@drawable/ic_up_jog"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/vert_down" />
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:id="@+id/vert_down"
+        android:background="@drawable/ic_down_jog"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="10dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/jog_vert_text"
+        android:layout_below="@+id/jog_vert_prompt"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="10dp"
+        android:inputType="number" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:id="@+id/jog_rot_text"
+        android:layout_alignBottom="@+id/apply_rot_jog_button"
+        android:layout_alignParentStart="true"
+        android:inputType="number" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Dips Per Revolution"
+        android:id="@+id/dips_per_rev_prompt"
+        android:layout_above="@+id/dips_per_rev_text"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/dips_per_rev_text"
+        android:layout_alignBottom="@+id/pause_button"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:id="@+id/rot_right"
+        android:background="@drawable/ic_right_rotate"
+        android:layout_below="@+id/jog_vert_text"
+        android:layout_alignStart="@+id/vert_down" />
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:id="@+id/rot_left"
+        android:background="@drawable/ic_left_rotate"
+        android:layout_below="@+id/jog_vert_text"
+        android:layout_toStartOf="@+id/vert_down" />
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:id="@+id/pause_button"
+        android:background="@drawable/ic_pause_button"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/rot_right" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="mm"
+        android:id="@+id/vert_units"
+        android:layout_alignBottom="@+id/apply_vert_jog_button"
+        android:layout_toEndOf="@+id/jog_vert_text"
+        android:layout_marginRight="5dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="degrees"
+        android:id="@+id/textView2"
+        android:layout_alignBottom="@+id/apply_rot_jog_button"
+        android:layout_toEndOf="@+id/jog_rot_text"
+        android:layout_marginRight="5dp" />
+
+</RelativeLayout>

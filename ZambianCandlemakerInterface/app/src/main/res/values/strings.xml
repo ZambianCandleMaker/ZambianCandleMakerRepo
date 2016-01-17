@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">ZambianCandlemakerInterface</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="invalid_vert_dialog_prompt">The number you have entered, %1$d mm, is not a valid for vertical jog. Please enter another number.</string>
+    <string name="invalid_rot_dialog_prompt">The number you have entered, %1$d degrees, is not a valid for rotational jog. Please enter another number.</string>
+    <string name="invalid_vertical_jog_input">Invalid Vertical Jog Input</string>
+    <string name="invalid_rotational_jog_input">Invalid Rotational Jog Input</string>
+</resources>
