@@ -13,4 +13,16 @@
     <string name="invalid_rot_dialog_prompt">The number you have entered, %1$d degrees, is not a valid for rotational jog. Please enter another number.</string>
     <string name="invalid_vertical_jog_input">Invalid Vertical Jog Input</string>
     <string name="invalid_rotational_jog_input">Invalid Rotational Jog Input</string>
+
+    <string-array name="units_array">
+        <item>mm</item>
+        <item>cm</item>
+    </string-array>
+
+    <string-array name="vertical_array">
+    </string-array>
+
+    <string-array name="rotational_array">
+    </string-array>
+
 </resources>
