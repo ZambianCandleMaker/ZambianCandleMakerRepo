@@ -92,6 +92,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_operator:
                 switchTo = new OperatorFragment();
                 break;
+            case R.id.nav_administrator_profile:
+                switchTo = new AdministratorProgramFragment();
+                break;
         }
 
         if (switchTo != null){

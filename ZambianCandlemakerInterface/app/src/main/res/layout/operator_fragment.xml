@@ -118,7 +118,7 @@
         android:layout_toRightOf="@+id/rot_spinner" />
 
     <Spinner
-        android:layout_width="100dp"
+        android:layout_width="75dp"
         android:layout_height="50dp"
         android:id="@+id/rot_spinner"
         android:spinnerMode="dropdown"
