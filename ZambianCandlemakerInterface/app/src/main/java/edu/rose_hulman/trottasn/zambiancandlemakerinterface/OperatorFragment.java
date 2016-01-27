@@ -51,7 +51,6 @@ public class OperatorFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
         }
     }
@@ -183,76 +182,44 @@ public class OperatorFragment extends Fragment {
         manualRotLeft.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (mHandler != null) return true;
-                    mDirection = "LEFT";
-                    mHandler = new Handler();
-                    mHandler.postDelayed(mAction, 0);
-                }
-                else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (mHandler == null) return true;
-                    mHandler.removeCallbacks(mAction);
-                    mHandler = null;
-                    Log.d("TESTING_RUNNABLE", "STOPPING");
-                }
-                return true;
+                return setForRepetition("LEFT", event, mAction);
             }
         });
         manualRotRight.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (mHandler != null) return true;
-                    mDirection = "RIGHT";
-                    mHandler = new Handler();
-                    mHandler.postDelayed(mAction, 0);
-                }
-                else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (mHandler == null) return true;
-                    mHandler.removeCallbacks(mAction);
-                    mHandler = null;
-                    Log.d("TESTING_RUNNABLE", "STOPPING");
-                }
-                return true;
+                return setForRepetition("RIGHT", event, mAction);
             }
         });
         manualVertUp.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (mHandler != null) return true;
-                    mDirection = "UP";
-                    mHandler = new Handler();
-                    mHandler.postDelayed(mAction, 0);
-                }
-                else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (mHandler == null) return true;
-                    mHandler.removeCallbacks(mAction);
-                    mHandler = null;
-                    Log.d("TESTING_RUNNABLE", "STOPPING");
-                }
-                return true;
+                return setForRepetition("UP", event, mAction);
             }
         });
         manualVertDown.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (mHandler != null) return true;
-                    mDirection = "DOWN";
-                    mHandler = new Handler();
-                    mHandler.postDelayed(mAction, 0);
-                }
-                else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (mHandler == null) return true;
-                    mHandler.removeCallbacks(mAction);
-                    mHandler = null;
-                    Log.d("TESTING_RUNNABLE", "STOPPING");
-                }
-                return true;
+                return setForRepetition("DOWN", event, mAction);
             }
         });
         return view;
+    }
+
+    public boolean setForRepetition(String variableString, MotionEvent event, Runnable mAction){
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (mHandler != null) return true;
+            mDirection = variableString;
+            mHandler = new Handler();
+            mHandler.postDelayed(mAction, 0);
+        }
+        else if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (mHandler == null) return true;
+            mHandler.removeCallbacks(mAction);
+            mHandler = null;
+            Log.d("TESTING_RUNNABLE", "STOPPING");
+        }
+        return true;
     }
 
     public void sendCautionaryPauseDialog(){

@@ -7,11 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class AdministratorProgramFragment extends Fragment {
-
+/**
+ * Created by TrottaSN on 1/25/2016.
+ */
+public class AdministratorProfileFragment extends Fragment {
     private OperatorFragment.Callback mCallback;
 
-    public AdministratorProgramFragment() {
+    public AdministratorProfileFragment() {
         // Required empty public constructor
     }
 

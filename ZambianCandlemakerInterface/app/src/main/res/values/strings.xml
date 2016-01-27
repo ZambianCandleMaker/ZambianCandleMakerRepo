@@ -9,4 +9,10 @@
     <string name="caution_soft_pause">Caution - About to Perform Soft Pause!</string>
     <string name="pause_are_you_sure">You are about to commit a soft pause, bringing the machine to a stop at its next possible convenience. Are you sure you want to do this?</string>
     <string name="zambian_candlemaker_app_header">Zambian Candlemaker App</string>
+    <string name="exit_are_you_sure">You Are About to Exit the Application! Are You Sure?</string>
+    <string name="yes_exit">Yes, Exit</string>
+    <string name="no_stay">No, Stay</string>
+    <string name="operator">Operator</string>
+    <string name="admin_make_profile">Administrator - Make Profile</string>
+    <string name="admin_make_program">Administrator - Make Program</string>
 </resources>
