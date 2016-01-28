@@ -2,4 +2,36 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="TestText"
+        android:id="@+id/test_text"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/testEdit"
+        android:layout_below="@+id/test_text"
+        android:layout_centerHorizontal="true"
+        android:text="Enter your text!" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Run Save"
+        android:id="@+id/run_save_button"
+        android:layout_below="@+id/testEdit"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Run Load"
+        android:id="@+id/run_load_button"
+        android:layout_below="@+id/run_save_button"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
