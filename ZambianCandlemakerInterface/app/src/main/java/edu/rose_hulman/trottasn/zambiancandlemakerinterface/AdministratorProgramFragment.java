@@ -53,29 +53,6 @@ public class AdministratorProgramFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/CSVs");
-        boolean var = false;
-        if(!folder.exists()){
-            var = folder.mkdir();
-        }
-        String fileString = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/CSVs" + "/" + "TestText.txt";
-        FileOutputStream fos = null;
-        try {
-            fos = getContext().openFileOutput(fileString, Context.MODE_PRIVATE);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        String testString = "test string";
-        try {
-            fos.write(testString.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         if (getArguments() != null) {
 
         }
@@ -111,6 +88,13 @@ public class AdministratorProgramFragment extends Fragment {
             var = folder.mkdir();
         }
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/CSVs" + "/" + "Test.csv");
+        if(!file.exists()){
+            try {
+                var = file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         file.setWritable(true);
         final String filename = file.toString();
         MediaScannerConnection.scanFile(getContext(), new String[] {file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener(){

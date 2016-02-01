@@ -15,4 +15,12 @@
     <string name="operator">Operator</string>
     <string name="admin_make_profile">Administrator - Make Profile</string>
     <string name="admin_make_program">Administrator - Make Program</string>
+    <string name="efficiency_off">Efficiency Mode Off</string>
+    <string name="efficiency_on">Efficiency Mode On</string>
+    <string name="efficiency_mode">Efficiency Mode</string>
+    <string name="dips_per_revolution">Dips Per Revolution</string>
+    <string name="rotational_jog">Rotational Jog</string>
+    <string name="apply">Apply</string>
+    <string name="degrees">degrees</string>
+    <string name="vertical_jog">Vertical Jog</string>
 </resources>

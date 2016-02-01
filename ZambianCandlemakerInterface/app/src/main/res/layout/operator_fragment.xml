@@ -4,155 +4,173 @@
     android:layout_height="match_parent"
     android:id="@+id/operator_view"
     tools:context="edu.rose_hulman.trottasn.zambiancandlemakerinterface.OperatorFragment">
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:text="Apply"
-        android:id="@+id/apply_vert_jog_button"
-        android:layout_toEndOf="@+id/unit_spinner"
-        android:layout_toRightOf="@+id/unit_spinner"
-        android:layout_alignBottom="@+id/unit_spinner" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:text="Apply"
-        android:id="@+id/apply_rot_jog_button"
-        android:layout_alignBottom="@+id/degrees_unit"
-        android:layout_toEndOf="@+id/degrees_unit"
-        android:layout_toRightOf="@+id/degrees_unit" />
-
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/jog_vert_prompt"
-        android:text="Vertical Jog"
+        android:layout_width="225dp"
+        android:id="@+id/immediate_buttons"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginLeft="50dp">
+        <Button
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:id="@+id/rot_right"
+            android:background="@drawable/ic_right_rotate"
+            android:layout_alignParentEnd="true" />
+
+        <Button
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:id="@+id/pause_button"
+            android:background="@drawable/ic_pause_button"
+            android:layout_alignParentBottom="true"
+            android:layout_toStartOf="@+id/vert_down" />
+
+        <Button
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:id="@+id/rot_left"
+            android:background="@drawable/ic_left_rotate"
+            android:layout_alignTop="@+id/rot_right"
+            android:layout_toStartOf="@+id/rot_right" />
+
+        <Button
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:id="@+id/vert_down"
+            android:background="@drawable/ic_down_jog"
+            android:layout_below="@+id/rot_left"
+            android:layout_alignStart="@+id/rot_left" />
+
+        <Button
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:id="@+id/vert_up"
+            android:background="@drawable/ic_up_jog"
+            android:layout_below="@+id/rot_right"
+            android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true" />
+        android:id="@+id/programmed_pods"
+        android:weightSum="4"
+        android:layout_toLeftOf="@+id/immediate_buttons">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/apply"
+                android:id="@+id/apply_vert_jog_button"
+                android:layout_alignTop="@+id/unit_spinner"
+                android:layout_alignParentEnd="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/jog_vert_prompt"
+                android:text="@string/vertical_jog"/>
+            <Spinner
+                android:layout_width="75dp"
+                android:layout_height="50dp"
+                android:id="@+id/vert_spinner"
+                android:layout_below="@+id/jog_vert_prompt"
+                android:layout_alignParentStart="true"
+                android:spinnerMode="dialog"
+                android:layout_alignParentLeft="true" />
+            <Spinner
+                android:layout_width="75dp"
+                android:layout_height="50dp"
+                android:spinnerMode="dialog"
+                android:layout_marginLeft="10dp"
+                android:id="@+id/unit_spinner"
+                android:layout_below="@+id/jog_vert_prompt"
+                android:layout_toEndOf="@+id/vert_spinner" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/apply"
+                android:id="@+id/apply_rot_jog_button"
+                android:layout_below="@+id/jog_rot_prompt"
+                android:layout_alignParentEnd="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/rotational_jog"
+                android:id="@+id/jog_rot_prompt" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/degrees"
+                android:layout_marginLeft="10dp"
+                android:id="@+id/degrees_unit"
+                android:layout_alignBottom="@+id/apply_rot_jog_button"
+                android:layout_toEndOf="@+id/rot_spinner"
+                android:textSize="16sp" />
+            <Spinner
+                android:layout_width="75dp"
+                android:layout_height="50dp"
+                android:id="@+id/rot_spinner"
+                android:spinnerMode="dialog"
+                android:layout_below="@+id/jog_rot_prompt"
+                android:layout_alignParentStart="true" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <Spinner
+                android:layout_width="75dp"
+                android:layout_height="50dp"
+                android:id="@+id/dips_per_rev_spinner"
+                android:layout_below="@+id/dips_per_prompt"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:spinnerMode="dialog" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Rotational Jog"
-        android:id="@+id/jog_rot_prompt"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/vert_spinner"
-        android:layout_alignParentLeft="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/dips_per_revolution"
+                android:id="@+id/dips_per_prompt"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:text="Apply"
-        android:id="@+id/apply_dips_button"
-        android:layout_alignBottom="@+id/dips_per_rev_spinner"
-        android:layout_toEndOf="@+id/dips_per_rev_spinner"
-        android:layout_toRightOf="@+id/dips_per_rev_spinner" />
-
-    <Button
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:id="@+id/vert_up"
-        android:background="@drawable/ic_up_jog"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/vert_down"
-        android:layout_toLeftOf="@+id/vert_down" />
-
-    <Button
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:id="@+id/vert_down"
-        android:background="@drawable/ic_down_jog"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="false"
-        android:layout_marginRight="10dp"
-        android:layout_alignParentRight="true" />
-
-    <Spinner
-        android:layout_width="75dp"
-        android:layout_height="50dp"
-        android:id="@+id/vert_spinner"
-        android:layout_below="@+id/jog_vert_prompt"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="20dp"
-        android:spinnerMode="dropdown"
-        android:layout_alignParentLeft="true" />
-
-    <Button
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:id="@+id/rot_right"
-        android:background="@drawable/ic_right_rotate"
-        android:layout_toEndOf="@+id/vert_up"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/vert_down"
-        android:layout_marginRight="10dp" />
-
-    <Button
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:id="@+id/rot_left"
-        android:background="@drawable/ic_left_rotate"
-        android:layout_below="@+id/vert_up"
-        android:layout_toStartOf="@+id/rot_right" />
-
-    <Button
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:id="@+id/pause_button"
-        android:background="@drawable/ic_pause_button"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="degrees"
-        android:id="@+id/degrees_unit"
-        android:layout_alignBottom="@+id/rot_spinner"
-        android:layout_toEndOf="@+id/rot_spinner"
-        android:layout_toRightOf="@+id/rot_spinner" />
-
-    <Spinner
-        android:layout_width="75dp"
-        android:layout_height="50dp"
-        android:id="@+id/rot_spinner"
-        android:spinnerMode="dropdown"
-        android:layout_below="@+id/jog_rot_prompt"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="20dp"
-        android:layout_alignParentLeft="true" />
-
-    <Spinner
-        android:layout_width="75dp"
-        android:layout_height="50dp"
-        android:id="@+id/dips_per_rev_spinner"
-        android:layout_below="@+id/dips_per_prompt"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:spinnerMode="dropdown" />
-
-    <Spinner
-        android:layout_width="75dp"
-        android:layout_height="50dp"
-        android:layout_alignBottom="@+id/vert_spinner"
-        android:layout_toEndOf="@+id/vert_spinner"
-        android:layout_below="@+id/jog_vert_prompt"
-        android:spinnerMode="dropdown"
-        android:id="@+id/unit_spinner" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Dips Per Revolution"
-        android:id="@+id/dips_per_prompt"
-        android:layout_below="@+id/rot_spinner"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true" />
-
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/apply"
+                android:id="@+id/apply_dips_button"
+                android:layout_below="@+id/dips_per_prompt"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <ToggleButton
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="@string/efficiency_mode"
+                android:id="@+id/e_mode_toggle"
+                android:checked="true"
+                android:textOff="@string/efficiency_off"
+                android:textOn="@string/efficiency_on" />
+        </RelativeLayout>
+    </LinearLayout>
 </RelativeLayout>
