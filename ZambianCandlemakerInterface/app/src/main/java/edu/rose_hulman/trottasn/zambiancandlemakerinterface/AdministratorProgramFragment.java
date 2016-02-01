@@ -23,6 +23,7 @@ import com.opencsv.CSVWriter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -52,6 +53,29 @@ public class AdministratorProgramFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/CSVs");
+        boolean var = false;
+        if(!folder.exists()){
+            var = folder.mkdir();
+        }
+        String fileString = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/CSVs" + "/" + "TestText.txt";
+        FileOutputStream fos = null;
+        try {
+            fos = getContext().openFileOutput(fileString, Context.MODE_PRIVATE);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String testString = "test string";
+        try {
+            fos.write(testString.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (getArguments() != null) {
 
         }
