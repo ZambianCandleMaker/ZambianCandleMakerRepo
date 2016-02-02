@@ -86,39 +86,12 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_choose_program) {
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
-//    public void displayExitWarningDialog(){
-//        DialogFragment appDialog = new StayInAppDialog();
-//        appDialog.show(getSupportFragmentManager(), "EXIT_WARNING");
-//    }
-//
-//
-//    public static class StayInAppDialog extends DialogFragment {
-//        @Override
-//        public Dialog onCreateDialog(Bundle savedInstanceState) {
-//            // Use the Builder class for convenient dialog construction
-//            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//            builder.setMessage(getResources().getString(R.string.exit_are_you_sure))
-//                    .setPositiveButton(getResources().getString(R.string.yes_exit), new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//                            mStayInApp = false;
-//                        }
-//                    })
-//                    .setNegativeButton(getResources().getString(R.string.no_stay), new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//                            mStayInApp = true;
-//                        }
-//                    });
-//            // Create the AlertDialog object and return it
-//            return builder.create();
-//        }
-//    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -132,11 +105,16 @@ public class MainActivity extends AppCompatActivity
                 switchTo = new OperatorFragment();
                 break;
             case R.id.nav_administrator_profile:
-                ft.addToBackStack("Operator");
+                if(!getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
+                    ft.addToBackStack(getString(R.string.operator_frag_name));
+                }
                 switchTo = new AdministratorProfileFragment();
                 break;
             case R.id.nav_administrator_program:
-                ft.addToBackStack("Operator");
+                //HAVE TO CHECK IF BACKSTACK ENTRY NULL FIRST!
+                if(!getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
+                    ft.addToBackStack(getString(R.string.operator_frag_name));
+                }
                 switchTo = new AdministratorProgramFragment();
         }
         if (switchTo != null){

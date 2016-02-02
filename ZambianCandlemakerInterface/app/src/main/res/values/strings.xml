@@ -23,4 +23,6 @@
     <string name="apply">Apply</string>
     <string name="degrees">degrees</string>
     <string name="vertical_jog">Vertical Jog</string>
+    <string name="choose_program_title">Choose Current Program</string>
+    <string name="operator_frag_name">Operator</string>
 </resources>
