@@ -1,14 +1,29 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.opencsv.CSVReader;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AdminProfileChooserFragment extends Fragment implements AvailableProfilesAdapter.ProfileChooserFragmentHelper {
 
@@ -53,8 +68,67 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
 
         mAvailableAdapter = new AvailableProfilesAdapter(this);
         mAvailableRecycler.setAdapter(mAvailableAdapter);
-        mAvailableAdapter.addProfile(new DipProfile("title", "description"));
+        File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/CSVs");
+        if (dir.exists()) {
+            File[] files = dir.listFiles();
+            for (int i = 0; i < files.length; ++i) {
+                File file = files[i];
+                if (file.isDirectory()) {
+                    Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+                } else {
+                    readInCSVFile(file);
+                }
+            }
+        }
         return totalView;
+    }
+
+    public void readInCSVFile(File file){
+        file.setWritable(true);
+        MediaScannerConnection.scanFile(getContext(), new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+            public void onScanCompleted(String path, Uri uri) {
+                Log.i("EXTERNAL STORAGE", "SCANNED");
+            }
+        });
+        final String filename = file.toString();
+        CharSequence contentTitle = getString(R.string.app_name);
+        final List<String> strList = new ArrayList<String>();
+        final ProgressDialog progDailog = ProgressDialog.show(
+                getContext(), contentTitle, "Please Wait.",
+                true);//please wait
+        final DipProfile newProfile = new DipProfile();
+        final Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                newProfile.setTitle(strList.get(0));
+                newProfile.setDescription(strList.get(1));
+                for(int i = 2; i < strList.size(); i+=2){
+                    TimePosPair newPair = new TimePosPair(Integer.parseInt(strList.get(i)), Integer.parseInt(strList.get(i+1)));
+                    newProfile.addPair(newPair);
+                }
+                mAvailableAdapter.addProfile(newProfile);
+            }
+        };
+        new Thread(){
+            public void run(){
+                try {
+                    CSVReader reader = new CSVReader(new FileReader(filename));
+                    String[] nextLine;
+                    while ((nextLine = reader.readNext()) != null) {
+                        for(int i = 0; i < nextLine.length; i++){
+                            strList.add(nextLine[i]);
+                        }
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                handler.sendEmptyMessage(0);
+                progDailog.dismiss();
+            }
+        }.start();
     }
 
     public void onButtonPressed(Uri uri) {

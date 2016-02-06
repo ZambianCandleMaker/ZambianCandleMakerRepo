@@ -35,4 +35,8 @@ public class DipProfile {
     public void setDescription(String newDescription){
         this.description = newDescription;
     }
+
+    public void addPair(TimePosPair newPair){
+        this.pairList.add(newPair);
+    }
 }

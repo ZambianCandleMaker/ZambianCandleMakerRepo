@@ -38,7 +38,7 @@ public class AvailableProfilesAdapter extends RecyclerView.Adapter<AvailableProf
         return mAvailableProfiles.size();
     }
 
-    public void addProfile(DipProfile newProfile){
+    public synchronized void addProfile(DipProfile newProfile){
         mAvailableProfiles.add(newProfile);
         mProfileChooserHelper.returnToTop();
         notifyItemInserted(0);
