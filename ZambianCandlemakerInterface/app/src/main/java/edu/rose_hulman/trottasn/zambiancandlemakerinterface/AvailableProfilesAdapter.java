@@ -40,13 +40,13 @@ public class AvailableProfilesAdapter extends RecyclerView.Adapter<AvailableProf
 
     public synchronized void addProfile(DipProfile newProfile){
         mAvailableProfiles.add(newProfile);
-        mProfileChooserHelper.returnToTop();
+        mProfileChooserHelper.returnAvailableToTop();
         notifyItemInserted(0);
     }
 
     public void removeProfile(int position){
         mAvailableProfiles.remove(position);
-        mProfileChooserHelper.slideToPosition(position);
+        mProfileChooserHelper.slideAvailableToPosition(position);
         notifyItemRemoved(position);
     }
 
@@ -75,7 +75,7 @@ public class AvailableProfilesAdapter extends RecyclerView.Adapter<AvailableProf
     }
 
     public interface ProfileChooserFragmentHelper {
-        void returnToTop();
-        void slideToPosition(int position);
+        void returnAvailableToTop();
+        void slideAvailableToPosition(int position);
     }
 }

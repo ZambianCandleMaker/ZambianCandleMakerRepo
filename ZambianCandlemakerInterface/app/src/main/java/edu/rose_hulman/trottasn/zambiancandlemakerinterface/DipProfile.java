@@ -1,11 +1,14 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
 /**
  * Created by TrottaSN on 2/4/2016.
  */
-public class DipProfile {
+public class DipProfile implements Parcelable{
     private ArrayList<TimePosPair> pairList;
     private String title;
     private String description;
@@ -19,6 +22,23 @@ public class DipProfile {
         this.description = description;
         this.pairList = new ArrayList<TimePosPair>();
     }
+
+    protected DipProfile(Parcel in) {
+        title = in.readString();
+        description = in.readString();
+    }
+
+    public static final Creator<DipProfile> CREATOR = new Creator<DipProfile>() {
+        @Override
+        public DipProfile createFromParcel(Parcel in) {
+            return new DipProfile(in);
+        }
+
+        @Override
+        public DipProfile[] newArray(int size) {
+            return new DipProfile[size];
+        }
+    };
 
     public String getTitle(){
         return this.title;
@@ -38,5 +58,16 @@ public class DipProfile {
 
     public void addPair(TimePosPair newPair){
         this.pairList.add(newPair);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(description);
     }
 }
