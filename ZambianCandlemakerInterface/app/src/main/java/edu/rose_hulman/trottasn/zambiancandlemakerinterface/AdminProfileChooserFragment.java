@@ -101,6 +101,13 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
+                if(strList.size() < 2){
+                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has less than two entries (no title / description)");
+                    return;
+                };
+                if(strList.size()%2 != 0){
+                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has an odd number of entries (there exists an unequal pair)");
+                }
                 newProfile.setTitle(strList.get(0));
                 newProfile.setDescription(strList.get(1));
                 for(int i = 2; i < strList.size(); i+=2){
