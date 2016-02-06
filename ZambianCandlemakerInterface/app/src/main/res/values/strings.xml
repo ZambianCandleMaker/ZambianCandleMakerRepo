@@ -25,4 +25,7 @@
     <string name="vertical_jog">Vertical Jog</string>
     <string name="choose_program_title">Choose Current Program</string>
     <string name="operator_frag_name">Operator</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

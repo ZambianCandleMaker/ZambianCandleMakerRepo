@@ -1,14 +1,11 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,16 +17,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity
-        implements OperatorFragment.Callback, NavigationView.OnNavigationItemSelectedListener {
-
-    private static boolean mStayInApp;
+        implements OperatorFragment.Callback, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mStayInApp = true;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -105,17 +98,16 @@ public class MainActivity extends AppCompatActivity
                 switchTo = new OperatorFragment();
                 break;
             case R.id.nav_administrator_profile:
-                if(!getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
+                if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
                     ft.addToBackStack(getString(R.string.operator_frag_name));
                 }
                 switchTo = new AdministratorProfileFragment();
                 break;
             case R.id.nav_administrator_program:
-                //HAVE TO CHECK IF BACKSTACK ENTRY NULL FIRST!
-                if(!getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
+                if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
                     ft.addToBackStack(getString(R.string.operator_frag_name));
                 }
-                switchTo = new AdministratorProgramFragment();
+                switchTo = new AdminProfileChooserFragment();
         }
         if (switchTo != null){
             ft.replace(R.id.fragment_container, switchTo);
@@ -128,5 +120,10 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onProfileChosen(Uri uri) {
+        // Nothing - Possibly Always Nothing
     }
 }

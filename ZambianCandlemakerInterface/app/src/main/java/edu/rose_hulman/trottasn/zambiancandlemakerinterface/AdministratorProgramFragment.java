@@ -2,7 +2,6 @@ package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Path;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,7 +22,6 @@ import com.opencsv.CSVWriter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
