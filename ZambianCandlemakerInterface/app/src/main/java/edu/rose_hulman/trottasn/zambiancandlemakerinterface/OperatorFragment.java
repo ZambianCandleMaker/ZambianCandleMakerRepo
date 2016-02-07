@@ -29,7 +29,7 @@ public class OperatorFragment extends Fragment {
     private int vertical_selection;
     private int rotational_selection;
     private int dips_selection;
-    private Callback mCallback;
+    private OperatorFragmentListener mCallback;
     private ArrayAdapter<CharSequence> vertical_adapter_cm;
     private ArrayAdapter<CharSequence> vertical_adapter_mm;
     private ArrayAdapter<CharSequence> rotational_adapter;
@@ -256,8 +256,8 @@ public class OperatorFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof Callback) {
-            mCallback = (Callback) context;
+        if (context instanceof OperatorFragmentListener) {
+            mCallback = (OperatorFragmentListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -270,6 +270,6 @@ public class OperatorFragment extends Fragment {
         mCallback = null;
     }
 
-    public interface Callback {
+    public interface OperatorFragmentListener {
     }
 }

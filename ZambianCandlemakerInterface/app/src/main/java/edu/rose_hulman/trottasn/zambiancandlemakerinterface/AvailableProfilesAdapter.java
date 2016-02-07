@@ -15,7 +15,7 @@ public class AvailableProfilesAdapter extends RecyclerView.Adapter<AvailableProf
 
     public AvailableProfilesAdapter(ProfileChooserFragmentHelper chooseHelper) {
         mProfileChooserHelper = chooseHelper;
-        mAvailableProfiles = new ArrayList<DipProfile>();
+        mAvailableProfiles = new ArrayList<>();
     }
 
     @Override
@@ -38,19 +38,26 @@ public class AvailableProfilesAdapter extends RecyclerView.Adapter<AvailableProf
         return mAvailableProfiles.size();
     }
 
-    public synchronized void addProfile(DipProfile newProfile){
+    public void addProfile(DipProfile newProfile){
         mAvailableProfiles.add(newProfile);
         mProfileChooserHelper.returnAvailableToTop();
-        notifyItemInserted(0);
+        notifyItemInserted(mAvailableProfiles.size() - 1);
     }
 
-    public void removeProfile(int position){
-        mAvailableProfiles.remove(position);
+    public DipProfile removeProfile(int position){
+        DipProfile removed = mAvailableProfiles.remove(position);
         mProfileChooserHelper.slideAvailableToPosition(position);
         notifyItemRemoved(position);
+        return removed;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    public void clear(){
+        mAvailableProfiles.clear();
+        mProfileChooserHelper.returnAvailableToTop();
+        notifyDataSetChanged();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mTitleView;
         private TextView mDescriptionView;
@@ -60,22 +67,20 @@ public class AvailableProfilesAdapter extends RecyclerView.Adapter<AvailableProf
             mTitleView = (TextView) itemView.findViewById(R.id.avail_profile_title);
             mDescriptionView = (TextView) itemView.findViewById(R.id.avail_profile_desc);
             itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             Log.d("AVAIL_CLICK", "Clicked a View");
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            return true;
+            DipProfile lastRemoved = removeProfile(getAdapterPosition());
+            Log.d("CHECK", lastRemoved.getTitle());
+            mProfileChooserHelper.addToSelectedAdapter(lastRemoved);
         }
     }
 
     public interface ProfileChooserFragmentHelper {
         void returnAvailableToTop();
         void slideAvailableToPosition(int position);
+        void addToSelectedAdapter(DipProfile dipProfile);
     }
 }

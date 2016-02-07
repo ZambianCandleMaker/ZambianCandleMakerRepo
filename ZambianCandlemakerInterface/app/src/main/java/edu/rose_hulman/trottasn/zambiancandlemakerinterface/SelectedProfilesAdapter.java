@@ -1,21 +1,23 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfilesAdapter.ViewHolder> {
+public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfilesAdapter.ViewHolder> implements ItemTouchHelperAdapter{
 
-    private ArrayList<DipProfile> mSelectedProfiles;
+    private List<DipProfile> mSelectedProfiles;
     private ProfileSelectedHelper mProfileSelectedHelper;
 
     public SelectedProfilesAdapter(ProfileSelectedHelper selectedHelper) {
         mProfileSelectedHelper = selectedHelper;
-        mSelectedProfiles = new ArrayList<DipProfile>();
+        mSelectedProfiles = new ArrayList<>();
     }
 
     @Override
@@ -38,19 +40,33 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
         return mSelectedProfiles.size();
     }
 
-    public synchronized void addProfile(DipProfile newProfile){
+    public void addProfile(DipProfile newProfile){
         mSelectedProfiles.add(newProfile);
         mProfileSelectedHelper.returnSelectedToTop();
-        notifyItemInserted(0);
+        notifyItemInserted(mSelectedProfiles.size() - 1);
     }
 
-    public void removeProfile(int position){
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(mSelectedProfiles, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(mSelectedProfiles, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onItemDismiss(int position){
         mSelectedProfiles.remove(position);
-        mProfileSelectedHelper.slideSelectedToPosition(position);
         notifyItemRemoved(position);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mTitleView;
         private TextView mDescriptionView;
@@ -59,18 +75,7 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
             super(itemView);
             mTitleView = (TextView) itemView.findViewById(R.id.avail_profile_title);
             mDescriptionView = (TextView) itemView.findViewById(R.id.avail_profile_desc);
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
-        }
 
-        @Override
-        public void onClick(View v) {
-            Log.d("AVAIL_CLICK", "Clicked a View");
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            return true;
         }
     }
 

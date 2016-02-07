@@ -5,6 +5,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
@@ -33,27 +34,29 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements OperatorFragment.Callback, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener {
+        implements OperatorFragment.OperatorFragmentListener, FileObserverResponder, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener {
 
-    private static final HashMap<String, DipProfile> pathToProfileHash = new HashMap<String, DipProfile>();
+    private static HashMap<String, DipProfile> pathToProfileHash;
+    public static final String PROFILES_PATH_MAIN = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getPath() + "/Profile_CSVs";
+    private static FileObserver mFileObserver;
+    private ProfileHashFragment currFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/CSVs");
-        if (dir.exists()) {
-            File[] files = dir.listFiles();
-            for (int i = 0; i < files.length; ++i) {
-                File file = files[i];
-                if (file.isDirectory()) {
-                    Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
-                } else {
-                    readInCSVFile(file);
+        repopulateHash();
+        mFileObserver = new FileObserver(PROFILES_PATH_MAIN) {
+            @Override
+            public void onEvent(int event, String path) {
+                if(event == FileObserver.ALL_EVENTS){
+                    repopulateHash();
                 }
             }
-        }
+        };
+
+        mFileObserver.startWatching();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -109,6 +112,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 newProfile.setTitle(strList.get(0));
                 newProfile.setDescription(strList.get(1));
+                newProfile.setPath(filename);
                 for(int i = 2; i < strList.size(); i+=2){
                     TimePosPair newPair = new TimePosPair(Integer.parseInt(strList.get(i)), Integer.parseInt(strList.get(i+1)));
                     newProfile.addPair(newPair);
@@ -143,10 +147,12 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if(getSupportFragmentManager().getBackStackEntryCount() == 0){
+            if(getSupportFragmentManager().getBackStackEntryCount() == 0) {
+                drawer.setSelected(false);
                 return;
             }
             super.onBackPressed();
+            drawer.setSelected(false);
         }
     }
 
@@ -193,7 +199,9 @@ public class MainActivity extends AppCompatActivity
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
                     ft.addToBackStack(getString(R.string.operator_frag_name));
                 }
-                switchTo = AdminProfileChooserFragment.newInstance(new HashMapParcel(pathToProfileHash));
+                AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(new HashMapParcel(pathToProfileHash), new FileObserverParcel(mFileObserver));
+                switchTo = (Fragment) adminFrag;
+                currFragment = (ProfileHashFragment) adminFrag;
         }
         if (switchTo != null){
             ft.replace(R.id.fragment_container, switchTo);
@@ -211,5 +219,28 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onProfileChosen(Uri uri) {
         // Nothing - Possibly Always Nothing
+    }
+
+    @Override
+    public void repopulateHash() {
+        pathToProfileHash = new HashMap<>();
+        File innerDir = new File(PROFILES_PATH_MAIN);
+        innerDir.mkdirs();
+        innerDir.setWritable(true);
+        innerDir.setReadable(true);
+        if(innerDir.exists()) {
+            File[] files = innerDir.listFiles();
+            for (int i = 0; i < files.length; ++i) {
+                File file = files[i];
+                if (file.isDirectory()) {
+                    Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+                } else {
+                    readInCSVFile(file);
+                }
+            }
+        }
+        if(currFragment != null){
+            currFragment.setNewHash(pathToProfileHash);
+        }
     }
 }

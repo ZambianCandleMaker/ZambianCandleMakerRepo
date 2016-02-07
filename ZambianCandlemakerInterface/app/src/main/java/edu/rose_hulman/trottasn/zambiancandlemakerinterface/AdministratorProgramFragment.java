@@ -30,7 +30,7 @@ import java.util.List;
 
 public class AdministratorProgramFragment extends Fragment {
 
-    private OperatorFragment.Callback mCallback;
+    private OperatorFragment.OperatorFragmentListener mCallback;
     private TextView testText;
     private EditText testEdit;
     private Button runSave;
@@ -184,8 +184,8 @@ public class AdministratorProgramFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OperatorFragment.Callback) {
-            mCallback = (OperatorFragment.Callback) context;
+        if (context instanceof OperatorFragment.OperatorFragmentListener) {
+            mCallback = (OperatorFragment.OperatorFragmentListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");

@@ -12,12 +12,14 @@ public class DipProfile implements Parcelable{
     private ArrayList<TimePosPair> pairList;
     private String title;
     private String description;
+    private String path;
 
     public DipProfile(){
         this.pairList = new ArrayList<TimePosPair>();
     }
 
-    public DipProfile(String title, String description){
+    public DipProfile(String title, String description, String path){
+        this.path = path;
         this.title = title;
         this.description = description;
         this.pairList = new ArrayList<TimePosPair>();
@@ -26,6 +28,7 @@ public class DipProfile implements Parcelable{
     protected DipProfile(Parcel in) {
         title = in.readString();
         description = in.readString();
+        path = in.readString();
     }
 
     public static final Creator<DipProfile> CREATOR = new Creator<DipProfile>() {
@@ -60,6 +63,14 @@ public class DipProfile implements Parcelable{
         this.pairList.add(newPair);
     }
 
+    public String getPath(){
+        return this.path;
+    }
+
+    public void setPath(String newPath){
+        this.path = newPath;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -69,5 +80,6 @@ public class DipProfile implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(title);
         dest.writeString(description);
+        dest.writeString(path);
     }
 }
