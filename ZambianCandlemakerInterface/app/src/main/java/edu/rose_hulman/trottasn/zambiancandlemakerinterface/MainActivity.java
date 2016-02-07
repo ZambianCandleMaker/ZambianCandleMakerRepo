@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
                     ft.addToBackStack(getString(R.string.operator_frag_name));
                 }
-                switchTo = new AdministratorProfileFragment();
+                switchTo = null;
                 break;
             case R.id.nav_administrator_program:
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {

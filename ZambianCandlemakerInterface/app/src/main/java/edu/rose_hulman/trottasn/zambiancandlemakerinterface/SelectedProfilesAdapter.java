@@ -1,10 +1,11 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
 
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +23,7 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.available_profile_view, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.selected_profile_view, parent, false);
         return new ViewHolder(v);
     }
 
@@ -48,6 +49,10 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
+        Log.d("GOT_HERE", "got here");
+        if((toPosition > mSelectedProfiles.size() - 1) || toPosition < 0){
+            return;
+        }
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(mSelectedProfiles, i, i + 1);
@@ -62,25 +67,45 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
 
     @Override
     public void onItemDismiss(int position){
-        mSelectedProfiles.remove(position);
+        Log.d("AVAIL_CLICK", "Clicked a View");
+        DipProfile lastRemoved = mSelectedProfiles.remove(position);
         notifyItemRemoved(position);
+        mProfileSelectedHelper.slideSelectedToPosition(position);
+        Log.d("CHECK", lastRemoved.getTitle());
+        mProfileSelectedHelper.addToAvailableAdapter(lastRemoved);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mTitleView;
         private TextView mDescriptionView;
+        private Button mDownButton;
+        private Button mUpButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mTitleView = (TextView) itemView.findViewById(R.id.avail_profile_title);
             mDescriptionView = (TextView) itemView.findViewById(R.id.avail_profile_desc);
-
+            mDownButton = (Button) itemView.findViewById(R.id.down_button);
+            mDownButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onItemMove(getAdapterPosition(), getAdapterPosition() + 1);
+                }
+            });
+            mUpButton = (Button) itemView.findViewById(R.id.up_button);
+            mUpButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onItemMove(getAdapterPosition(), getAdapterPosition() - 1);
+                }
+            });
         }
     }
 
     public interface ProfileSelectedHelper {
         void returnSelectedToTop();
         void slideSelectedToPosition(int position);
+        void addToAvailableAdapter(DipProfile dipProfile);
     }
 }

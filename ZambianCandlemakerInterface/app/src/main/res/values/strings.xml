@@ -32,4 +32,6 @@
     <string name="default_description">Default Description</string>
     <string name="hash">HASH</string>
     <string name="options">Options</string>
+    <string name="time_delay">Time Delay:</string>
+    <string name="general_program_settings_prompt">General Program Settings and Parameters</string>
 </resources>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:layout_width = "match_parent"
+    android:layout_height = "match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/layout_time_delay">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Time Delay : "
+                android:id="@+id/time_delay_prompt"
+                android:textSize="18sp"
+                android:gravity="bottom|center_horizontal" />
+
+            <Spinner
+                android:layout_width="75dp"
+                android:layout_height="match_parent"
+                android:id="@+id/time_delay_spinner"
+                android:spinnerMode="dropdown"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="bottom" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="seconds"
+                android:id="@+id/time_delay_units"
+                android:gravity="bottom|center_horizontal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/layout_time_delay"
+            android:layout_alignParentStart="true"
+            android:id="@+id/layout_max_accel_vert"
+            android:weightSum="1"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Max\nAcceleration (Vertical) : "
+                android:id="@+id/vert_accel_prompt"
+                android:textSize="18sp" />
+
+            <EditText
+                android:layout_width="75dp"
+                android:layout_height="match_parent"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/vert_accel_box"
+                android:layout_gravity="bottom" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="mm / s / s"
+                android:id="@+id/max_accel_vert_units"
+                android:layout_marginLeft="10dp"
+                android:gravity="bottom" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/layout_max_accel_vert"
+            android:layout_alignParentStart="true"
+            android:id="@+id/layout_max_accel_rot"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Max\nAcceleration (Rotational) : "
+                android:id="@+id/max_accel_rot_prompt"
+                android:textSize="18dp"
+                android:gravity="bottom" />
+
+            <EditText
+                android:layout_width="75dp"
+                android:layout_height="match_parent"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/max_accel_rot_box"
+                android:layout_gravity="bottom" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="mm / s / s"
+                android:id="@+id/max_accel_rot_units"
+                android:layout_gravity="bottom"
+                android:layout_marginLeft="10dp"
+                android:gravity="bottom" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/layout_max_accel_rot"
+            android:layout_alignParentStart="true"
+            android:id="@+id/layout_default_vert"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Default Jog\nVelocity (Vertical) : "
+                android:id="@+id/default_jog_vel_vert"
+                android:textSize="18sp"
+                android:gravity="bottom" />
+
+            <EditText
+                android:layout_width="75dp"
+                android:layout_height="match_parent"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/def_jog_vel_vert_box"
+                android:gravity="bottom" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="mm / s"
+                android:id="@+id/def_jog_vel_vert_units"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:layout_marginLeft="10dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@+id/layout_default_vert"
+            android:layout_alignParentStart="true"
+            android:id="@+id/layout_default_rot"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Default Jog\nVelocity (Rotational) : "
+                android:id="@+id/def_jog_vel_rot_prompt"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:textSize="18dp" />
+
+            <EditText
+                android:layout_width="75dp"
+                android:layout_height="match_parent"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/def_jog_vel_rot_box"
+                android:layout_gravity="bottom"
+                android:gravity="bottom" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="mm / s"
+                android:id="@+id/def_jog_vel_rot_units"
+                android:layout_gravity="bottom"
+                android:layout_marginLeft="10dp"
+                android:gravity="bottom" />
+        </LinearLayout>
+    </RelativeLayout>
+</ScrollView>
