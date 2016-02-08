@@ -38,15 +38,25 @@ public class AvailableProfilesAdapter extends RecyclerView.Adapter<AvailableProf
         return mAvailableProfiles.size();
     }
 
+<<<<<<< HEAD
     public void addProfile(DipProfile newProfile){
         mAvailableProfiles.add(newProfile);
         mProfileChooserHelper.returnToTop();
+=======
+    public synchronized void addProfile(DipProfile newProfile){
+        mAvailableProfiles.add(newProfile);
+        mProfileChooserHelper.returnAvailableToTop();
+>>>>>>> master
         notifyItemInserted(0);
     }
 
     public void removeProfile(int position){
         mAvailableProfiles.remove(position);
+<<<<<<< HEAD
         mProfileChooserHelper.slideToPosition(position);
+=======
+        mProfileChooserHelper.slideAvailableToPosition(position);
+>>>>>>> master
         notifyItemRemoved(position);
     }
 
@@ -75,7 +85,12 @@ public class AvailableProfilesAdapter extends RecyclerView.Adapter<AvailableProf
     }
 
     public interface ProfileChooserFragmentHelper {
+<<<<<<< HEAD
         void returnToTop();
         void slideToPosition(int position);
+=======
+        void returnAvailableToTop();
+        void slideAvailableToPosition(int position);
+>>>>>>> master
     }
 }
