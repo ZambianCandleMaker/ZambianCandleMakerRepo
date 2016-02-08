@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.FileObserver;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -59,8 +60,57 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        repopulateProfileHash();
-        repopulateProgramHash();
+//        repopulateProfileHash();
+
+        final Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                repopulateProgramHash();
+            }
+        };
+
+        new Thread(){
+            public void run(){
+                Looper.prepare();
+                pathToProfileHash = new HashMap<>();
+                File innerDir = new File(CONSTANTS.PROFILES_PATH_MAIN);
+                innerDir.mkdirs();
+                innerDir.setWritable(true);
+                innerDir.setReadable(true);
+                List<Thread> threadList = new ArrayList<Thread>();
+                if(innerDir.exists()) {
+                    File[] files = innerDir.listFiles();
+                    for (int i = 0; i < files.length; ++i) {
+                        File file = files[i];
+                        if (file.isDirectory()) {
+                            Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+                        } else {
+                            threadList.add(readInProfileCSVFile(file));
+                        }
+                    }
+                }
+                for(Thread toStart : threadList){
+                    toStart.start();
+                }
+                while(true){
+                    boolean oneAlive = false;
+                    for(Thread thread : threadList){
+                        if(thread.isAlive()){
+                            oneAlive = true;
+                        }
+                    }
+                    if(!oneAlive){
+                        break;
+                    }
+                }
+                if(currFragment != null){
+                    currFragment.setNewProfileHash(pathToProfileHash);
+                }
+                handler.sendEmptyMessage(0);
+            }
+        }.start();
+
         mProfileObserver = new FileObserver(CONSTANTS.PROFILES_PATH_MAIN) {
             @Override
             public void onEvent(int event, String path) {
@@ -108,7 +158,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void readInProfileCSVFile(File file){
+    public Thread readInProfileCSVFile(File file){
         file.setWritable(true);
         MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
             public void onScanCompleted(String path, Uri uri) {
@@ -127,11 +177,11 @@ public class MainActivity extends AppCompatActivity
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 if(strList.size() < 2){
-                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has less than two entries (no title / description)");
+                    Log.d("INVALID_CSV_FOR_PROFILE", "CSV has less than two entries (no title / description)");
                     return;
                 };
                 if(strList.size()%2 != 0){
-                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has an odd number of entries (there exists an unequal pair)");
+                    Log.d("INVALID_CSV_FOR_PROFILE", "CSV has an odd number of entries (there exists an unequal pair)");
                 }
                 newProfile.setTitle(strList.get(0));
                 newProfile.setDescription(strList.get(1));
@@ -140,7 +190,81 @@ public class MainActivity extends AppCompatActivity
                     TimePosPair newPair = new TimePosPair(Integer.parseInt(strList.get(i)), Integer.parseInt(strList.get(i+1)));
                     newProfile.addPair(newPair);
                 }
-                pathToProfileHash.put(filename, newProfile);
+                pathToProfileHash.put(newProfile.getPath(), newProfile);
+            }
+        };
+        Thread thread = new Thread(){
+            public void run(){
+                try {
+                    CSVReader reader = new CSVReader(new FileReader(filename));
+                    String[] nextLine;
+                    while ((nextLine = reader.readNext()) != null) {
+                        for(int i = 0; i < nextLine.length; i++){
+                            strList.add(nextLine[i]);
+                        }
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d("PATHNAME", filename);
+                handler.sendEmptyMessage(0);
+                progDialog.dismiss();
+            }
+        };
+        return thread;
+    }
+
+    public void readInProgramCSVFile(File file){
+        file.setWritable(true);
+        MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+            public void onScanCompleted(String path, Uri uri) {
+            }
+        });
+        final String filename = file.toString();
+        CharSequence contentTitle = getString(R.string.app_name);
+        final List<String> strList = new ArrayList<String>();
+        final ProgressDialog progDialog = ProgressDialog.show(
+                this, contentTitle, "Please Wait.",
+                true);//please wait
+        final DipProgram newProgram = new DipProgram();
+        final Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if(strList.size() < 6){
+                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has less than six entries (not enough information)");
+                    return;
+                };
+                newProgram.setTitle(strList.get(0));
+                newProgram.setDescription(strList.get(1));
+                newProgram.setPath(filename);
+                newProgram.setMaxAccelVert(Integer.parseInt(strList.get(2)));
+                newProgram.setMaxAccelRot(Integer.parseInt(strList.get(3)));
+                newProgram.setMaxVelVert(Integer.parseInt(strList.get(4)));
+                newProgram.setMaxVelRot(Integer.parseInt(strList.get(5)));
+                for(int i = 6; i < strList.size(); i+=1){
+                    DipProfile nextProfile = pathToProfileHash.get(strList.get(i));
+                    Log.d("TEST", strList.get(i));
+                    if(nextProfile == null){
+                        Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has unidentified path to Profile (non-existent profile)");
+                        return;
+                    }
+                    newProgram.addToProfileList(nextProfile);
+                }
+                Log.d("Name: ", newProgram.getTitle());
+                Log.d("Desc: ", newProgram.getDescription());
+                Log.d("Path: ", newProgram.getPath());
+                Log.d("MAV: ", String.valueOf(newProgram.getMaxAccelVert()));
+                Log.d("MAR: ", String.valueOf(newProgram.getMaxAccelRot()));
+                Log.d("MVV: ", String.valueOf(newProgram.getMaxVelVert()));
+                Log.d("MVR: ", String.valueOf(newProgram.getMaxVelRot()));
+                for(DipProfile dP : newProgram.getProfileList()){
+                    Log.d("DPT: ", dP.getTitle());
+                    Log.d("DPD: ", dP.getDescription());
+                }
+                pathToProgramHash.put(filename, newProgram);
             }
         };
         new Thread(){
@@ -162,62 +286,6 @@ public class MainActivity extends AppCompatActivity
                 progDialog.dismiss();
             }
         }.start();
-    }
-
-    public void readInProgramCSVFile(File file){
-//        file.setWritable(true);
-//        MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-//            public void onScanCompleted(String path, Uri uri) {
-//                Log.i("EXTERNAL STORAGE", "SCANNED");
-//            }
-//        });
-//        final String filename = file.toString();
-//        CharSequence contentTitle = getString(R.string.app_name);
-//        final List<String> strList = new ArrayList<String>();
-//        final ProgressDialog progDialog = ProgressDialog.show(
-//                this, contentTitle, "Please Wait.",
-//                true);//please wait
-//        final DipProfile newProfile = new DipProfile();
-//        final Handler handler = new Handler() {
-//            @Override
-//            public void handleMessage(Message msg) {
-//                super.handleMessage(msg);
-//                if(strList.size() < 2){
-//                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has less than two entries (no title / description)");
-//                    return;
-//                };
-//                if(strList.size()%2 != 0){
-//                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has an odd number of entries (there exists an unequal pair)");
-//                }
-//                newProfile.setTitle(strList.get(0));
-//                newProfile.setDescription(strList.get(1));
-//                newProfile.setPath(filename);
-//                for(int i = 2; i < strList.size(); i+=2){
-//                    TimePosPair newPair = new TimePosPair(Integer.parseInt(strList.get(i)), Integer.parseInt(strList.get(i+1)));
-//                    newProfile.addPair(newPair);
-//                }
-//                pathToProfileHash.put(filename, newProfile);
-//            }
-//        };
-//        new Thread(){
-//            public void run(){
-//                try {
-//                    CSVReader reader = new CSVReader(new FileReader(filename));
-//                    String[] nextLine;
-//                    while ((nextLine = reader.readNext()) != null) {
-//                        for(int i = 0; i < nextLine.length; i++){
-//                            strList.add(nextLine[i]);
-//                        }
-//                    }
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                handler.sendEmptyMessage(0);
-//                progDialog.dismiss();
-//            }
-//        }.start();
     }
 
     @Override

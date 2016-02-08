@@ -1,74 +1,106 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by TrottaSN on 2/8/2016.
  */
 public class DipProgram {
-    private int mTimeDelay;
-    private int mMaxAccelVert;
-    private int mMaxAccelRot;
-    private int mMaxVelVert;
-    private int mMaxVelRot;
-    private String mPath;
+    private String title;
+    private String description;
+    private int timeDelay;
+    private int maxAccelVert;
+    private int maxAccelRot;
+    private int maxVelVert;
+    private int maxVelRot;
+    private String path;
+    private List<DipProfile> profileList;
 
     public DipProgram(){
-
     }
 
-    public DipProgram(int timeDelay, int maxAccelVert, int maxAccelRot, int maxVelVert, int maxVelRot, String path){
-        this.mTimeDelay = timeDelay;
-        this.mMaxAccelVert = maxAccelVert;
-        this.mMaxAccelRot = maxAccelRot;
-        this.mMaxVelVert = maxVelVert;
-        this.mMaxVelRot = maxVelRot;
-        this.mPath = path;
+    public DipProgram(String title, String description, String path){
+        this.title = title;
+        this.description = description;
+        this.path = path;
+        this.profileList = new ArrayList<DipProfile>();
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getTimeDelay() {
-        return mTimeDelay;
+        return this.timeDelay;
     }
 
-    public void setTimeDelay(int mTimeDelay) {
-        this.mTimeDelay = mTimeDelay;
+    public void setTimeDelay(int timeDelay) {
+        this.timeDelay = timeDelay;
     }
 
     public int getMaxAccelVert() {
-        return mMaxAccelVert;
+        return this.maxAccelVert;
     }
 
-    public void setMaxAccelVert(int mMaxAccelVert) {
-        this.mMaxAccelVert = mMaxAccelVert;
+    public void setMaxAccelVert(int maxAccelVert) {
+        this.maxAccelVert = maxAccelVert;
     }
 
     public int getMaxAccelRot() {
-        return mMaxAccelRot;
+        return this.maxAccelRot;
     }
 
-    public void setMaxAccelRot(int mMaxAccelRot) {
-        this.mMaxAccelRot = mMaxAccelRot;
+    public void setMaxAccelRot(int maxAccelRot) {
+        this.maxAccelRot = maxAccelRot;
     }
 
     public int getMaxVelVert() {
-        return mMaxVelVert;
+        return this.maxVelVert;
     }
 
-    public void setMaxVelVert(int mMaxVelVert) {
-        this.mMaxVelVert = mMaxVelVert;
+    public void setMaxVelVert(int maxVelVert) {
+        this.maxVelVert = maxVelVert;
     }
 
     public int getMaxVelRot() {
-        return mMaxVelRot;
+        return this.maxVelRot;
     }
 
-    public void setMaxVelRot(int mMaxVelRot) {
-        this.mMaxVelRot = mMaxVelRot;
+    public void setMaxVelRot(int maxVelRot) {
+        this.maxVelRot = maxVelRot;
     }
 
     public String getPath() {
-        return mPath;
+        return this.path;
     }
 
-    public void setPath(String mPath) {
-        this.mPath = mPath;
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public void addToProfileList(DipProfile newProfile){
+        if(this.profileList == null){
+            this.profileList = new ArrayList<DipProfile>();
+        }
+        else{
+            this.profileList.add(newProfile);
+        }
+    }
+
+    public List<DipProfile> getProfileList(){
+        return this.profileList;
     }
 }
