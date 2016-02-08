@@ -20,6 +20,7 @@ import android.graphics.Canvas;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.ItemTouchHelperAdapter;
 
@@ -60,11 +61,16 @@ public class SimpleTouchHelperCallback extends ItemTouchHelper.Callback {
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
         if (source.getItemViewType() != target.getItemViewType()) {
-            return false;
+//            final int fromPosition = source.getAdapterPosition();
+//            final int toPosition = target.getAdapterPosition();
+//            // move item in `fromPos` to `toPos` in adapter.
+//            Log.d("MOVING", "Moving " + fromPosition + " " + toPosition);
+//            mAdapter.onItemMove(fromPosition, toPosition);
+//            return true;// true if moved, false otherwise
         }
 
         // Notify the adapter of the move
-        mAdapter.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
+        //mAdapter.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
         return true;
     }
 

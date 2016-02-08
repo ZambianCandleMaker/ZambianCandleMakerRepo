@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Message;
@@ -33,6 +32,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverResponder;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.AdminProfileChooserFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.OperatorFragment;
@@ -40,15 +41,17 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.ProfileHas
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverParcel;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.HashMapParcel;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProfileHashParcel;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProgramHashParcel;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class MainActivity extends AppCompatActivity
         implements OperatorFragment.OperatorFragmentListener, FileObserverResponder, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener {
 
     private static HashMap<String, DipProfile> pathToProfileHash;
-    public static final String PROFILES_PATH_MAIN = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getPath() + "/Profile_CSVs";
-    private static FileObserver mFileObserver;
+    private static HashMap<String, DipProgram> pathToProgramHash;
+    private static FileObserver mProfileObserver;
+    private static FileObserver mProgramObserver;
     private ProfileHashFragment currFragment;
 
     @Override
@@ -56,17 +59,27 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        repopulateHash();
-        mFileObserver = new FileObserver(PROFILES_PATH_MAIN) {
+        repopulateProfileHash();
+        repopulateProgramHash();
+        mProfileObserver = new FileObserver(CONSTANTS.PROFILES_PATH_MAIN) {
             @Override
             public void onEvent(int event, String path) {
                 if(event == FileObserver.ALL_EVENTS){
-                    repopulateHash();
+                    repopulateProfileHash();
+                }
+            }
+        };
+        mProgramObserver = new FileObserver(CONSTANTS.PROGRAMS_PATH_MAIN) {
+            @Override
+            public void onEvent(int event, String path) {
+                if(event == FileObserver.ALL_EVENTS){
+                    repopulateProgramHash();
                 }
             }
         };
 
-        mFileObserver.startWatching();
+        mProfileObserver.startWatching();
+        mProgramObserver.startWatching();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -95,7 +108,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void readInCSVFile(File file){
+    public void readInProfileCSVFile(File file){
         file.setWritable(true);
         MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
             public void onScanCompleted(String path, Uri uri) {
@@ -149,6 +162,62 @@ public class MainActivity extends AppCompatActivity
                 progDialog.dismiss();
             }
         }.start();
+    }
+
+    public void readInProgramCSVFile(File file){
+//        file.setWritable(true);
+//        MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+//            public void onScanCompleted(String path, Uri uri) {
+//                Log.i("EXTERNAL STORAGE", "SCANNED");
+//            }
+//        });
+//        final String filename = file.toString();
+//        CharSequence contentTitle = getString(R.string.app_name);
+//        final List<String> strList = new ArrayList<String>();
+//        final ProgressDialog progDialog = ProgressDialog.show(
+//                this, contentTitle, "Please Wait.",
+//                true);//please wait
+//        final DipProfile newProfile = new DipProfile();
+//        final Handler handler = new Handler() {
+//            @Override
+//            public void handleMessage(Message msg) {
+//                super.handleMessage(msg);
+//                if(strList.size() < 2){
+//                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has less than two entries (no title / description)");
+//                    return;
+//                };
+//                if(strList.size()%2 != 0){
+//                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has an odd number of entries (there exists an unequal pair)");
+//                }
+//                newProfile.setTitle(strList.get(0));
+//                newProfile.setDescription(strList.get(1));
+//                newProfile.setPath(filename);
+//                for(int i = 2; i < strList.size(); i+=2){
+//                    TimePosPair newPair = new TimePosPair(Integer.parseInt(strList.get(i)), Integer.parseInt(strList.get(i+1)));
+//                    newProfile.addPair(newPair);
+//                }
+//                pathToProfileHash.put(filename, newProfile);
+//            }
+//        };
+//        new Thread(){
+//            public void run(){
+//                try {
+//                    CSVReader reader = new CSVReader(new FileReader(filename));
+//                    String[] nextLine;
+//                    while ((nextLine = reader.readNext()) != null) {
+//                        for(int i = 0; i < nextLine.length; i++){
+//                            strList.add(nextLine[i]);
+//                        }
+//                    }
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                handler.sendEmptyMessage(0);
+//                progDialog.dismiss();
+//            }
+//        }.start();
     }
 
     @Override
@@ -209,7 +278,7 @@ public class MainActivity extends AppCompatActivity
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
                     ft.addToBackStack(getString(R.string.operator_frag_name));
                 }
-                AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(new HashMapParcel(pathToProfileHash), new FileObserverParcel(mFileObserver));
+                AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(new ProfileHashParcel(pathToProfileHash), new ProgramHashParcel(pathToProgramHash), new FileObserverParcel(mProfileObserver), new FileObserverParcel(mProgramObserver));
                 switchTo = (Fragment) adminFrag;
                 currFragment = (ProfileHashFragment) adminFrag;
         }
@@ -232,9 +301,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void repopulateHash() {
+    public void repopulateProfileHash() {
         pathToProfileHash = new HashMap<>();
-        File innerDir = new File(PROFILES_PATH_MAIN);
+        File innerDir = new File(CONSTANTS.PROFILES_PATH_MAIN);
         innerDir.mkdirs();
         innerDir.setWritable(true);
         innerDir.setReadable(true);
@@ -245,12 +314,35 @@ public class MainActivity extends AppCompatActivity
                 if (file.isDirectory()) {
                     Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
                 } else {
-                    readInCSVFile(file);
+                    readInProfileCSVFile(file);
                 }
             }
         }
         if(currFragment != null){
-            currFragment.setNewHash(pathToProfileHash);
+            currFragment.setNewProfileHash(pathToProfileHash);
+        }
+    }
+
+    @Override
+    public void repopulateProgramHash() {
+        pathToProgramHash = new HashMap<>();
+        File innerDir = new File(CONSTANTS.PROGRAMS_PATH_MAIN);
+        innerDir.mkdirs();
+        innerDir.setWritable(true);
+        innerDir.setReadable(true);
+        if(innerDir.exists()) {
+            File[] files = innerDir.listFiles();
+            for (int i = 0; i < files.length; ++i) {
+                File file = files[i];
+                if (file.isDirectory()) {
+                    Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+                } else {
+                    readInProgramCSVFile(file);
+                }
+            }
+        }
+        if(currFragment != null){
+            currFragment.setNewProgramHash(pathToProgramHash);
         }
     }
 }

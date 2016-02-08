@@ -1,11 +1,15 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.FileObserver;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -24,15 +28,25 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.opencsv.CSVWriter;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.AvailableProfilesAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.SelectedProfilesAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverParcel;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.HashMapParcel;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProfileHashParcel;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProgramHashParcel;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class AdminProfileChooserFragment extends Fragment implements ProfileHashFragment, AvailableProfilesAdapter.ProfileChooserFragmentHelper, SelectedProfilesAdapter.ProfileSelectedHelper {
@@ -51,10 +65,16 @@ public class AdminProfileChooserFragment extends Fragment implements ProfileHash
     private OnAdminProfileChosenListener mListener;
 
     private static HashMap<String, DipProfile> pathToProfileHash;
-    private static final String HASH = "hash";
+    private static final String PROFILE_HASH = "PROFILE_HASH";
 
-    private FileObserver mFileObserver;
-    private static final String OBSERVER = "observer";
+    private static HashMap<String, DipProgram> pathToProgramHash;
+    private static final String PROGRAM_HASH = "PROGRAM_HASH";
+
+    private FileObserver mProfileObserver;
+    private static final String PROFILE_OBSERVER = "PROFILE_OBSERVER";
+
+    private FileObserver mProgramObserver;
+    private static final String PROGRAM_OBSERVER = "PROGRAM_OBSERVER";
 
     public static final int MAX_TIME_DELAY = 60;
 
@@ -63,11 +83,13 @@ public class AdminProfileChooserFragment extends Fragment implements ProfileHash
         // Required empty public constructor
     }
 
-    public static AdminProfileChooserFragment newInstance(Parcelable inHash, Parcelable inObserver) {
+    public static AdminProfileChooserFragment newInstance(Parcelable inProfileHash, Parcelable inProgramHash, Parcelable inProfileObserver, Parcelable inProgramObserver) {
         AdminProfileChooserFragment fragment = new AdminProfileChooserFragment();
         Bundle args = new Bundle();
-        args.putParcelable(HASH, inHash);
-        args.putParcelable(OBSERVER, inObserver);
+        args.putParcelable(PROFILE_HASH, inProfileHash);
+        args.putParcelable(PROGRAM_HASH, inProgramHash);
+        args.putParcelable(PROFILE_OBSERVER, inProfileObserver);
+        args.putParcelable(PROGRAM_OBSERVER, inProgramObserver);
         fragment.setArguments(args);
         return fragment;
     }
@@ -77,10 +99,14 @@ public class AdminProfileChooserFragment extends Fragment implements ProfileHash
         super.onCreate(savedInstanceState);
         mFieldValuePairs = new HashMap<String, String>();
         if (getArguments() != null) {
-            HashMapParcel profileParcel = getArguments().getParcelable(HASH);
-            FileObserverParcel observerParcel = getArguments().getParcelable(OBSERVER);
+            ProfileHashParcel profileParcel = getArguments().getParcelable(PROFILE_HASH);
+            ProgramHashParcel programParcel = getArguments().getParcelable(PROGRAM_HASH);
+            FileObserverParcel profileObserverParcel = getArguments().getParcelable(PROFILE_OBSERVER);
+            FileObserverParcel programObserverParcel = getArguments().getParcelable(PROGRAM_OBSERVER);
             pathToProfileHash = profileParcel.getHash();
-            mFileObserver = observerParcel.getFileObserver();
+            pathToProgramHash = programParcel.getHash();
+            mProfileObserver = profileObserverParcel.getFileObserver();
+            mProgramObserver = programObserverParcel.getFileObserver();
         }
     }
 
@@ -125,6 +151,12 @@ public class AdminProfileChooserFragment extends Fragment implements ProfileHash
                 // Open New Dialog - Should Only be Available After Options Verified
             }
         });
+        if(mSavePreparedness){
+            mSaveButton.setVisibility(View.VISIBLE);
+        }
+        else{
+            mSaveButton.setVisibility(View.GONE);
+        };
         populateFromHash();
         return totalView;
     }
@@ -142,6 +174,87 @@ public class AdminProfileChooserFragment extends Fragment implements ProfileHash
                 mAvailableAdapter.addProfile(dipProf);
             }
         }
+    }
+
+    public void displaySaveDialog(){
+        final DialogFragment df = new DialogFragment() {
+
+            @Override
+            public Dialog onCreateDialog(Bundle b) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setIcon(android.R.drawable.ic_menu_save);
+                builder.setTitle(getResources().getString(R.string.save_new_program));
+                View view = getActivity().getLayoutInflater().inflate(R.layout.save_program_dialog, null, false);
+                final EditText titleBox = (EditText)view.findViewById(R.id.program_title_box);
+                final EditText descBox = (EditText)view.findViewById(R.id.program_desc_box);
+                final Button saveButton = (Button)view.findViewById(R.id.save_button);
+                saveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                    }
+                });
+                builder.setView(view);
+
+                return builder.create();
+            }
+        };
+        df.show(getFragmentManager(), "");
+    }
+
+    public void writeToCSVFile(File file){
+        file.setWritable(true);
+        MediaScannerConnection.scanFile(getActivity(), new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+            public void onScanCompleted(String path, Uri uri) {
+                Log.i("EXTERNAL STORAGE", "SCANNED");
+            }
+        });
+        final String filename = file.toString();
+        CharSequence contentTitle = getString(R.string.app_name);
+        final List<String> strList = new ArrayList<String>();
+        final ProgressDialog progDialog = ProgressDialog.show(
+                getActivity(), contentTitle, "Please Wait.",
+                true);//please wait
+        final DipProfile newProfile = new DipProfile();
+        final Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if(strList.size() < 2){
+                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has less than two entries (no title / description)");
+                    return;
+                };
+                if(strList.size()%2 != 0){
+                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has an odd number of entries (there exists an unequal pair)");
+                }
+                newProfile.setTitle(strList.get(0));
+                newProfile.setDescription(strList.get(1));
+                newProfile.setPath(filename);
+                for(int i = 2; i < strList.size(); i+=2){
+                    TimePosPair newPair = new TimePosPair(Integer.parseInt(strList.get(i)), Integer.parseInt(strList.get(i+1)));
+                    newProfile.addPair(newPair);
+                }
+                pathToProfileHash.put(filename, newProfile);
+            }
+        };
+        new Thread(){
+            public void run(){
+                try {
+                    CSVWriter writer = new CSVWriter(new FileWriter("yourfile.csv"), '\t');
+                    // feed in your array (or convert your data to an array)
+                    String[] entries = "first#second#third".split("#");
+//                    while (true) {
+//                        writer.writeNext(entries);
+//                    }
+                    writer.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                handler.sendEmptyMessage(0);
+                progDialog.dismiss();
+            }
+        }.start();
     }
 
     public void displayOptionsDialog(final boolean fromInvalidOptions, final HashMap<String, String> fieldMap){
@@ -164,6 +277,7 @@ public class AdminProfileChooserFragment extends Fragment implements ProfileHash
                 time_delay_array.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 timeDelayBox.setAdapter(time_delay_array);
 
+                // BELOW : STRATEGY PATTERN FOR THESE? THERE'S GOT TO BE A WAY TO CONDENSE
                 String popTimeDelay = fieldMap.get(CONSTANTS.TIME_DELAY_KEY);
                 if(popTimeDelay != null && !popTimeDelay.equals("")) {
                     timeDelayBox.setSelection(time_delay_array.getPosition(String.valueOf(popTimeDelay)));
@@ -222,6 +336,7 @@ public class AdminProfileChooserFragment extends Fragment implements ProfileHash
                             for(String key : mFieldValuePairs.keySet()){
                                 Log.d("PFHV", key + " : " + mFieldValuePairs.get(key));
                             }
+                            mSaveButton.setVisibility(View.VISIBLE);
                             Toast.makeText(getContext(), "General Program Options Recorded - Save to Commit Changes to CSV", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -289,8 +404,14 @@ public class AdminProfileChooserFragment extends Fragment implements ProfileHash
     }
 
     @Override
-    public void setNewHash(HashMap<String, DipProfile> newHash) {
+    public void setNewProfileHash(HashMap<String, DipProfile> newHash) {
         pathToProfileHash = newHash;
+        populateFromHash();
+    }
+
+    @Override
+    public void setNewProgramHash(HashMap<String, DipProgram> newHash){
+        pathToProgramHash = newHash;
         populateFromHash();
     }
 

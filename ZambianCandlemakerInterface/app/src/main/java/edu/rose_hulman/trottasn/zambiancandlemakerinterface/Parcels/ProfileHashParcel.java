@@ -10,26 +10,26 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 /**
  * Created by TrottaSN on 2/6/2016.
  */
-public class HashMapParcel implements Parcelable {
+public class ProfileHashParcel implements Parcelable {
 
     private HashMap<String, DipProfile> pathToProfileHash;
 
-    public HashMapParcel(HashMap<String, DipProfile> inHash){
+    public ProfileHashParcel(HashMap<String, DipProfile> inHash){
         this.pathToProfileHash = inHash;
     }
 
-    protected HashMapParcel(Parcel in) {
+    protected ProfileHashParcel(Parcel in) {
     }
 
-    public static final Creator<HashMapParcel> CREATOR = new Creator<HashMapParcel>() {
+    public static final Creator<ProfileHashParcel> CREATOR = new Creator<ProfileHashParcel>() {
         @Override
-        public HashMapParcel createFromParcel(Parcel in) {
-            return new HashMapParcel(in);
+        public ProfileHashParcel createFromParcel(Parcel in) {
+            return new ProfileHashParcel(in);
         }
 
         @Override
-        public HashMapParcel[] newArray(int size) {
-            return new HashMapParcel[size];
+        public ProfileHashParcel[] newArray(int size) {
+            return new ProfileHashParcel[size];
         }
     };
 
