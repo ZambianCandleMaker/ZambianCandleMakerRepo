@@ -25,10 +25,12 @@
     <string name="vertical_jog">Vertical Jog</string>
     <string name="choose_program_title">Choose Current Program</string>
     <string name="operator_frag_name">Operator</string>
+    <string name="graph_make_profile">Make Profile</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="default_title">Default Title</string>
     <string name="default_description">Default Description</string>
     <string name="hash">HASH</string>
+    <string name="choose_profile">Choose Profile</string>
 </resources>

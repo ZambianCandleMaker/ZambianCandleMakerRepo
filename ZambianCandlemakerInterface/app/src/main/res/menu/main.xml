@@ -6,4 +6,10 @@
         android:orderInCategory="100"
         android:title="@string/choose_program_title"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_choose_profile"
+        android:orderInCategory="100"
+        android:title="@string/choose_profile"
+        android:visible="false"
+        />
 </menu>

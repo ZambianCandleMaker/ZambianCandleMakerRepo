@@ -1,10 +1,7 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
 
-<<<<<<< HEAD
-=======
 import android.app.ProgressDialog;
 import android.media.MediaScannerConnection;
->>>>>>> master
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -14,10 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-<<<<<<< HEAD
-=======
 import android.util.Log;
->>>>>>> master
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -40,19 +34,28 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements OperatorFragment.Callback, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener {
-<<<<<<< HEAD
-=======
 
     private static final HashMap<String, DipProfile> pathToProfileHash = new HashMap<String, DipProfile>();
->>>>>>> master
+
+    private DipProfile TEST_PROFILE_1 = new DipProfile("Test Profile 1","Test description");
+    private DipProfile TEST_PROFILE_2 = new DipProfile("Test Profile 2","Test description");
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-<<<<<<< HEAD
-=======
+        TEST_PROFILE_1.addPair(new TimePosPair(5,0));
+        TEST_PROFILE_1.addPair(new TimePosPair(2,1000));
+        TEST_PROFILE_1.addPair(new TimePosPair(5,2000));
+
+
+        pathToProfileHash.put(TEST_PROFILE_1.getTitle(),TEST_PROFILE_1);
+        pathToProfileHash.put(TEST_PROFILE_2.getTitle(),TEST_PROFILE_2);
+
+
         File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/CSVs");
         if (dir.exists()) {
             File[] files = dir.listFiles();
@@ -66,7 +69,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
->>>>>>> master
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -203,24 +205,18 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_administrator_program:
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
-<<<<<<< HEAD
-                    ft.addToBackStack(getString(R.string.operator_frag_name));
-                }
-                switchTo = new AdminProfileChooserFragment();
-                break;
-            case R.id.nav_graph_make_profile:
-                if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
-                    ft.addToBackStack(getString(R.string.operator_frag_name));
-                }
-                switchTo = new GraphFragment();
-                break;
-            default:
-                break;
-=======
                     ft.addToBackStack(getString(R.string.operator_frag_name));
                 }
                 switchTo = AdminProfileChooserFragment.newInstance(new HashMapParcel(pathToProfileHash));
->>>>>>> master
+                break;
+            case R.id.nav_graph_make_profile:
+
+                if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
+                    ft.addToBackStack(getString(R.string.operator_frag_name));
+                }
+                switchTo = GraphFragment.newInstance(new HashMapParcel(pathToProfileHash));
+                break;
+
         }
         if (switchTo != null){
             ft.replace(R.id.fragment_container, switchTo);

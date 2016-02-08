@@ -1,11 +1,5 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
 
-<<<<<<< HEAD
-/**
- * Created by TrottaSN on 2/4/2016.
- */
-public class SelectedProfilesAdapter {
-=======
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -84,5 +78,4 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
         void returnSelectedToTop();
         void slideSelectedToPosition(int position);
     }
->>>>>>> master
 }

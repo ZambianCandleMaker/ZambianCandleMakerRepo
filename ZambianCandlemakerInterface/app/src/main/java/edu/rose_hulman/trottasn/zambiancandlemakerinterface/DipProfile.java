@@ -1,21 +1,19 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
 
-<<<<<<< HEAD
-=======
 import android.os.Parcel;
 import android.os.Parcelable;
 
->>>>>>> master
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * Created by TrottaSN on 2/4/2016.
  */
-<<<<<<< HEAD
-public class DipProfile {
-=======
 public class DipProfile implements Parcelable{
->>>>>>> master
     private ArrayList<TimePosPair> pairList;
     private String title;
     private String description;
@@ -30,8 +28,6 @@ public class DipProfile implements Parcelable{
         this.pairList = new ArrayList<TimePosPair>();
     }
 
-<<<<<<< HEAD
-=======
     protected DipProfile(Parcel in) {
         title = in.readString();
         description = in.readString();
@@ -49,7 +45,6 @@ public class DipProfile implements Parcelable{
         }
     };
 
->>>>>>> master
     public String getTitle(){
         return this.title;
     }
@@ -65,8 +60,6 @@ public class DipProfile implements Parcelable{
     public void setDescription(String newDescription){
         this.description = newDescription;
     }
-<<<<<<< HEAD
-=======
 
     public void addPair(TimePosPair newPair){
         this.pairList.add(newPair);
@@ -82,5 +75,26 @@ public class DipProfile implements Parcelable{
         dest.writeString(title);
         dest.writeString(description);
     }
->>>>>>> master
+
+    public LinkedList<TimePosPair> getLinkedList(){
+        LinkedList<TimePosPair> linkedList = new LinkedList<TimePosPair>();
+        for(TimePosPair p : pairList){
+            linkedList.add(p);
+        }
+        return linkedList;
+    }
+
+    public LineGraphSeries<DataPoint> getLineGraphSeries(){
+
+        ArrayList<DataPoint> arrayList = new ArrayList<DataPoint>();
+
+        for(TimePosPair p: pairList){
+            arrayList.add(new DataPoint(p.getTime(),p.getPosition()));
+        }
+
+        DataPoint[] dp = arrayList.toArray(new DataPoint[arrayList.size()]);
+
+        return new LineGraphSeries<DataPoint>(dp);
+    }
+
 }
