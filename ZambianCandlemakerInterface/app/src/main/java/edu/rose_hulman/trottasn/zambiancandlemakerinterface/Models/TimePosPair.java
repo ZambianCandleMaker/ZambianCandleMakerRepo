@@ -1,4 +1,4 @@
-package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
+package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models;
 
 /**
  * Created by TrottaSN on 1/27/2016.

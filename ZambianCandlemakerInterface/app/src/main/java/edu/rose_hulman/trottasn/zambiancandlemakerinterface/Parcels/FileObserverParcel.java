@@ -1,4 +1,4 @@
-package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
+package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels;
 
 import android.os.FileObserver;
 import android.os.Parcel;

@@ -1,4 +1,4 @@
-package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
+package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

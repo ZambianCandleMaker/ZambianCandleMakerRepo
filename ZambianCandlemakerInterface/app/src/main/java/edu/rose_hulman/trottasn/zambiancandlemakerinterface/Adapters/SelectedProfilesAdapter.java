@@ -1,4 +1,4 @@
-package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
+package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfilesAdapter.ViewHolder> implements ItemTouchHelperAdapter{
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
+
+public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfilesAdapter.ViewHolder> implements ItemTouchHelperAdapter {
 
     private List<DipProfile> mSelectedProfiles;
     private ProfileSelectedHelper mProfileSelectedHelper;

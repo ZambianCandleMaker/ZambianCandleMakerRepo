@@ -1,9 +1,11 @@
-package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
+package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.HashMap;
+
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 
 /**
  * Created by TrottaSN on 2/6/2016.

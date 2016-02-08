@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
+package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 
 import android.graphics.Canvas;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.ItemTouchHelperAdapter;
 
 public class SimpleTouchHelperCallback extends ItemTouchHelper.Callback {
 

@@ -1,4 +1,4 @@
-package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
+package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -21,6 +21,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class OperatorFragment extends Fragment {
     private static final int MAX_DIPS_PER_REV = 25;

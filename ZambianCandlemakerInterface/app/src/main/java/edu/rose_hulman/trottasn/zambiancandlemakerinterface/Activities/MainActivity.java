@@ -1,4 +1,4 @@
-package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
+package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities;
 
 import android.app.ProgressDialog;
 import android.media.MediaScannerConnection;
@@ -32,6 +32,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverResponder;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.AdminProfileChooserFragment;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.OperatorFragment;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.ProfileHashFragment;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverParcel;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.HashMapParcel;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class MainActivity extends AppCompatActivity
         implements OperatorFragment.OperatorFragmentListener, FileObserverResponder, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener {

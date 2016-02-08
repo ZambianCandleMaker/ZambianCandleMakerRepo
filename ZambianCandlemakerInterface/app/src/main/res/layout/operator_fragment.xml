@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/operator_view"
-    tools:context="edu.rose_hulman.trottasn.zambiancandlemakerinterface.OperatorFragment">
+    tools:context=".Fragments.OperatorFragment">
     <RelativeLayout
         android:layout_height="wrap_content"
         android:layout_width="225dp"
