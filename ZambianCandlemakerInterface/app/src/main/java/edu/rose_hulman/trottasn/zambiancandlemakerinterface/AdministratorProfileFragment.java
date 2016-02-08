@@ -11,6 +11,7 @@ import android.view.ViewGroup;
  * Created by TrottaSN on 1/25/2016.
  */
 public class AdministratorProfileFragment extends Fragment {
+
     private OperatorFragment.Callback mCallback;
 
     public AdministratorProfileFragment() {
@@ -20,7 +21,6 @@ public class AdministratorProfileFragment extends Fragment {
     public static AdministratorProgramFragment newInstance() {
         AdministratorProgramFragment fragment = new AdministratorProgramFragment();
         Bundle args = new Bundle();
-//        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
