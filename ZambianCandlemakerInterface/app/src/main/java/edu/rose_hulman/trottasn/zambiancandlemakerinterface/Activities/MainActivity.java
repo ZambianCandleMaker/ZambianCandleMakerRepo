@@ -66,62 +66,30 @@ public class MainActivity extends AppCompatActivity
 
 
         TEST_PROFILE_1.addPair(new TimePosPair(5,0));
-        TEST_PROFILE_1.addPair(new TimePosPair(2,1000));
-        TEST_PROFILE_1.addPair(new TimePosPair(5,2000));
+        TEST_PROFILE_1.addPair(new TimePosPair(2, 1000));
+        TEST_PROFILE_1.addPair(new TimePosPair(5, 2000));
 
+        pathToProfileHash = new HashMap<>();
+        pathToProfileHash.put(TEST_PROFILE_1.getTitle(), TEST_PROFILE_1);
+        pathToProfileHash.put(TEST_PROFILE_2.getTitle(), TEST_PROFILE_2);
 
-//        repopulateProfileHash();
-
-        final Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                repopulateProgramHash();
+        File innerDir = new File(CONSTANTS.PROFILES_PATH_MAIN);
+        innerDir.mkdirs();
+        innerDir.setWritable(true);
+        innerDir.setReadable(true);
+        List<Thread> threadList = new ArrayList<Thread>();
+        if(innerDir.exists()) {
+            File[] files = innerDir.listFiles();
+            for (int i = 0; i < files.length; ++i) {
+                File file = files[i];
+                if (file.isDirectory()) {
+                    Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+                } else {
+                    readInProfileCSVFile(file);
+                }
             }
-        };
-
-        new Thread(){
-            public void run(){
-                Looper.prepare();
-                pathToProfileHash = new HashMap<>();
-                pathToProfileHash.put(TEST_PROFILE_1.getTitle(), TEST_PROFILE_1);
-                pathToProfileHash.put(TEST_PROFILE_2.getTitle(), TEST_PROFILE_2);
-                File innerDir = new File(CONSTANTS.PROFILES_PATH_MAIN);
-                innerDir.mkdirs();
-                innerDir.setWritable(true);
-                innerDir.setReadable(true);
-                List<Thread> threadList = new ArrayList<Thread>();
-                if(innerDir.exists()) {
-                    File[] files = innerDir.listFiles();
-                    for (int i = 0; i < files.length; ++i) {
-                        File file = files[i];
-                        if (file.isDirectory()) {
-                            Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
-                        } else {
-                            threadList.add(readInProfileCSVFile(file));
-                        }
-                    }
-                }
-                for(Thread toStart : threadList){
-                    toStart.start();
-                }
-                while(true){
-                    boolean oneAlive = false;
-                    for(Thread thread : threadList){
-                        if(thread.isAlive()){
-                            oneAlive = true;
-                        }
-                    }
-                    if(!oneAlive){
-                        break;
-                    }
-                }
-                if(currFragment != null){
-                    currFragment.setNewProfileHash(pathToProfileHash);
-                }
-                handler.sendEmptyMessage(0);
-            }
-        }.start();
+        }
+        repopulateProgramHash();
 
         mProfileObserver = new FileObserver(CONSTANTS.PROFILES_PATH_MAIN) {
             @Override
@@ -170,7 +138,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public Thread readInProfileCSVFile(File file){
+    public void readInProfileCSVFile(File file){
         file.setWritable(true);
         MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
             public void onScanCompleted(String path, Uri uri) {
@@ -178,54 +146,37 @@ public class MainActivity extends AppCompatActivity
             }
         });
         final String filename = file.toString();
-        CharSequence contentTitle = getString(R.string.app_name);
         final List<String> strList = new ArrayList<String>();
-        final ProgressDialog progDialog = ProgressDialog.show(
-                this, contentTitle, "Please Wait.",
-                true);//please wait
         final DipProfile newProfile = new DipProfile();
-        final Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                if(strList.size() < 2){
-                    Log.d("INVALID_CSV_FOR_PROFILE", "CSV has less than two entries (no title / description)");
-                    return;
-                };
-                if(strList.size()%2 != 0){
-                    Log.d("INVALID_CSV_FOR_PROFILE", "CSV has an odd number of entries (there exists an unequal pair)");
+        try {
+            CSVReader reader = new CSVReader(new FileReader(filename));
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                for(int i = 0; i < nextLine.length; i++){
+                    strList.add(nextLine[i]);
                 }
-                newProfile.setTitle(strList.get(0));
-                newProfile.setDescription(strList.get(1));
-                newProfile.setPath(filename);
-                for(int i = 2; i < strList.size(); i+=2){
-                    TimePosPair newPair = new TimePosPair(Integer.parseInt(strList.get(i)), Integer.parseInt(strList.get(i+1)));
-                    newProfile.addPair(newPair);
-                }
-                pathToProfileHash.put(newProfile.getPath(), newProfile);
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d("PATHNAME", filename);
+        if(strList.size() < 2){
+            Log.d("INVALID_CSV_FOR_PROFILE", "CSV has less than two entries (no title / description)");
+            return;
         };
-        Thread thread = new Thread(){
-            public void run(){
-                try {
-                    CSVReader reader = new CSVReader(new FileReader(filename));
-                    String[] nextLine;
-                    while ((nextLine = reader.readNext()) != null) {
-                        for(int i = 0; i < nextLine.length; i++){
-                            strList.add(nextLine[i]);
-                        }
-                    }
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Log.d("PATHNAME", filename);
-                handler.sendEmptyMessage(0);
-                progDialog.dismiss();
-            }
-        };
-        return thread;
+        if(strList.size()%2 != 0){
+            Log.d("INVALID_CSV_FOR_PROFILE", "CSV has an odd number of entries (there exists an unequal pair)");
+        }
+        newProfile.setTitle(strList.get(0));
+        newProfile.setDescription(strList.get(1));
+        newProfile.setPath(filename);
+        for(int i = 2; i < strList.size(); i+=2){
+            TimePosPair newPair = new TimePosPair(Integer.parseInt(strList.get(i)), Integer.parseInt(strList.get(i+1)));
+            newProfile.addPair(newPair);
+        }
+        pathToProfileHash.put(newProfile.getPath(), newProfile);
     }
 
     public void readInProgramCSVFile(File file){
@@ -235,69 +186,54 @@ public class MainActivity extends AppCompatActivity
             }
         });
         final String filename = file.toString();
-        CharSequence contentTitle = getString(R.string.app_name);
         final List<String> strList = new ArrayList<String>();
-        final ProgressDialog progDialog = ProgressDialog.show(
-                this, contentTitle, "Please Wait.",
-                true);//please wait
         final DipProgram newProgram = new DipProgram();
-        final Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                if(strList.size() < 6){
-                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has less than six entries (not enough information)");
-                    return;
-                };
-                newProgram.setTitle(strList.get(0));
-                newProgram.setDescription(strList.get(1));
-                newProgram.setPath(filename);
-                newProgram.setMaxAccelVert(Integer.parseInt(strList.get(2)));
-                newProgram.setMaxAccelRot(Integer.parseInt(strList.get(3)));
-                newProgram.setMaxVelVert(Integer.parseInt(strList.get(4)));
-                newProgram.setMaxVelRot(Integer.parseInt(strList.get(5)));
-                for(int i = 6; i < strList.size(); i+=1){
-                    DipProfile nextProfile = pathToProfileHash.get(strList.get(i));
-                    Log.d("TEST", strList.get(i));
-                    if(nextProfile == null){
-                        Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has unidentified path to Profile (non-existent profile)");
-                        return;
-                    }
-                    newProgram.addToProfileList(nextProfile);
+        try {
+            CSVReader reader = new CSVReader(new FileReader(filename));
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                for(int i = 0; i < nextLine.length; i++){
+                    strList.add(nextLine[i]);
                 }
-                Log.d("Name: ", newProgram.getTitle());
-                Log.d("Desc: ", newProgram.getDescription());
-                Log.d("Path: ", newProgram.getPath());
-                Log.d("MAV: ", String.valueOf(newProgram.getMaxAccelVert()));
-                Log.d("MAR: ", String.valueOf(newProgram.getMaxAccelRot()));
-                Log.d("MVV: ", String.valueOf(newProgram.getMaxVelVert()));
-                Log.d("MVR: ", String.valueOf(newProgram.getMaxVelRot()));
-                for(DipProfile dP : newProgram.getProfileList()){
-                    Log.d("DPT: ", dP.getTitle());
-                    Log.d("DPD: ", dP.getDescription());
-                }
-                pathToProgramHash.put(filename, newProgram);
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(strList.size() < 6){
+            Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has less than six entries (not enough information)");
+            return;
         };
-        new Thread(){
-            public void run(){
-                try {
-                    CSVReader reader = new CSVReader(new FileReader(filename));
-                    String[] nextLine;
-                    while ((nextLine = reader.readNext()) != null) {
-                        for(int i = 0; i < nextLine.length; i++){
-                            strList.add(nextLine[i]);
-                        }
-                    }
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                handler.sendEmptyMessage(0);
-                progDialog.dismiss();
+
+        newProgram.setTitle(strList.get(0));
+        newProgram.setDescription(strList.get(1));
+        newProgram.setPath(filename);
+        newProgram.setMaxAccelVert(Integer.parseInt(strList.get(2)));
+        newProgram.setMaxAccelRot(Integer.parseInt(strList.get(3)));
+        newProgram.setMaxVelVert(Integer.parseInt(strList.get(4)));
+        newProgram.setMaxVelRot(Integer.parseInt(strList.get(5)));
+        for(int i = 6; i < strList.size(); i+=1){
+            DipProfile nextProfile = pathToProfileHash.get(strList.get(i));
+            Log.d("TEST", strList.get(i));
+            if(nextProfile == null){
+                Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has unidentified path to Profile (non-existent profile)");
+                return;
             }
-        }.start();
+            newProgram.addToProfileList(nextProfile);
+        }
+        Log.d("Name: ", newProgram.getTitle());
+        Log.d("Desc: ", newProgram.getDescription());
+        Log.d("Path: ", newProgram.getPath());
+        Log.d("MAV: ", String.valueOf(newProgram.getMaxAccelVert()));
+        Log.d("MAR: ", String.valueOf(newProgram.getMaxAccelRot()));
+        Log.d("MVV: ", String.valueOf(newProgram.getMaxVelVert()));
+        Log.d("MVR: ", String.valueOf(newProgram.getMaxVelRot()));
+        for(DipProfile dP : newProgram.getProfileList()){
+            Log.d("DPT: ", dP.getTitle());
+            Log.d("DPD: ", dP.getDescription());
+        }
+        pathToProgramHash.put(filename, newProgram);
     }
 
     @Override
@@ -305,14 +241,9 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
-            if(getSupportFragmentManager().getBackStackEntryCount() == 0) {
-                drawer.setSelected(false);
-                return;
-            }
-            super.onBackPressed();
-            drawer.setSelected(false);
-        }
+        };
+        drawer.setSelected(false);
+        super.onBackPressed();
     }
 
     @Override
@@ -359,8 +290,10 @@ public class MainActivity extends AppCompatActivity
                     ft.addToBackStack(getString(R.string.operator_frag_name));
                 }
                 AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(new ProfileHashParcel(pathToProfileHash), new ProgramHashParcel(pathToProgramHash), new FileObserverParcel(mProfileObserver), new FileObserverParcel(mProgramObserver));
-                switchTo = (Fragment) adminFrag;
-                currFragment = (ProfileHashFragment) adminFrag;
+                switchTo = adminFrag;
+                adminFrag.setNewProfileHash(pathToProfileHash);
+                adminFrag.setNewProgramHash(pathToProgramHash);
+                break;
 
             case R.id.nav_graph_make_profile:
 
@@ -370,13 +303,14 @@ public class MainActivity extends AppCompatActivity
                 switchTo = GraphFragment.newInstance(new ProfileHashParcel(pathToProfileHash));
                 break;
         }
+
         if (switchTo != null){
             ft.replace(R.id.fragment_container, switchTo);
-            for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++){
-                getSupportFragmentManager().popBackStackImmediate();
-            }
+//            for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++){
+//                getSupportFragmentManager().popBackStackImmediate();
+//            }
             ft.commit();
-        }
+        };
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
