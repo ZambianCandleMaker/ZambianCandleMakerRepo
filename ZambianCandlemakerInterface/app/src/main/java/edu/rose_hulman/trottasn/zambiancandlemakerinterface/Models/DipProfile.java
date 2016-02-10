@@ -3,7 +3,12 @@ package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * Created by TrottaSN on 2/4/2016.
@@ -82,4 +87,26 @@ public class DipProfile implements Parcelable{
         dest.writeString(description);
         dest.writeString(path);
     }
+
+    public LinkedList<TimePosPair> getLinkedList(){
+        LinkedList<TimePosPair> linkedList = new LinkedList<TimePosPair>();
+        for(TimePosPair p : pairList){
+            linkedList.add(p);
+        }
+        return linkedList;
+    }
+
+    public LineGraphSeries<DataPoint> getLineGraphSeries(){
+
+        ArrayList<DataPoint> arrayList = new ArrayList<DataPoint>();
+
+        for(TimePosPair p: pairList){
+            arrayList.add(new DataPoint(p.getTime(),p.getPosition()));
+        }
+
+        DataPoint[] dp = arrayList.toArray(new DataPoint[arrayList.size()]);
+
+        return new LineGraphSeries<DataPoint>(dp);
+    }
+
 }

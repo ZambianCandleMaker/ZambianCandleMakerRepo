@@ -6,4 +6,5 @@
     <color name="headerBarCenter">#111111</color>
     <color name="headerBarEnd">#999999</color>
     <color name="headerBarStart">#445566</color>
+    <color name="graphSeriesLine">#b30000</color>
 </resources>

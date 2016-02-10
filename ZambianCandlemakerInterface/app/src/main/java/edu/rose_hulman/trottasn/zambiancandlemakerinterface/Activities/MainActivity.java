@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.GraphFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverResponder;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.AdminProfileChooserFragment;
@@ -49,6 +50,9 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 public class MainActivity extends AppCompatActivity
         implements OperatorFragment.OperatorFragmentListener, FileObserverResponder, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener {
 
+    private DipProfile TEST_PROFILE_1 = new DipProfile("Test Profile 1","Test description", "");
+    private DipProfile TEST_PROFILE_2 = new DipProfile("Test Profile 2","Test description", "");
+
     private static HashMap<String, DipProfile> pathToProfileHash;
     private static HashMap<String, DipProgram> pathToProgramHash;
     private static FileObserver mProfileObserver;
@@ -60,6 +64,14 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        TEST_PROFILE_1.addPair(new TimePosPair(5,0));
+        TEST_PROFILE_1.addPair(new TimePosPair(2,1000));
+        TEST_PROFILE_1.addPair(new TimePosPair(5,2000));
+
+
+        pathToProfileHash.put(TEST_PROFILE_1.getTitle(), TEST_PROFILE_1);
+        pathToProfileHash.put(TEST_PROFILE_2.getTitle(), TEST_PROFILE_2);
 //        repopulateProfileHash();
 
         final Handler handler = new Handler() {
@@ -349,6 +361,14 @@ public class MainActivity extends AppCompatActivity
                 AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(new ProfileHashParcel(pathToProfileHash), new ProgramHashParcel(pathToProgramHash), new FileObserverParcel(mProfileObserver), new FileObserverParcel(mProgramObserver));
                 switchTo = (Fragment) adminFrag;
                 currFragment = (ProfileHashFragment) adminFrag;
+
+            case R.id.nav_graph_make_profile:
+
+                if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
+                    ft.addToBackStack(getString(R.string.operator_frag_name));
+                }
+                switchTo = GraphFragment.newInstance(new ProfileHashParcel(pathToProfileHash));
+                break;
         }
         if (switchTo != null){
             ft.replace(R.id.fragment_container, switchTo);

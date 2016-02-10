@@ -13,5 +13,9 @@
             android:id="@+id/nav_administrator_profile"
             android:icon="@android:drawable/ic_menu_directions"
             android:title="@string/admin_make_profile" />
+        <item
+            android:id="@+id/nav_graph_make_profile"
+            android:icon="@drawable/ic_graph"
+            android:title="@string/graph_make_profile"/>
     </group>
 </menu>
