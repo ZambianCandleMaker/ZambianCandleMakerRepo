@@ -76,6 +76,7 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
          */
         @Override
         public void onClick(View v) {
+
         }
     }
 }

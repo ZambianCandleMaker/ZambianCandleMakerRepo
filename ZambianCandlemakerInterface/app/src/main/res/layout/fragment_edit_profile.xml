@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -28,4 +29,55 @@
         android:layout_width="200dp"
         android:layout_height="fill_parent"
         android:layout_below="@+id/profile_point_time_title" />
+
+    <com.jjoe64.graphview.GraphView
+        android:layout_toRightOf="@id/profile_point_recycler"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/edit_graph"
+        app:seriesType = "line"
+        app:seriesColor = "@color/graphSeriesLine"
+        android:layout_below="@+id/editText" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/time_title"
+        android:id="@+id/edit_time_title"
+        android:layout_above="@+id/edit_graph"
+        android:layout_alignStart="@+id/edit_graph"
+        android:layout_centerVertical="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:height="30dp"
+        android:width="100dp"
+        android:id="@+id/editText"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/edit_time_title" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/depth_title"
+        android:id="@+id/textView"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/editText" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:height="30dp"
+        android:width="100dp"
+        android:id="@+id/editText2"
+        android:layout_alignTop="@+id/textView"
+        android:layout_toEndOf="@+id/textView" />
+
 </RelativeLayout>

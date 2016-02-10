@@ -38,4 +38,6 @@
     <string name="depth">Depth</string>
     <string name="time">Time(ms)</string>
     <string name="edit_current_profile">Edit Profile</string>
+    <string name="time_title">Time:</string>
+    <string name="depth_title">Depth:</string>
 </resources>
