@@ -1,10 +1,13 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 /**
  * Created by Jake on 2/9/16.
@@ -12,17 +15,24 @@ import android.widget.TextView;
 public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.ViewHolder> {
 
     private DipProfile profile;
+    private ArrayList<TimePosPair> pointList;
 
     public EditProfileAdapter(DipProfile profile){
         this.profile = profile;
+        pointList = profile.getPairList();
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_point, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        TimePosPair currentPair = pointList.get(position);
+        holder.timeView.setText(currentPair.getTime());
+        holder.depthView.setText(currentPair.getPosition());
 
     }
 
@@ -33,18 +43,18 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
      */
     @Override
     public int getItemCount() {
-        return profile.getPairList().size();
+        return pointList.size();
     }
 
     public class ViewHolder extends  RecyclerView.ViewHolder implements View.OnClickListener{
 
-        private TextView timeText;
-        private TextView depthText;
+        private TextView timeView;
+        private TextView depthView;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            timeText  = (TextView) itemView.findViewById(R.id.profile_point_time);
-            depthText = (TextView) itemView.findViewById(R.id.profile_point_depth);
+            timeView  = (TextView) itemView.findViewById(R.id.profile_point_time);
+            depthView = (TextView) itemView.findViewById(R.id.profile_point_depth);
             itemView.setOnClickListener(this);
         }
 
