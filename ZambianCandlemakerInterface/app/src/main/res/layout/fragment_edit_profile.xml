@@ -27,5 +27,5 @@
         android:id="@+id/profile_point_recycler"
         android:layout_width="200dp"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/profile_point_time_title"></android.support.v7.widget.RecyclerView>
+        android:layout_below="@+id/profile_point_time_title" />
 </RelativeLayout>

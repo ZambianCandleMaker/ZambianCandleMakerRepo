@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telecom.Call;
 import android.view.LayoutInflater;
@@ -54,8 +55,10 @@ public class EditProfileFragment extends Fragment {
 
         pointRecycler = (RecyclerView) view.findViewById(R.id.profile_point_recycler);
 
-        pointRecycler.setAdapter(new EditProfileAdapter(currentProfile));
+        pointRecycler.setAdapter(new EditProfileAdapter(getContext(), currentProfile));
 
+        pointRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        pointRecycler.setHasFixedSize(true);
         return view;
 
     }

@@ -1,12 +1,16 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters;
 
+import android.content.Context;
+import android.provider.Settings;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.sql.Time;
 import java.util.ArrayList;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
@@ -18,12 +22,15 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
  */
 public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.ViewHolder> {
 
-    private DipProfile profile;
-    private ArrayList<TimePosPair> pointList;
+    private DipProfile mProfile;
+    private Context mContext;
 
-    public EditProfileAdapter(DipProfile profile){
-        this.profile = profile;
-        pointList = profile.getPairList();
+    private ArrayList<TimePosPair> mPoints;
+
+    public EditProfileAdapter(Context context, DipProfile profile){
+        this.mProfile = profile;
+        this.mContext = context;
+        mPoints = profile.getPairList();
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -34,9 +41,9 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        TimePosPair currentPair = pointList.get(position);
-        holder.timeView.setText(currentPair.getTime());
-        holder.depthView.setText(currentPair.getPosition());
+        TimePosPair currentPair = mPoints.get(position);
+        holder.timeView.setText(Integer.toString(currentPair.getTime()));
+        holder.depthView.setText(Integer.toString(currentPair.getPosition()));
 
     }
 
@@ -47,7 +54,7 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
      */
     @Override
     public int getItemCount() {
-        return pointList.size();
+        return mPoints.size();
     }
 
     public class ViewHolder extends  RecyclerView.ViewHolder implements View.OnClickListener{
@@ -69,7 +76,6 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
          */
         @Override
         public void onClick(View v) {
-
         }
     }
 }
