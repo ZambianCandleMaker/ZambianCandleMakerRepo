@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.GraphFragment;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverResponder;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.AdminProfileChooserFragment;
@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     private static FileObserver mProfileObserver;
     private static FileObserver mProgramObserver;
     private ProfileHashFragment currFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //changed scope so can hide it
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -296,11 +298,12 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_graph_make_profile:
-
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
                     ft.addToBackStack(getString(R.string.operator_frag_name));
                 }
-                switchTo = GraphFragment.newInstance(new ProfileHashParcel(pathToProfileHash));
+                EditProfileFragment editFrag = EditProfileFragment.newInstance(new ProfileHashParcel(pathToProfileHash));
+                switchTo = editFrag;
+                editFrag.setNewProfileHash(pathToProfileHash);
                 break;
         }
 

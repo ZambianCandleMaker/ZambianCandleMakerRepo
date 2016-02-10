@@ -40,4 +40,9 @@
     <string name="edit_current_profile">Edit Profile</string>
     <string name="time_title">Time:</string>
     <string name="depth_title">Depth:</string>
+    <string name="confirm">Confirm</string>
+    <string name="edit_points">Edit Points:</string>
+    <string name="save_profile">Save Profile</string>
+    <string name="reset_profile">Reset Profile</string>
+    <string name="save_confirmation_text">Check to save</string>
 </resources>

@@ -18,4 +18,10 @@
         android:title="@string/edit_current_profile"
         android:visible="false"
         />
+    <item
+        android:id="@+id/action_reset_profile"
+        android:orderInCategory="100"
+        android:title="@string/reset_profile"
+        android:visible="false"
+        />
 </menu>

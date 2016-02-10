@@ -8,76 +8,131 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment">>
-
-    <TextView
-        android:id="@+id/profile_point_time_title"
-        android:text="@string/time"
-        android:layout_width="100dp"
-        android:layout_height="20dp" />
-    <TextView
-        android:id="@+id/profile_point_depth_title"
-        android:text="@string/depth"
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/profile_point_time_title"
-        android:layout_marginLeft="20dp" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/profile_point_recycler"
-        android:layout_width="200dp"
-        android:layout_height="fill_parent"
-        android:layout_below="@+id/profile_point_time_title" />
+    tools:context="edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment">
 
     <com.jjoe64.graphview.GraphView
-        android:layout_toRightOf="@id/profile_point_recycler"
+        android:layout_toRightOf="@+id/recycler_layout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/edit_graph"
         app:seriesType = "line"
         app:seriesColor = "@color/graphSeriesLine"
-        android:layout_below="@+id/editText" />
+        android:layout_below="@+id/confirmationLayout" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/time_title"
-        android:id="@+id/edit_time_title"
-        android:layout_above="@+id/edit_graph"
-        android:layout_alignStart="@+id/edit_graph"
-        android:layout_centerVertical="true" />
-
-    <EditText
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:height="30dp"
-        android:width="100dp"
-        android:id="@+id/editText"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/edit_time_title" />
+        android:id="@+id/confirmationLayout"
+        android:layout_alignStart="@id/edit_graph">
 
-    <TextView
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_points"
+            android:textStyle="bold"
+            android:id="@+id/edit_point_title"
+            android:paddingBottom="10dp"
+           />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/time_title"
+            android:id="@+id/edit_time_title"
+            android:layout_centerVertical="true"
+            android:layout_below="@id/edit_point_title"/>
+
+        <EditText
+            android:paddingStart="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:height="30dp"
+            android:width="70dp"
+            android:id="@+id/edit_time_text"
+            android:layout_alignTop="@id/edit_time_title"
+            android:layout_toEndOf="@+id/edit_time_title" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/depth_title"
+            android:id="@+id/edit_depth_title"
+            android:layout_alignTop="@id/edit_time_title"
+            android:layout_toEndOf="@+id/edit_time_text" />
+
+        <EditText
+            android:paddingStart="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:height="50dp"
+            android:width="70dp"
+            android:id="@+id/edit_depth_text"
+            android:layout_alignTop="@id/edit_time_title"
+            android:layout_toEndOf="@+id/edit_depth_title" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/confirm"
+            android:id="@+id/insert_point_button"
+            android:layout_alignTop="@id/edit_time_title"
+            android:layout_toEndOf="@+id/edit_depth_text" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/recycler_layout"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/depth_title"
-        android:id="@+id/textView"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/editText" />
+        android:layout_height="fill_parent">
 
-    <EditText
+        <TextView
+            android:id="@+id/profile_point_time_title"
+            android:text="@string/time"
+            android:textStyle="bold"
+            android:layout_width="100dp"
+            android:layout_height="20dp" />
+        <TextView
+            android:id="@+id/profile_point_depth_title"
+            android:text="@string/depth"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/profile_point_time_title"
+            android:textStyle="bold"
+            android:layout_marginLeft="20dp" />
+
+        <android.support.v7.widget.RecyclerView
+        android:id="@+id/profile_point_recycler"
+        android:layout_width="200dp"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/save_profile_button"
+            android:layout_below="@+id/profile_point_time_title"
+            />
+
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:height="30dp"
-        android:width="100dp"
-        android:id="@+id/editText2"
-        android:layout_alignTop="@+id/textView"
-        android:layout_toEndOf="@+id/textView" />
+        android:text="@string/save_profile"
+        android:textSize="10dp"
+        android:id="@+id/save_profile_button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reset Profile"
+        android:textSize="10dp"
+        android:id="@+id/reset_profile_button"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/profile_point_time_title" />
+    </RelativeLayout>
 
 </RelativeLayout>
