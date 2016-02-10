@@ -68,6 +68,8 @@ public class DipProfile implements Parcelable{
         this.pairList.add(newPair);
     }
 
+    public ArrayList<TimePosPair> getPairList() {return this.pairList; }
+
     public String getPath(){
         return this.path;
     }

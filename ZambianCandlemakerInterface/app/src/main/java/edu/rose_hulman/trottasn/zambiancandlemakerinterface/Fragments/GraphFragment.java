@@ -1,15 +1,25 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.telecom.Call;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -21,10 +31,16 @@ import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.OperatorFragment;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.ProfileHashFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProfileHashParcel;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
@@ -33,12 +49,14 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 public class GraphFragment extends Fragment {
 
     private OperatorFragment.OperatorFragmentListener mCallback;
+
     private Series<DataPoint> currentSeries;
     private Context mContext;
     private GraphView graph;
 
     private static HashMap<String, DipProfile> pathToProfileHash;
     private static final String HASH = "hash";
+    private static final String PROFILE = "profile";
 
     private static DipProfile currentProfile;
 
@@ -60,13 +78,11 @@ public class GraphFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            ProfileHashParcel profileParcel = (ProfileHashParcel) getArguments().getParcelable(HASH);
-            pathToProfileHash = profileParcel.getHash();
-
+            ProfileHashParcel profileHashParcel = (ProfileHashParcel) getArguments().getParcelable(HASH);
+            pathToProfileHash = profileHashParcel.getHash();
         }
         if(currentSeries == null) showSwitchDialog();
 
-//        fab = (FloatingActionButton) findViewById(R.id.fab);
     }
 
     @Override
@@ -74,8 +90,57 @@ public class GraphFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_graph, container, false);
+        setHasOptionsMenu(true);
         graph = (GraphView) view.findViewById(R.id.profile_graph);
+
+//        fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem item = menu.findItem(R.id.action_choose_program);
+        item.setVisible(false);
+
+        MenuItem edit_profile_item = menu.findItem(R.id.action_edit_current_profile);
+        edit_profile_item.setVisible(true);
+
+        MenuItem choose_profile_item = menu.findItem(R.id.action_choose_profile);
+        choose_profile_item.setVisible(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+//        super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()){
+            case R.id.action_edit_current_profile:
+//                Intent intent = new Intent(getContext(), EditProfileActivity.class);
+//                intent.putExtra(PROFILE, currentProfile);
+//                startActivity(intent);
+                Fragment fragment = new EditProfileFragment().newInstance(currentProfile);
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+                transaction.replace(R.id.fragment_container,fragment);
+                transaction.addToBackStack(getString(R.string.graph_frag_name));
+                transaction.commit();
+                break;
+
+            case R.id.action_choose_profile:
+                showSwitchDialog();
+                break;
+
+        }
+
+        return false;
     }
 
     @Override
@@ -83,7 +148,8 @@ public class GraphFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof OperatorFragment.OperatorFragmentListener) {
             mCallback = (OperatorFragment.OperatorFragmentListener) context;
-        } else {
+        }
+        else{
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
@@ -133,6 +199,7 @@ public class GraphFragment extends Fragment {
 
                             }
                         });
+                        graph.removeAllSeries();
                         graph.addSeries(currentSeries);
                     }
 

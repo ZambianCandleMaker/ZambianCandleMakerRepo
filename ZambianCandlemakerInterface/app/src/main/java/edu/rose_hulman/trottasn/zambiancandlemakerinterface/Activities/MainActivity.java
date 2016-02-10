@@ -70,8 +70,6 @@ public class MainActivity extends AppCompatActivity
         TEST_PROFILE_1.addPair(new TimePosPair(5,2000));
 
 
-        pathToProfileHash.put(TEST_PROFILE_1.getTitle(), TEST_PROFILE_1);
-        pathToProfileHash.put(TEST_PROFILE_2.getTitle(), TEST_PROFILE_2);
 //        repopulateProfileHash();
 
         final Handler handler = new Handler() {
@@ -86,6 +84,8 @@ public class MainActivity extends AppCompatActivity
             public void run(){
                 Looper.prepare();
                 pathToProfileHash = new HashMap<>();
+                pathToProfileHash.put(TEST_PROFILE_1.getTitle(), TEST_PROFILE_1);
+                pathToProfileHash.put(TEST_PROFILE_2.getTitle(), TEST_PROFILE_2);
                 File innerDir = new File(CONSTANTS.PROFILES_PATH_MAIN);
                 innerDir.mkdirs();
                 innerDir.setWritable(true);
