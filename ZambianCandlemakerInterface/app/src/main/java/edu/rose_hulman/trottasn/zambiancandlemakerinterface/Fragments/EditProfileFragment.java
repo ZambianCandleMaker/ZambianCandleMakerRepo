@@ -61,7 +61,6 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     private static final String CURRENT_PROFILE = "current_profile";
 
     private static DipProfile currentProfile;
-    private static DipProfile editProfile;
 
     private static HashMap<String, DipProfile> pathToProfileHash;
 
@@ -97,10 +96,8 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
         SharedPreferences.Editor prefsEditor = prefs.edit();
         Gson gson = new Gson();
-        String editJson = gson.toJson(editProfile);
         String currentJson = gson.toJson(currentProfile);
 
-        prefsEditor.putString(EDIT_PROFILE, editJson);
         prefsEditor.putString(CURRENT_PROFILE, currentJson);
         prefsEditor.apply();
 
@@ -113,14 +110,12 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         super.onStart();
         Gson gson = new Gson();
         String json;
-        if(prefs.contains(EDIT_PROFILE)){
-            json = prefs.getString(EDIT_PROFILE, "");
-            editProfile = gson.fromJson(json, DipProfile.class);
+        if(prefs.contains(CURRENT_PROFILE)){
 
             json = prefs.getString(CURRENT_PROFILE, "");
             currentProfile = gson.fromJson(json, DipProfile.class);
 
-            mAdapter = new EditProfileAdapter(getContext(),editProfile);
+            mAdapter = new EditProfileAdapter(getContext(),currentProfile);
             pointRecycler.setAdapter(mAdapter);
 
             profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
@@ -156,12 +151,12 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         confirmationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int size = editProfile.getPairList().size();
+                int size = currentProfile.getPairList().size();
                 int time = Integer.parseInt(timeText.getText().toString());
                 int depth = Integer.parseInt(depthText.getText().toString());
-                int pos = editProfile.addPair(new TimePosPair(depth,time));
+                int pos = currentProfile.addPair(new TimePosPair(depth,time));
 
-                if(editProfile.getPairList().size() > size) mAdapter.notifyItemInserted(pos);
+                if(currentProfile.getPairList().size() > size) mAdapter.notifyItemInserted(pos);
                 else mAdapter.notifyItemChanged(pos);
 
                 updateGraph();
@@ -197,9 +192,9 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         currentProfile = new DipProfile();
         for(int i = 1; ; i++){
             String title = "New Profile "+ i;
-            if(pathToProfileHash.get(title) == null) {
+            if(!pathToProfileHash.containsKey(title)) {
                 currentProfile.setTitle(title);
-                resetCurrentProfile();
+                updateAdapter();
                 return;
             }
 
@@ -207,18 +202,20 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     }
 
     private void resetCurrentProfile(){
+        currentProfile = new DipProfile(pathToProfileHash.get(currentProfile.getTitle()));
+        updateAdapter();
+    }
 
+    private void updateAdapter(){
         profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
-        editProfile = new DipProfile(currentProfile);
-        mAdapter = new EditProfileAdapter(getContext(), editProfile);
+        mAdapter = new EditProfileAdapter(getContext(), currentProfile);
         pointRecycler.setAdapter(mAdapter);
-
         updateGraph();
     }
 
     private void updateGraph(){
         graph.removeAllSeries();
-        LineGraphSeries<DataPoint> series = editProfile.getLineGraphSeries();
+        LineGraphSeries<DataPoint> series = currentProfile.getLineGraphSeries();
         series.setDrawDataPoints(true);
         series.setDataPointsRadius(10);
         series.setColor(getResources().getColor(R.color.graphSeriesLine));
@@ -356,16 +353,14 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                         MainActivity mainActivity = (MainActivity) getActivity();
 
                         if(confirmationCheckbox.isChecked()) {
-                            pathToProfileHash.put(dropdown.getSelectedItem().toString(),editProfile);
-                            currentProfile = new DipProfile(editProfile);
+                            pathToProfileHash.put(dropdown.getSelectedItem().toString(),currentProfile);
                             mainActivity.savePathToProfileHash(pathToProfileHash);
                             dismiss();
 
                         }else if(title != "" && title !=" " && !title.contains("  ")){
-                            editProfile = new DipProfile(editProfile);
-                            editProfile.setTitle(title);
-                            pathToProfileHash.put(title, editProfile);
-                            currentProfile = new DipProfile(editProfile);
+                            currentProfile = new DipProfile(currentProfile);
+                            currentProfile.setTitle(title);
+                            pathToProfileHash.put(title, currentProfile);
                             mainActivity.savePathToProfileHash(pathToProfileHash);
                             profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
                             dismiss();
@@ -433,7 +428,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        currentProfile = pathToProfileHash.get(dropdown.getSelectedItem().toString());
+                        currentProfile = new DipProfile(pathToProfileHash.get(dropdown.getSelectedItem().toString()));
                         resetCurrentProfile();
 
 
