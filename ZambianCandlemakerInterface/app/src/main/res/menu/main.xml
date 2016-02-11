@@ -7,21 +7,36 @@
         android:title="@string/choose_program_title"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_edit_description"
+        android:orderInCategory="5"
+        android:title="@string/edit_description"
+        android:visible="false"
+        />
+    <item
         android:id="@+id/action_choose_profile"
         android:orderInCategory="10"
         android:title="@string/choose_profile"
         android:visible="false"
+        android:icon="@drawable/ic_choose_profile"
+        app:showAsAction="ifRoom"
         />
+    <!--Icon made by Freepik from www.flaticon.com-->
+
     <item
         android:id="@+id/action_new_profile"
         android:orderInCategory="20"
         android:title="@string/new_profile_text"
         android:visible="false"
-        />
+        android:icon="@drawable/ic_new_profile"
+        app:showAsAction="ifRoom"/>
+        <!--Icon made by Sarfraz Shoukat from www.flaticon.com-->
     <item
         android:id="@+id/action_delete_profile"
         android:orderInCategory="30"
         android:title="Delete Profile"
         android:visible="false"
-        />
+        android:icon="@drawable/ic_delete_profile"
+        app:showAsAction="never"/>
+        <!--Icon made by Icon Works from www.flaticon.com-->
+
 </menu>

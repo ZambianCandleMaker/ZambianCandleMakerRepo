@@ -202,7 +202,12 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     }
 
     private void resetCurrentProfile(){
-        currentProfile = new DipProfile(pathToProfileHash.get(currentProfile.getTitle()));
+        String title = currentProfile.getTitle();
+        if(pathToProfileHash.containsKey(title)) currentProfile = new DipProfile(pathToProfileHash.get(title));
+        else {
+            currentProfile = new DipProfile();
+            currentProfile.setTitle(title);
+        }
         updateAdapter();
     }
 
