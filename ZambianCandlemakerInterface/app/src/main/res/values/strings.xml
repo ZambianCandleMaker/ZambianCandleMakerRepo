@@ -44,5 +44,6 @@
     <string name="edit_points">Edit Points:</string>
     <string name="save_profile">Save Profile</string>
     <string name="reset_profile">Reset Profile</string>
-    <string name="save_confirmation_text">Check to save</string>
+    <string name="save_confirmation_text">Check to overwrite profile</string>
+    <string name="profile_name">Profile Name</string>
 </resources>

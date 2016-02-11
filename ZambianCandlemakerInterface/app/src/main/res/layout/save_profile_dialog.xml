@@ -3,22 +3,32 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/new_profile_name"
+        android:hint="@string/profile_name"
+        android:layout_alignRight="@+id/save_profile_spinner"
+        />
+
     <Spinner
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/save_profile_spinner"
         android:layout_gravity="center_horizontal"
-        android:layout_toLeftOf="@+id/confirmation_checkbox"/>
+        android:layout_below="@id/new_profile_name"
+        android:layout_toLeftOf="@+id/confirmation_checkbox" />
 
     <CheckBox
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:text="@string/save_confirmation_text"
+        android:maxLines="2"
         android:id="@+id/confirmation_checkbox"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="40dp"
-        android:layout_alignBottom="@+id/save_profile_spinner" />
-
+        android:layout_alignBottom="@+id/save_profile_spinner"
+        android:checked="false" />
 
 </RelativeLayout>
