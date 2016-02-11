@@ -29,6 +29,7 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.Series;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -126,7 +127,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
             mAdapter = new EditProfileAdapter(getContext(),editProfile);
             pointRecycler.setAdapter(mAdapter);
 
-            graph.addSeries(editProfile.getLineGraphSeries());
+            resetGraph();
         }
 
     }
@@ -158,9 +159,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         pointRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         pointRecycler.setHasFixedSize(true);
 
-        setGraphMaxes(editProfile);
-        graph.addSeries(editProfile.getLineGraphSeries());
-
+        resetGraph();
 
         Button confirmationButton = (Button) view.findViewById(R.id.insert_point_button);
         final EditText timeText = (EditText) view.findViewById(R.id.edit_time_text);
@@ -175,9 +174,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
                 int pos = editProfile.addPair(new TimePosPair(depth,time));
 
-                graph.removeAllSeries();
-                setGraphMaxes(editProfile);
-                graph.addSeries(editProfile.getLineGraphSeries());
+                resetGraph();
 
                 if(editProfile.getPairList().size() > size) mAdapter.notifyItemInserted(pos);
                 else mAdapter.notifyItemChanged(pos);
@@ -201,9 +198,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
             @Override
             public void onClick(View v) {
                 resetProfile();
-                graph.removeAllSeries();
-                setGraphMaxes(editProfile);
-                graph.addSeries(editProfile.getLineGraphSeries());
+                resetGraph();
 
             }
         });
@@ -219,8 +214,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
             if(pathToProfileHash.get(title) == null) {
                 currentProfile.setTitle(title);
                 resetProfile();
-                graph.removeAllSeries();
-                graph.addSeries(editProfile.getLineGraphSeries());
+                resetGraph();
                 return;
             }
 
@@ -231,6 +225,13 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         editProfile = new DipProfile(currentProfile);
         mAdapter = new EditProfileAdapter(getContext(), editProfile);
         pointRecycler.setAdapter(mAdapter);
+    }
+
+    private void resetGraph(){
+        graph.removeAllSeries();
+        LineGraphSeries<DataPoint> series = editProfile.getLineGraphSeries();
+        series.setColor(getResources().getColor(R.color.graphSeriesLine));
+        graph.addSeries(series);
     }
 
     @Override
@@ -286,10 +287,10 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 //        viewport.setYAxisBoundsManual(true);
 //        viewport.setXAxisBoundsManual(true);
 //        viewport.setYAxisBoundsStatus();
-//        viewport.setMinX(0);
-//        viewport.setMinY(0);
-//        viewport.setMaxX(profile.getMaxTime());
-//        viewport.setMaxY(profile.getmaxPos());
+        viewport.setMinX(0);
+        viewport.setMinY(0);
+        viewport.setMaxX(profile.getMaxTime());
+        viewport.setMaxY(profile.getmaxPos());
 //        viewport.scrollToEnd();
 
     }
@@ -409,13 +410,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
                         currentProfile = pathToProfileHash.get(dropdown.getSelectedItem().toString());
                         resetProfile();
-//                        editProfile = new DipProfile(currentProfile);
-//                        mAdapter = new EditProfileAdapter(getContext(), editProfile);
-//                        pointRecycler.setAdapter(mAdapter);
-
-                        graph.removeAllSeries();
-                        setGraphMaxes(editProfile);
-                        graph.addSeries(editProfile.getLineGraphSeries());
+                        resetGraph();
 
 
 
