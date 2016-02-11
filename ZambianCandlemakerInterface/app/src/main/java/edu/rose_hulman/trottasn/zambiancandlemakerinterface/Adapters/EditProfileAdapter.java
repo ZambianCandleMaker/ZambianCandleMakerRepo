@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
 
     private DipProfile mProfile;
     private Context mContext;
+
 
     private ArrayList<TimePosPair> mPoints;
 
@@ -57,7 +59,8 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
         return mPoints.size();
     }
 
-    public class ViewHolder extends  RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends  RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+
 
         private TextView timeView;
         private TextView depthView;
@@ -67,7 +70,9 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
             timeView  = (TextView) itemView.findViewById(R.id.profile_point_time);
             depthView = (TextView) itemView.findViewById(R.id.profile_point_depth);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
+
 
         /**
          * Called when a view has been clicked.
@@ -76,7 +81,21 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
          */
         @Override
         public void onClick(View v) {
+//            timeText.setText(Integer.parseInt(timeView.getText().toString()));
+//            depthText.setText(Integer.parseInt(depthView.getText().toString()));
+//            Toast.makeText(ViewHolder.this, , Toast.LENGTH_SHORT).show();
+        }
 
+        /**
+         * Called when a view has been clicked and held.
+         *
+         * @param v The view that was clicked and held.
+         * @return true if the callback consumed the long click, false otherwise.
+         */
+        @Override
+        public boolean onLongClick(View v) {
+
+            return false;
         }
     }
 }
