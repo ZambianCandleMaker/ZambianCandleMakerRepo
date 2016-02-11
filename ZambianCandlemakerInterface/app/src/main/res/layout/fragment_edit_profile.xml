@@ -38,6 +38,7 @@
             android:layout_height="50dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/time_title"
+            android:gravity="center"
             android:id="@+id/edit_time_title"
             android:layout_centerVertical="true"
             android:layout_below="@id/edit_point_title"/>
@@ -59,6 +60,7 @@
             android:layout_height="50dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/depth_title"
+            android:gravity="center"
             android:id="@+id/edit_depth_title"
             android:layout_alignTop="@id/edit_time_title"
             android:layout_toEndOf="@+id/edit_time_text" />

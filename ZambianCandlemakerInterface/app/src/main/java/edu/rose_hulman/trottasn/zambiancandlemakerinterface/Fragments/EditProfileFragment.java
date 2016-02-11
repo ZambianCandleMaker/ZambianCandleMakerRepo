@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -23,18 +24,19 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.jjoe64.graphview.series.Series;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.EditProfileAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
@@ -50,17 +52,13 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     private RecyclerView pointRecycler;
     private EditProfileAdapter mAdapter;
     private GraphView graph;
-    private Viewport viewport;
     private LineGraphSeries<DataPoint> currentSeries;
     private SharedPreferences prefs;
+    private TextView profileTitleView;
 
     private static final String HASH = "hash";
     private static final String EDIT_PROFILE = "edit_profile";
     private static final String CURRENT_PROFILE = "current_profile";
-
-    public static final String PREFS_NAME = "editorPrefs";
-
-//    private static final String PROFILE = "profile";
 
     private static DipProfile currentProfile;
     private static DipProfile editProfile;
@@ -68,11 +66,11 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     private static HashMap<String, DipProfile> pathToProfileHash;
 
 
+
     public static EditProfileFragment newInstance(Parcelable inHash) {
         EditProfileFragment fragment = new EditProfileFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
-//        args.putParcelable(PROFILE, profile);
         args.putParcelable(HASH,inHash);
         fragment.setArguments(args);
         return fragment;
@@ -87,6 +85,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             prefs = this.getActivity().getSharedPreferences("profilePrefs", Context.MODE_PRIVATE);
+
             ProfileHashParcel profileHashParcel = (ProfileHashParcel) getArguments().getParcelable(HASH);
             pathToProfileHash = profileHashParcel.getHash();
         }
@@ -103,13 +102,10 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
         prefsEditor.putString(EDIT_PROFILE, editJson);
         prefsEditor.putString(CURRENT_PROFILE, currentJson);
-        prefsEditor.commit();
-    }
+        prefsEditor.apply();
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        onStop();
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.savePathToProfileHash(pathToProfileHash);
     }
 
     @Override
@@ -117,7 +113,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         super.onStart();
         Gson gson = new Gson();
         String json;
-        if(!prefs.getString(EDIT_PROFILE, "").equals(null)){
+        if(prefs.contains(EDIT_PROFILE)){
             json = prefs.getString(EDIT_PROFILE, "");
             editProfile = gson.fromJson(json, DipProfile.class);
 
@@ -127,16 +123,14 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
             mAdapter = new EditProfileAdapter(getContext(),editProfile);
             pointRecycler.setAdapter(mAdapter);
 
-            resetGraph();
+            profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
+
+            updateGraph();
+
         }
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        onStart();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -148,20 +142,14 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
         pointRecycler = (RecyclerView) view.findViewById(R.id.profile_point_recycler);
         graph = (GraphView) view.findViewById(R.id.edit_graph);
+        profileTitleView = (TextView) view.findViewById(R.id.edit_point_title);
 
-        viewport = graph.getViewport();
-
-
-
-
-        if(currentProfile == null) createNewDipProfile();
+        if(currentProfile == null) createNewCurrentProfile();
 
         pointRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         pointRecycler.setHasFixedSize(true);
 
-        resetGraph();
-
-        Button confirmationButton = (Button) view.findViewById(R.id.insert_point_button);
+        final Button confirmationButton = (Button) view.findViewById(R.id.insert_point_button);
         final EditText timeText = (EditText) view.findViewById(R.id.edit_time_text);
         final EditText depthText = (EditText) view.findViewById(R.id.edit_depth_text);
 
@@ -171,13 +159,12 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                 int size = editProfile.getPairList().size();
                 int time = Integer.parseInt(timeText.getText().toString());
                 int depth = Integer.parseInt(depthText.getText().toString());
-
                 int pos = editProfile.addPair(new TimePosPair(depth,time));
-
-                resetGraph();
 
                 if(editProfile.getPairList().size() > size) mAdapter.notifyItemInserted(pos);
                 else mAdapter.notifyItemChanged(pos);
+
+                updateGraph();
 
 
             }
@@ -197,8 +184,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                resetProfile();
-                resetGraph();
+                resetCurrentProfile();
 
             }
         });
@@ -207,32 +193,44 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
     }
 
-    private void createNewDipProfile() {
+    private void createNewCurrentProfile() {
         currentProfile = new DipProfile();
         for(int i = 1; ; i++){
             String title = "New Profile "+ i;
             if(pathToProfileHash.get(title) == null) {
                 currentProfile.setTitle(title);
-                resetProfile();
-                resetGraph();
+                resetCurrentProfile();
                 return;
             }
 
         }
     }
 
-    private void resetProfile(){
+    private void resetCurrentProfile(){
+
+        profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
         editProfile = new DipProfile(currentProfile);
         mAdapter = new EditProfileAdapter(getContext(), editProfile);
         pointRecycler.setAdapter(mAdapter);
+
+        updateGraph();
     }
 
-    private void resetGraph(){
+    private void updateGraph(){
         graph.removeAllSeries();
         LineGraphSeries<DataPoint> series = editProfile.getLineGraphSeries();
+        series.setDrawDataPoints(true);
+        series.setDataPointsRadius(10);
         series.setColor(getResources().getColor(R.color.graphSeriesLine));
         graph.addSeries(series);
     }
+
+    //TODO
+    private void renameProfile(){
+
+    }
+
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -246,6 +244,9 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
         MenuItem reset_profile_item = menu.findItem(R.id.action_new_profile);
         reset_profile_item.setVisible(true);
+
+        MenuItem delete_profile_item = menu.findItem(R.id.action_delete_profile);
+        delete_profile_item.setVisible(true);
     }
 
 
@@ -257,8 +258,10 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                 selectProfileDialog();
                 break;
             case R.id.action_new_profile:
-                createNewDipProfile();
+                createNewCurrentProfile();
                 break;
+            case R.id.action_delete_profile:
+                deleteProfileDialog();
             default:
         }
 
@@ -283,30 +286,20 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         mCallback = null;
     }
 
-    private void setGraphMaxes(DipProfile profile){
-//        viewport.setYAxisBoundsManual(true);
-//        viewport.setXAxisBoundsManual(true);
-//        viewport.setYAxisBoundsStatus();
-        viewport.setMinX(0);
-        viewport.setMinY(0);
-        viewport.setMaxX(profile.getMaxTime());
-        viewport.setMaxY(profile.getmaxPos());
-//        viewport.scrollToEnd();
-
-    }
 
     private void saveProfileDialog(){
         final DialogFragment df = new DialogFragment(){
+            ArrayList profileList;
+
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
                 View view = getActivity().getLayoutInflater().inflate(R.layout.save_profile_dialog,null,false);
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                final ArrayList profileList = new ArrayList (Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
+                profileList = new ArrayList (Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
                 final Spinner dropdown = (Spinner) view.findViewById(R.id.save_profile_spinner);
                 final EditText profileName = (EditText) view.findViewById(R.id.new_profile_name);
                 final CheckBox confirmationCheckbox = (CheckBox) view.findViewById(R.id.confirmation_checkbox);
-
 
                 confirmationCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
@@ -325,12 +318,15 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 dropdown.setAdapter(adapter);
 
+//                Collections.sort(profileList,String.CASE_INSENSITIVE_ORDER);
+
                 if(profileList.contains(currentProfile.getTitle())){
                     confirmationCheckbox.setChecked(true);
                     dropdown.setSelection(profileList.indexOf(currentProfile.getTitle()));
                 }else {
                     confirmationCheckbox.setChecked(false);
                     profileName.setText(currentProfile.getTitle());
+
                 }
 
 
@@ -346,10 +342,6 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-//                        if(confirmationCheckbox.isChecked()) {
-//                            pathToProfileHash.put(dropdown.getSelectedItem().toString(),editProfile);
-//                            currentProfile = new DipProfile(editProfile);
-//                        }
 
                     }
                 });
@@ -361,16 +353,23 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                     @Override
                     public void onClick(View v) {
                         String title = profileName.getText().toString();
+                        MainActivity mainActivity = (MainActivity) getActivity();
+
                         if(confirmationCheckbox.isChecked()) {
                             pathToProfileHash.put(dropdown.getSelectedItem().toString(),editProfile);
                             currentProfile = new DipProfile(editProfile);
+                            mainActivity.savePathToProfileHash(pathToProfileHash);
                             dismiss();
+
                         }else if(title != "" && title !=" " && !title.contains("  ")){
-                            //TODO fix saving a bit
                             editProfile = new DipProfile(editProfile);
+                            editProfile.setTitle(title);
                             pathToProfileHash.put(title, editProfile);
                             currentProfile = new DipProfile(editProfile);
+                            mainActivity.savePathToProfileHash(pathToProfileHash);
+                            profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
                             dismiss();
+
                         }
                     }
                 });
@@ -382,14 +381,39 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
     }
 
+    private void deleteProfileDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Delete Profile?");
+        builder.setMessage("Are you sure you want to delete the profile "+currentProfile.getTitle()+"?");
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        pathToProfileHash.remove(currentProfile.getTitle());
+                        createNewCurrentProfile();
+                        pathToProfileHash.remove("derp");
+                    }
+                });
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     private void selectProfileDialog(){
         DialogFragment df = new DialogFragment(){
+            ArrayList profileList;
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState){
 
                 final View view = getActivity().getLayoutInflater().inflate(R.layout.profile_choose_dialog,null,false);
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                final ArrayList profileList = new ArrayList (Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
+                profileList = new ArrayList (Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
                 final Spinner dropdown = (Spinner) view.findViewById(R.id.profile_choose_spinner);
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,profileList);
@@ -397,7 +421,8 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                 dropdown.setAdapter(adapter);
 
                 builder.setView(view);
-                builder.setTitle("Choose A Profile");
+                builder.setTitle("Choose Profile");
+                builder.setMessage("Please select a profile:");
                 builder.setNegativeButton(android.R.string.cancel , new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -409,8 +434,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                     public void onClick(DialogInterface dialog, int which) {
 
                         currentProfile = pathToProfileHash.get(dropdown.getSelectedItem().toString());
-                        resetProfile();
-                        resetGraph();
+                        resetCurrentProfile();
 
 
 
@@ -420,6 +444,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
                 return builder.create();
             }
+
         };
         df.show(getActivity().getSupportFragmentManager(),"select");
 

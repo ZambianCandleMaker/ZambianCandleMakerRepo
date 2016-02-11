@@ -1,6 +1,8 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -23,16 +26,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.opencsv.CSVReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.EditProfileAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
@@ -57,7 +64,15 @@ public class MainActivity extends AppCompatActivity
     private static HashMap<String, DipProgram> pathToProgramHash;
     private static FileObserver mProfileObserver;
     private static FileObserver mProgramObserver;
+
+    private static String PREFS = "activity_prefs";
+    private static String PROFILE_HASH = "profileHash";
+
     private ProfileHashFragment currFragment;
+
+
+    private SharedPreferences activityPrefs;
+
 
 
     @Override
@@ -66,13 +81,16 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
 
-        TEST_PROFILE_1.addPair(new TimePosPair(5,0));
-        TEST_PROFILE_1.addPair(new TimePosPair(2, 1000));
-        TEST_PROFILE_1.addPair(new TimePosPair(5, 2000));
+//        TEST_PROFILE_1.addPair(new TimePosPair(5,0));
+//        TEST_PROFILE_1.addPair(new TimePosPair(2, 1000));
+//        TEST_PROFILE_1.addPair(new TimePosPair(5, 2000));
+
+        activityPrefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 
         pathToProfileHash = new HashMap<>();
-        pathToProfileHash.put(TEST_PROFILE_1.getTitle(), TEST_PROFILE_1);
-        pathToProfileHash.put(TEST_PROFILE_2.getTitle(), TEST_PROFILE_2);
+//        pathToProfileHash.put(TEST_PROFILE_1.getTitle(), TEST_PROFILE_1);
+//        pathToProfileHash.put(TEST_PROFILE_2.getTitle(), TEST_PROFILE_2);
+
 
         File innerDir = new File(CONSTANTS.PROFILES_PATH_MAIN);
         innerDir.mkdirs();
@@ -369,5 +387,45 @@ public class MainActivity extends AppCompatActivity
         if(currFragment != null){
             currFragment.setNewProgramHash(pathToProgramHash);
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+            SharedPreferences.Editor prefsEditor = activityPrefs.edit();
+            Gson gson = new Gson();
+            String pathToProfileHashJson = gson.toJson(pathToProfileHash);
+
+            prefsEditor.putString(PROFILE_HASH, pathToProfileHashJson);
+            prefsEditor.apply();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Gson gson = new Gson();
+        String json;
+        if(activityPrefs.contains(PROFILE_HASH)){
+            json = activityPrefs.getString(PROFILE_HASH, "");
+            Type hashType = new TypeToken<HashMap<String ,DipProfile>>(){}.getType();
+            pathToProfileHash = gson.fromJson(json, hashType);
+        }
+
+    }
+
+    public void savePathToProfileHash(HashMap<String, DipProfile> hashMap){
+//        pathToProfileHash = new HashMap<String, DipProfile>(hashMap);
+//        SharedPreferences.Editor prefsEditor = activityPrefs.edit();
+//        Gson gson = new Gson();
+//        String pathToProfileHashJson = gson.toJson(pathToProfileHash);
+//
+//        prefsEditor.putString(HASH, pathToProfileHashJson);
+//        prefsEditor.apply();
+        SharedPreferences.Editor prefsEditor = activityPrefs.edit();
+        Gson gson = new Gson();
+        String pathToProfileHashJson = gson.toJson(pathToProfileHash);
+
+        prefsEditor.putString(PROFILE_HASH, pathToProfileHashJson);
+        prefsEditor.apply();
     }
 }
