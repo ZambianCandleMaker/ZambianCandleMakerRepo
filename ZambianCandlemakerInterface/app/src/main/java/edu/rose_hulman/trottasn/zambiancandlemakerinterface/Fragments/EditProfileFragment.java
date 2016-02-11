@@ -292,13 +292,13 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     private void saveProfileDialog(){
         final DialogFragment df = new DialogFragment(){
             ArrayList profileList;
-
+            @NonNull
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
                 View view = getActivity().getLayoutInflater().inflate(R.layout.save_profile_dialog,null,false);
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                profileList = new ArrayList (Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
+                profileList = new ArrayList<String>(Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
                 final Spinner dropdown = (Spinner) view.findViewById(R.id.save_profile_spinner);
                 final EditText profileName = (EditText) view.findViewById(R.id.new_profile_name);
                 final CheckBox confirmationCheckbox = (CheckBox) view.findViewById(R.id.confirmation_checkbox);
@@ -408,12 +408,13 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     private void selectProfileDialog(){
         DialogFragment df = new DialogFragment(){
             ArrayList profileList;
+            @NonNull
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState){
 
                 final View view = getActivity().getLayoutInflater().inflate(R.layout.profile_choose_dialog,null,false);
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                profileList = new ArrayList (Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
+                profileList = new ArrayList<String>(Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
                 final Spinner dropdown = (Spinner) view.findViewById(R.id.profile_choose_spinner);
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,profileList);
