@@ -3,6 +3,7 @@ package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.DialogFragment;
@@ -22,6 +23,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.google.gson.Gson;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
@@ -48,8 +50,14 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     private GraphView graph;
     private Viewport viewport;
     private LineGraphSeries<DataPoint> currentSeries;
+    private SharedPreferences prefs;
 
     private static final String HASH = "hash";
+    private static final String EDIT_PROFILE = "edit_profile";
+    private static final String CURRENT_PROFILE = "current_profile";
+
+    public static final String PREFS_NAME = "editorPrefs";
+
 //    private static final String PROFILE = "profile";
 
     private static DipProfile currentProfile;
@@ -76,10 +84,53 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-//            currentProfile = (DipProfile) getArguments().getParcelable(PROFILE);
+            prefs = this.getActivity().getSharedPreferences("profilePrefs", Context.MODE_PRIVATE);
             ProfileHashParcel profileHashParcel = (ProfileHashParcel) getArguments().getParcelable(HASH);
             pathToProfileHash = profileHashParcel.getHash();
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        SharedPreferences.Editor prefsEditor = prefs.edit();
+        Gson gson = new Gson();
+        String editJson = gson.toJson(editProfile);
+        String currentJson = gson.toJson(currentProfile);
+
+        prefsEditor.putString(EDIT_PROFILE, editJson);
+        prefsEditor.putString(CURRENT_PROFILE, currentJson);
+        prefsEditor.commit();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        onStop();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Gson gson = new Gson();
+        String json;
+        if(prefs.getString(EDIT_PROFILE, "") != null){
+            json = prefs.getString(EDIT_PROFILE, "");
+            editProfile = gson.fromJson(json, DipProfile.class);
+
+            json = prefs.getString(CURRENT_PROFILE, "");
+            currentProfile = gson.fromJson(json, DipProfile.class);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        onStart();
+//        if(prefs.getString(HASH,"") != null){
+//            currentProfile = pathToProfileHash.get(prefs.getString(HASH,""));
+//        }
     }
 
     @Override
@@ -97,13 +148,11 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
 
 
-        //DONE fix this as this is just a way to test and will crash if path is null
-//        currentProfile = pathToProfileHash.get(pathToProfileHash.keySet().toArray()[0]);
-        currentProfile = new DipProfile();
 
-        if(currentProfile == null) currentProfile = new DipProfile();
-
-        editProfile = new DipProfile(currentProfile);
+        if(currentProfile == null) {
+            currentProfile = new DipProfile();
+            editProfile = new DipProfile(currentProfile);
+        }
         mAdapter = new EditProfileAdapter(getContext(), editProfile);
         pointRecycler.setAdapter(mAdapter);
         pointRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
