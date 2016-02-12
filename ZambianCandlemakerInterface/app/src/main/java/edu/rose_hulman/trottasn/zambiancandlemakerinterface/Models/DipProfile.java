@@ -6,10 +6,7 @@ import android.os.Parcelable;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -22,7 +19,7 @@ public class DipProfile implements Parcelable{
     private String path;
 
     private ArrayList<TimePosPair> pairList;
-    private ArrayList<TimePosPair> maxDepthPair = new ArrayList<TimePosPair>(){{
+    private ArrayList<TimePosPair> maxYCoord = new ArrayList<TimePosPair>(){{
         add(new TimePosPair(1,1000));
     }};
 
@@ -110,8 +107,8 @@ public class DipProfile implements Parcelable{
     public int removePair(int time){
         for(TimePosPair current : this.pairList){
                if(current.getTime() == time){
-                   if(maxDepthPair.contains(current)){
-                       maxDepthPair.remove(current);
+                   if(maxYCoord.contains(current)){
+                       maxYCoord.remove(current);
                    }
                    int pos = this.pairList.indexOf(current);
                    this.pairList.remove(current);
@@ -122,7 +119,7 @@ public class DipProfile implements Parcelable{
     }
 
     private void setMaxPos(TimePosPair current) {
-        if(getMaxYCoordinate() <= current.getPosition()) this.maxDepthPair.add(current);
+        if(getMaxYCoordinate() <= current.getPosition()) this.maxYCoord.add(current);
     }
 
     public ArrayList<TimePosPair> getPairList() {return this.pairList; }
@@ -147,20 +144,20 @@ public class DipProfile implements Parcelable{
         dest.writeString(path);
     }
 
-    public LinkedList<TimePosPair> getLinkedList(){
-        LinkedList<TimePosPair> linkedList = new LinkedList<TimePosPair>();
-        for(TimePosPair p : pairList){
-            linkedList.add(p);
-        }
-        return linkedList;
-    }
+//    public LinkedList<TimePosPair> getLinkedList(){
+//        LinkedList<TimePosPair> linkedList = new LinkedList<TimePosPair>();
+//        for(TimePosPair p : pairList){
+//            linkedList.add(p);
+//        }
+//        return linkedList;
+//    }
 
     public LineGraphSeries<DataPoint> getLineGraphSeries(){
 
         ArrayList<DataPoint> arrayList = new ArrayList<DataPoint>();
 
         for(TimePosPair p: pairList){
-            arrayList.add(new DataPoint(p.getTime(),p.getPosition()));
+            arrayList.add(new DataPoint(p.getTime(),Math.abs(p.getPosition() - getMaxYCoordinate())));
         }
 
         DataPoint[] dp = arrayList.toArray(new DataPoint[arrayList.size()]);
@@ -168,14 +165,14 @@ public class DipProfile implements Parcelable{
         return new LineGraphSeries<DataPoint>(dp);
     }
 
-    public int getMaxTime() {
+    public double getMaxTime() {
         int time = this.pairList.get(this.pairList.size()-1).getTime();
         if(time < 1000) return 1000;
         return this.pairList.get(this.pairList.size()-1).getTime();
     }
 
     public int getMaxYCoordinate() {
-        return this.maxDepthPair.get(maxDepthPair.size()-1).getPosition();
+        return this.maxYCoord.get(maxYCoord.size()-1).getPosition();
     }
 
 

@@ -28,6 +28,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
@@ -36,6 +37,8 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -151,6 +154,23 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setYAxisBoundsManual(true);
 
+        graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+            @Override
+            public String formatLabel(double value, boolean isValueX) {
+                if (isValueX) {
+                    // show normal x values
+                    NumberFormat formatter = new DecimalFormat("#0.0");
+
+//                    return super.formatLabel(value/1000, isValueX);
+                    return formatter.format(value/1000.0);
+                } else {
+                    // show currency for y values
+                    return super.formatLabel(Math.abs(value-currentProfile.getMaxYCoordinate()), isValueX);
+                }
+            }
+        });
+
+
         profileTitleView = (TextView) view.findViewById(R.id.edit_point_title);
 
         if(currentProfile == null) createNewCurrentProfile();
@@ -255,7 +275,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
             @Override
             public void onTap(Series series, DataPointInterface dataPoint) {
                 String time = Integer.toString((int)dataPoint.getX());
-                String depth = Integer.toString((int)dataPoint.getY());
+                String depth = Integer.toString((int)Math.abs(dataPoint.getY()-currentProfile.getMaxYCoordinate()));
                 timeText.setText(time);
                 depthText.setText(depth);
             }
