@@ -8,6 +8,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -16,29 +17,37 @@ import java.util.ListIterator;
  * Created by TrottaSN on 2/4/2016.
  */
 public class DipProfile implements Parcelable{
-    private ArrayList<TimePosPair> pairList;
     private String title;
     private String description;
     private String path;
 
-    private int maxTime = 0;
-    private int maxPos = 0;
+    private ArrayList<TimePosPair> pairList;
+    private ArrayList<TimePosPair> maxDepthPair = new ArrayList<TimePosPair>(){{
+        add(new TimePosPair(1,1000));
+    }};
 
     public DipProfile(){
         this.pairList = new ArrayList<TimePosPair>();
+        addPair(0,0);
     }
 
     public DipProfile(String title, String description, String path){
-        this();
         this.path = path;
         this.title = title;
         this.description = description;
-//        this.pairList = new ArrayList<TimePosPair>();
+        this.pairList = new ArrayList<TimePosPair>();
     }
 
     public DipProfile(DipProfile profile){
         this(profile.getTitle(),profile.getDescription(),profile.getPath());
         this.pairList.addAll(profile.getPairList());
+
+        ListIterator<TimePosPair> i = this.pairList.listIterator();
+        while(i.hasNext()){
+            TimePosPair current = i.next();
+            setMaxPos(current);
+
+        }
     }
 
     protected DipProfile(Parcel in) {
@@ -77,7 +86,9 @@ public class DipProfile implements Parcelable{
 
     //returns position to notify insert
     public int addPair(TimePosPair newPair){
-        setMaxTimeAndPos(newPair.getTime(),newPair.getPosition());
+
+        setMaxPos(newPair);
+
         for(TimePosPair current: this.pairList){
                 if(current.getTime() > newPair.getTime()){
                     this.pairList.add(this.pairList.indexOf(current),newPair);
@@ -92,9 +103,26 @@ public class DipProfile implements Parcelable{
         return this.pairList.size()-1;
     }
 
-    private void setMaxTimeAndPos(int time, int position) {
-        if(this.maxTime < time) this.maxTime = time;
-        if(this.maxPos < position) this.maxPos = position;
+    public int addPair(int pos, int time){
+        return addPair(new TimePosPair(pos,time));
+    }
+
+    public int removePair(int time){
+        for(TimePosPair current : this.pairList){
+               if(current.getTime() == time){
+                   if(maxDepthPair.contains(current)){
+                       maxDepthPair.remove(current);
+                   }
+                   int pos = this.pairList.indexOf(current);
+                   this.pairList.remove(current);
+                   return pos;
+               }
+        }
+        return -1;
+    }
+
+    private void setMaxPos(TimePosPair current) {
+        if(getMaxYCoordinate() <= current.getPosition()) this.maxDepthPair.add(current);
     }
 
     public ArrayList<TimePosPair> getPairList() {return this.pairList; }
@@ -141,11 +169,14 @@ public class DipProfile implements Parcelable{
     }
 
     public int getMaxTime() {
-        return maxTime;
+        int time = this.pairList.get(this.pairList.size()-1).getTime();
+        if(time < 1000) return 1000;
+        return this.pairList.get(this.pairList.size()-1).getTime();
     }
 
-    public int getmaxPos() {
-        return maxPos;
+    public int getMaxYCoordinate() {
+        return this.maxDepthPair.get(maxDepthPair.size()-1).getPosition();
     }
+
 
 }

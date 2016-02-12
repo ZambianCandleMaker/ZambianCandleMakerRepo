@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.sql.Time;
 import java.util.ArrayList;
 
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
@@ -25,13 +26,16 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
 
     private DipProfile mProfile;
     private Context mContext;
-
+    private View mView;
+    private EditProfileFragment mFragment;
 
     private ArrayList<TimePosPair> mPoints;
 
-    public EditProfileAdapter(Context context, DipProfile profile){
+    public EditProfileAdapter(Context context, EditProfileFragment fragment, View view, DipProfile profile){
         this.mProfile = profile;
+        this.mFragment = fragment;
         this.mContext = context;
+        this.mView = view;
         mPoints = profile.getPairList();
     }
     @Override
@@ -60,7 +64,8 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
     }
 
     public class ViewHolder extends  RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-
+        private EditText timeEditText;
+        private EditText depthEditText;
 
         private TextView timeView;
         private TextView depthView;
@@ -69,7 +74,10 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
             super(itemView);
             timeView  = (TextView) itemView.findViewById(R.id.profile_point_time);
             depthView = (TextView) itemView.findViewById(R.id.profile_point_depth);
-            itemView.setOnClickListener(this);
+
+            timeEditText = (EditText) mView.findViewById(R.id.edit_time_text);
+            depthEditText = (EditText) mView.findViewById(R.id.edit_depth_text);
+//            itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
 
@@ -81,10 +89,11 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
          */
         @Override
         public void onClick(View v) {
-//            timeText.setText(Integer.parseInt(timeView.getText().toString()));
-//            depthText.setText(Integer.parseInt(depthView.getText().toString()));
+            timeEditText.setText(timeView.getText());
+            depthEditText.setText(depthView.getText().toString());
 //            Toast.makeText(ViewHolder.this, , Toast.LENGTH_SHORT).show();
         }
+
 
         /**
          * Called when a view has been clicked and held.
@@ -94,7 +103,12 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
          */
         @Override
         public boolean onLongClick(View v) {
-
+            int time = Integer.parseInt(timeView.getText().toString());
+            if(time > 0){
+                int pos = mProfile.removePair(time);
+                notifyItemRemoved(pos);
+                mFragment.updateGraph();
+            }
             return false;
         }
     }

@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -30,7 +31,10 @@ import com.google.gson.Gson;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,13 +60,19 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     private SharedPreferences prefs;
     private TextView profileTitleView;
 
+
     private static final String HASH = "hash";
     private static final String EDIT_PROFILE = "edit_profile";
     private static final String CURRENT_PROFILE = "current_profile";
 
+    private static final LineGraphSeries<DataPoint> oldSeries = new LineGraphSeries<DataPoint>();
+
     private static DipProfile currentProfile;
 
     private static HashMap<String, DipProfile> pathToProfileHash;
+
+    private EditText timeText;
+    private EditText depthText;
 
 
 
@@ -115,7 +125,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
             json = prefs.getString(CURRENT_PROFILE, "");
             currentProfile = gson.fromJson(json, DipProfile.class);
 
-            mAdapter = new EditProfileAdapter(getContext(),currentProfile);
+            mAdapter = new EditProfileAdapter(getContext(),this,getView(),currentProfile);
             pointRecycler.setAdapter(mAdapter);
 
             profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
@@ -136,7 +146,11 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         setHasOptionsMenu(true);
 
         pointRecycler = (RecyclerView) view.findViewById(R.id.profile_point_recycler);
+
         graph = (GraphView) view.findViewById(R.id.edit_graph);
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setYAxisBoundsManual(true);
+
         profileTitleView = (TextView) view.findViewById(R.id.edit_point_title);
 
         if(currentProfile == null) createNewCurrentProfile();
@@ -145,23 +159,25 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         pointRecycler.setHasFixedSize(true);
 
         final Button confirmationButton = (Button) view.findViewById(R.id.insert_point_button);
-        final EditText timeText = (EditText) view.findViewById(R.id.edit_time_text);
-        final EditText depthText = (EditText) view.findViewById(R.id.edit_depth_text);
+        timeText = (EditText) view.findViewById(R.id.edit_time_text);
+        depthText = (EditText) view.findViewById(R.id.edit_depth_text);
 
         confirmationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int size = currentProfile.getPairList().size();
-                int time = Integer.parseInt(timeText.getText().toString());
-                int depth = Integer.parseInt(depthText.getText().toString());
-                int pos = currentProfile.addPair(new TimePosPair(depth,time));
+                    int size = currentProfile.getPairList().size();
+                    try {
+                        int time = Integer.parseInt(timeText.getText().toString());
+                        int depth = Integer.parseInt(depthText.getText().toString());
+                        int pos = currentProfile.addPair(new TimePosPair(depth, time));
 
-                if(currentProfile.getPairList().size() > size) mAdapter.notifyItemInserted(pos);
-                else mAdapter.notifyItemChanged(pos);
+                        if (currentProfile.getPairList().size() > size)
+                            mAdapter.notifyItemInserted(pos);
+                        else mAdapter.notifyItemChanged(pos);
 
-                updateGraph();
-
-
+                        updateGraph();
+                    }
+                    catch (Exception e){}
             }
         });
 
@@ -190,6 +206,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
     private void createNewCurrentProfile() {
         currentProfile = new DipProfile();
+
         for(int i = 1; ; i++){
             String title = "New Profile "+ i;
             if(!pathToProfileHash.containsKey(title)) {
@@ -207,24 +224,43 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         else {
             currentProfile = new DipProfile();
             currentProfile.setTitle(title);
-        }
+
+            }
         updateAdapter();
     }
 
     private void updateAdapter(){
         profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
-        mAdapter = new EditProfileAdapter(getContext(), currentProfile);
+        mAdapter = new EditProfileAdapter(getContext(),this, getView(), currentProfile);
         pointRecycler.setAdapter(mAdapter);
         updateGraph();
     }
 
-    private void updateGraph(){
+    public void updateGraph(){
         graph.removeAllSeries();
+//        graph.removeSeries();
         LineGraphSeries<DataPoint> series = currentProfile.getLineGraphSeries();
         series.setDrawDataPoints(true);
         series.setDataPointsRadius(10);
         series.setColor(getResources().getColor(R.color.graphSeriesLine));
         graph.addSeries(series);
+        graph.onDataChanged(true,false);
+
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(currentProfile.getMaxTime());
+
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(currentProfile.getMaxYCoordinate());
+
+        series.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                String time = Integer.toString((int)dataPoint.getX());
+                String depth = Integer.toString((int)dataPoint.getY());
+                timeText.setText(time);
+                depthText.setText(depth);
+            }
+        });
     }
 
     //TODO
