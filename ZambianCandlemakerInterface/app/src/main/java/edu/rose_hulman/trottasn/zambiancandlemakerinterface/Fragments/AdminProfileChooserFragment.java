@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -28,25 +30,26 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.opencsv.CSVWriter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.AvailableProfilesAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.SelectedProfilesAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverParcel;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProfileHashParcel;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProgramHashParcel;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class AdminProfileChooserFragment extends Fragment implements ProfileHashFragment, AvailableProfilesAdapter.ProfileChooserFragmentHelper, SelectedProfilesAdapter.ProfileSelectedHelper {
@@ -83,13 +86,13 @@ public class AdminProfileChooserFragment extends Fragment implements ProfileHash
         // Required empty public constructor
     }
 
-    public static AdminProfileChooserFragment newInstance(Parcelable inProfileHash, Parcelable inProgramHash, Parcelable inProfileObserver, Parcelable inProgramObserver) {
+    public static AdminProfileChooserFragment newInstance() {
         AdminProfileChooserFragment fragment = new AdminProfileChooserFragment();
         Bundle args = new Bundle();
-        args.putParcelable(PROFILE_HASH, inProfileHash);
-        args.putParcelable(PROGRAM_HASH, inProgramHash);
-        args.putParcelable(PROFILE_OBSERVER, inProfileObserver);
-        args.putParcelable(PROGRAM_OBSERVER, inProgramObserver);
+//        args.putParcelable(PROFILE_HASH, inProfileHash);
+//        args.putParcelable(PROGRAM_HASH, inProgramHash);
+//        args.putParcelable(PROFILE_OBSERVER, inProfileObserver);
+//        args.putParcelable(PROGRAM_OBSERVER, inProgramObserver);
         fragment.setArguments(args);
         return fragment;
     }
@@ -98,15 +101,15 @@ public class AdminProfileChooserFragment extends Fragment implements ProfileHash
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mFieldValuePairs = new HashMap<String, String>();
-        if (getArguments() != null) {
-            ProfileHashParcel profileParcel = getArguments().getParcelable(PROFILE_HASH);
-            ProgramHashParcel programParcel = getArguments().getParcelable(PROGRAM_HASH);
-            FileObserverParcel profileObserverParcel = getArguments().getParcelable(PROFILE_OBSERVER);
-            FileObserverParcel programObserverParcel = getArguments().getParcelable(PROGRAM_OBSERVER);
-            pathToProfileHash = profileParcel.getHash();
-            pathToProgramHash = programParcel.getHash();
-            mProfileObserver = profileObserverParcel.getFileObserver();
-            mProgramObserver = programObserverParcel.getFileObserver();
+        Gson gson = new Gson();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if(sharedPreferences != null){
+            String profileHashString = sharedPreferences.getString(MainActivity.PROFILE_HASH, "");
+            String programHashString = sharedPreferences.getString(MainActivity.PROGRAM_HASH, "");
+            Type hashType = new TypeToken<HashMap<String ,DipProfile>>(){}.getType();
+            Type progHashType = new TypeToken<HashMap<String, DipProgram>>(){}.getType();
+            pathToProfileHash = gson.fromJson(profileHashString, hashType);
+            pathToProgramHash = gson.fromJson(programHashString, progHashType);
         }
     }
 

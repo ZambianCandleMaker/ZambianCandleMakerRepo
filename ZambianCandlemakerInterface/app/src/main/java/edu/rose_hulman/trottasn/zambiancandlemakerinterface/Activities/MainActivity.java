@@ -1,15 +1,9 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.FileObserver;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -39,64 +33,46 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.EditProfileAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverResponder;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.AdminProfileChooserFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.OperatorFragment;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.ProfileHashFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverParcel;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProfileHashParcel;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProgramHashParcel;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class MainActivity extends AppCompatActivity
         implements OperatorFragment.OperatorFragmentListener, FileObserverResponder, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener {
 
-    private DipProfile TEST_PROFILE_1 = new DipProfile("Test Profile 1","Test description", "");
-    private DipProfile TEST_PROFILE_2 = new DipProfile("Test Profile 2","Test description", "");
-
     private static HashMap<String, DipProfile> pathToProfileHash;
     private static HashMap<String, DipProgram> pathToProgramHash;
-    private static FileObserver mProfileObserver;
-    private static FileObserver mProgramObserver;
 
     private static String PREFS = "activity_prefs";
-    private static String PROFILE_HASH = "profileHash";
-
-    private ProfileHashFragment currFragment;
-
-
+    public static String PROFILE_HASH = "profileHash";
+    public static String PROGRAM_HASH = "PROGRAM_HASH";
     private SharedPreferences activityPrefs;
-
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Set Main Activity Layout to Be activity_main
         setContentView(R.layout.activity_main);
 
-
-//        TEST_PROFILE_1.addPair(new TimePosPair(5,0));
-//        TEST_PROFILE_1.addPair(new TimePosPair(2, 1000));
-//        TEST_PROFILE_1.addPair(new TimePosPair(5, 2000));
-
+        // Save the Default SharedPreferences off to activityPrefs variable
         activityPrefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 
+        // Create the pathToProfileHash HashMap
         pathToProfileHash = new HashMap<>();
-//        pathToProfileHash.put(TEST_PROFILE_1.getTitle(), TEST_PROFILE_1);
-//        pathToProfileHash.put(TEST_PROFILE_2.getTitle(), TEST_PROFILE_2);
 
-
+        //Begin the Process of Reading in New Files and Saving Them
         File innerDir = new File(CONSTANTS.PROFILES_PATH_MAIN);
         innerDir.mkdirs();
         innerDir.setWritable(true);
         innerDir.setReadable(true);
-        List<Thread> threadList = new ArrayList<Thread>();
         if(innerDir.exists()) {
             File[] files = innerDir.listFiles();
             for (int i = 0; i < files.length; ++i) {
@@ -108,27 +84,29 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
+
+        // After this is done, read in the program files and link them to the profile from the hash
         repopulateProgramHash();
 
-        mProfileObserver = new FileObserver(CONSTANTS.PROFILES_PATH_MAIN) {
-            @Override
-            public void onEvent(int event, String path) {
-                if(event == FileObserver.ALL_EVENTS){
-                    repopulateProfileHash();
-                }
-            }
-        };
-        mProgramObserver = new FileObserver(CONSTANTS.PROGRAMS_PATH_MAIN) {
-            @Override
-            public void onEvent(int event, String path) {
-                if(event == FileObserver.ALL_EVENTS){
-                    repopulateProgramHash();
-                }
-            }
-        };
-
-        mProfileObserver.startWatching();
-        mProgramObserver.startWatching();
+        // May be able to use this soon
+//        mProfileObserver = new FileObserver(CONSTANTS.PROFILES_PATH_MAIN) {
+//            @Override
+//            public void onEvent(int event, String path) {
+//                if(event == FileObserver.ALL_EVENTS){
+//                    repopulateProfileHash();
+//                }
+//            }
+//        };
+//        mProgramObserver = new FileObserver(CONSTANTS.PROGRAMS_PATH_MAIN) {
+//            @Override
+//            public void onEvent(int event, String path) {
+//                if(event == FileObserver.ALL_EVENTS){
+//                    repopulateProgramHash();
+//                }
+//            }
+//        };
+//        mProfileObserver.startWatching();
+//        mProgramObserver.startWatching();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -158,6 +136,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /*
+        READS IN A SINGLE PROFILE FROM A PROFILE CSV IN THE APPROPRIATE DIRECTORY
+     */
     public void readInProfileCSVFile(File file){
         file.setWritable(true);
         MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
@@ -199,6 +180,9 @@ public class MainActivity extends AppCompatActivity
         pathToProfileHash.put(newProfile.getPath(), newProfile);
     }
 
+    /*
+    READS IN A SINGLE PROGRAM FROM THE APPROPRIATE PROGRAM DIRECTORY AND LINKS TO PROFILES
+     */
     public void readInProgramCSVFile(File file){
         file.setWritable(true);
         MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
@@ -256,6 +240,9 @@ public class MainActivity extends AppCompatActivity
         pathToProgramHash.put(filename, newProgram);
     }
 
+    /*
+    Overriding onBackPressed in order to close drawer and possibly, in the future, prevent exiting app from backpress in a meaningful way.
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -266,6 +253,9 @@ public class MainActivity extends AppCompatActivity
         super.onBackPressed();
     }
 
+    /*
+    Creates the Options Menu
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -297,22 +287,23 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id){
             case R.id.nav_operator:
+                //Switch without adding to backstack
                 switchTo = new OperatorFragment();
                 break;
             case R.id.nav_administrator_profile:
+                //Add to backstack if nothing there or if Operator is not there
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
                     ft.addToBackStack(getString(R.string.operator_frag_name));
                 }
                 switchTo = null;
                 break;
             case R.id.nav_administrator_program:
+                //Add to backstack like above
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
                     ft.addToBackStack(getString(R.string.operator_frag_name));
                 }
-                AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(new ProfileHashParcel(pathToProfileHash), new ProgramHashParcel(pathToProgramHash), new FileObserverParcel(mProfileObserver), new FileObserverParcel(mProgramObserver));
+                AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance();
                 switchTo = adminFrag;
-                adminFrag.setNewProfileHash(pathToProfileHash);
-                adminFrag.setNewProgramHash(pathToProgramHash);
                 break;
 
             case R.id.nav_graph_make_profile:
@@ -343,6 +334,9 @@ public class MainActivity extends AppCompatActivity
         // Nothing - Possibly Always Nothing
     }
 
+    /*
+    Simply reassigns/reads in the profiles to the hash file from the profile directory
+     */
     @Override
     public void repopulateProfileHash() {
         pathToProfileHash = new HashMap<>();
@@ -360,9 +354,6 @@ public class MainActivity extends AppCompatActivity
                     readInProfileCSVFile(file);
                 }
             }
-        }
-        if(currFragment != null){
-            currFragment.setNewProfileHash(pathToProfileHash);
         }
     }
 
@@ -384,43 +375,49 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-        if(currFragment != null){
-            currFragment.setNewProgramHash(pathToProgramHash);
-        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-            SharedPreferences.Editor prefsEditor = activityPrefs.edit();
-            Gson gson = new Gson();
-            String pathToProfileHashJson = gson.toJson(pathToProfileHash);
+        SharedPreferences.Editor prefsEditor = activityPrefs.edit();
+        Gson gson = new Gson();
+        String pathToProfileHashJson = gson.toJson(pathToProfileHash);
+        String pathToProgramHashJson = gson.toJson(pathToProgramHash);
+        prefsEditor.putString(PROFILE_HASH, pathToProfileHashJson);
+        prefsEditor.putString(PROGRAM_HASH, pathToProgramHashJson);
+        prefsEditor.apply();
+    }
 
-            prefsEditor.putString(PROFILE_HASH, pathToProfileHashJson);
-            prefsEditor.apply();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor prefsEditor = activityPrefs.edit();
+        Gson gson = new Gson();
+        String pathToProfileHashJson = gson.toJson(pathToProfileHash);
+        String pathToProgramHashJson = gson.toJson(pathToProgramHash);
+        prefsEditor.putString(PROFILE_HASH, pathToProfileHashJson);
+        prefsEditor.putString(PROGRAM_HASH, pathToProgramHashJson);
+        prefsEditor.apply();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         Gson gson = new Gson();
-        String json;
         if(activityPrefs.contains(PROFILE_HASH)){
-            json = activityPrefs.getString(PROFILE_HASH, "");
+            String json = activityPrefs.getString(PROFILE_HASH, "");
             Type hashType = new TypeToken<HashMap<String ,DipProfile>>(){}.getType();
             pathToProfileHash = gson.fromJson(json, hashType);
         }
-
+        if(activityPrefs.contains(PROGRAM_HASH)){
+            String jsonPrograms = activityPrefs.getString(PROGRAM_HASH, "");
+            Type progHashType = new TypeToken<HashMap<String, DipProgram>>(){}.getType();
+            pathToProgramHash = gson.fromJson(jsonPrograms, progHashType);
+        }
     }
 
     public void savePathToProfileHash(HashMap<String, DipProfile> hashMap){
-//        pathToProfileHash = new HashMap<String, DipProfile>(hashMap);
-//        SharedPreferences.Editor prefsEditor = activityPrefs.edit();
-//        Gson gson = new Gson();
-//        String pathToProfileHashJson = gson.toJson(pathToProfileHash);
-//
-//        prefsEditor.putString(HASH, pathToProfileHashJson);
-//        prefsEditor.apply();
         SharedPreferences.Editor prefsEditor = activityPrefs.edit();
         Gson gson = new Gson();
         String pathToProfileHashJson = gson.toJson(pathToProfileHash);
