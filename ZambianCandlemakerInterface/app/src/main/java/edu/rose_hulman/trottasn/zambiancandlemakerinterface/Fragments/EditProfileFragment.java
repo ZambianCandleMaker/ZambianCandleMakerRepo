@@ -238,7 +238,6 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
     public void updateGraph(){
         graph.removeAllSeries();
-//        graph.removeSeries();
         LineGraphSeries<DataPoint> series = currentProfile.getLineGraphSeries();
         series.setDrawDataPoints(true);
         series.setDataPointsRadius(10);
@@ -344,7 +343,12 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if(isChecked){
                             profileName.setEnabled(false);
+//                            if(profileList.size()>0) {
+//                                dropdown.setEnabled(true);
+//                            }
+                            profileName.setEnabled(false);
                             dropdown.setEnabled(true);
+
                         }
                         else{
                             profileName.setEnabled(true);
@@ -360,9 +364,15 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
                 if(profileList.contains(currentProfile.getTitle())){
                     confirmationCheckbox.setChecked(true);
+                    confirmationCheckbox.setEnabled(true);
+                    dropdown.setEnabled(true);
                     dropdown.setSelection(profileList.indexOf(currentProfile.getTitle()));
-                }else {
+                } else{
+                if(profileList.size() == 0) {
+                    confirmationCheckbox.setEnabled(false);
+                }
                     confirmationCheckbox.setChecked(false);
+                    dropdown.setEnabled(false);
                     profileName.setText(currentProfile.getTitle());
 
                 }
@@ -394,19 +404,19 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                         MainActivity mainActivity = (MainActivity) getActivity();
 
                         if(confirmationCheckbox.isChecked()) {
-                            pathToProfileHash.put(dropdown.getSelectedItem().toString(),currentProfile);
-                            mainActivity.savePathToProfileHash(pathToProfileHash);
-                            dismiss();
+                            title = dropdown.getSelectedItem().toString();
 
                         }else if(title != "" && title !=" " && !title.contains("  ")){
                             currentProfile = new DipProfile(currentProfile);
-                            currentProfile.setTitle(title);
-                            pathToProfileHash.put(title, currentProfile);
-                            mainActivity.savePathToProfileHash(pathToProfileHash);
-                            profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
-                            dismiss();
 
                         }
+                        currentProfile.setTitle(title);
+                        pathToProfileHash.put(title,currentProfile);
+                        mainActivity.savePathToProfileHash(pathToProfileHash);
+                        profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
+                        dismiss();
+
+
                     }
                 });
 
@@ -419,15 +429,14 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
     private void deleteProfileDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Delete Profile?");
-        builder.setMessage("Are you sure you want to delete the profile "+currentProfile.getTitle()+"?");
+        builder.setTitle(getString(R.string.dialog_delete_profile_title));
+        builder.setMessage(getString(R.string.dialog_delete_profile_message)+currentProfile.getTitle()+ getString(R.string.question_mark));
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                         pathToProfileHash.remove(currentProfile.getTitle());
                         createNewCurrentProfile();
-                        pathToProfileHash.remove("derp");
                     }
                 });
 
@@ -458,15 +467,15 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                 dropdown.setAdapter(adapter);
 
                 builder.setView(view);
-                builder.setTitle("Choose Profile");
-                builder.setMessage("Please select a profile:");
+                builder.setTitle(getString(R.string.dialog_choose_profile_title));
+                builder.setMessage(getString(R.string.dialog_select_profile_message));
                 builder.setNegativeButton(android.R.string.cancel , new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                     }
                 });
-                builder.setPositiveButton("ACCEPT", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(getString(R.string.accept_string), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 

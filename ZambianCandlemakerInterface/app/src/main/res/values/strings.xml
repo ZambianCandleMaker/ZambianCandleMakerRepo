@@ -47,4 +47,10 @@
     <string name="save_confirmation_text">Check to overwrite profile</string>
     <string name="profile_name">Profile Name</string>
     <string name="edit_description">Edit Description</string>
+    <string name="dialog_choose_profile_title">Choose Profile</string>
+    <string name="dialog_select_profile_message">Please select a profile:</string>
+    <string name="accept_string">ACCEPT</string>
+    <string name="dialog_delete_profile_title">Delete Profile?</string>
+    <string name="dialog_delete_profile_message">"Are you sure you want to delete the profile "</string>
+    <string name="question_mark">\?</string>
 </resources>
