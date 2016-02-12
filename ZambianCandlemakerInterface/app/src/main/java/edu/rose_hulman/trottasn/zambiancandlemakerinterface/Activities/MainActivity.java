@@ -45,7 +45,7 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProfileHashP
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class MainActivity extends AppCompatActivity
-        implements OperatorFragment.OperatorFragmentListener, FileObserverResponder, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener {
+        implements CallbackActivity, OperatorFragment.OperatorFragmentListener, FileObserverResponder, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener {
 
     private static HashMap<String, DipProfile> pathToProfileHash;
     private static HashMap<String, DipProgram> pathToProgramHash;
@@ -417,6 +417,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
     public void savePathToProfileHash(HashMap<String, DipProfile> hashMap){
         SharedPreferences.Editor prefsEditor = activityPrefs.edit();
         Gson gson = new Gson();
