@@ -107,15 +107,17 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     public void onStop() {
         super.onStop();
 
-        SharedPreferences.Editor prefsEditor = prefs.edit();
-        Gson gson = new Gson();
-        String currentJson = gson.toJson(currentProfile);
+        if((currentProfile.getTitle().contains("New Profile") && !pathToProfileHash.containsKey(currentProfile.getTitle())) || pathToProfileHash.containsKey(currentProfile.getTitle())) {
+            SharedPreferences.Editor prefsEditor = prefs.edit();
+            Gson gson = new Gson();
+            String currentJson = gson.toJson(currentProfile);
 
-        prefsEditor.putString(CURRENT_PROFILE, currentJson);
-        prefsEditor.apply();
+            prefsEditor.putString(CURRENT_PROFILE, currentJson);
+            prefsEditor.apply();
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.savePathToProfileHash(pathToProfileHash);
+            MainActivity mainActivity = (MainActivity) getActivity();
+            mainActivity.savePathToProfileHash(pathToProfileHash);
+        }
     }
 
     @Override
