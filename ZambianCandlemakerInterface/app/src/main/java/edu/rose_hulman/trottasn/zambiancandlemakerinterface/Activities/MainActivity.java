@@ -305,7 +305,7 @@ public class MainActivity extends AppCompatActivity
     public void savePathToProfileHash(Map<String, DipProfile> hashMap){
         SharedPreferences.Editor prefsEditor = activityPrefs.edit();
         Gson gson = new Gson();
-        String pathToProfileHashJson = gson.toJson(pathToProfileHash);
+        String pathToProfileHashJson = gson.toJson(hashMap);
 
         prefsEditor.putString(PROFILE_HASH, pathToProfileHashJson);
         prefsEditor.apply();

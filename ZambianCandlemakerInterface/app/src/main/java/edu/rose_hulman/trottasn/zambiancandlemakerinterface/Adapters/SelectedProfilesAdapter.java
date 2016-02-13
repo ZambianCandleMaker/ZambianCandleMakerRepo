@@ -44,7 +44,7 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
         String title = dipProfile.getTitle();
         String description = dipProfile.getDescription();
         holder.mTitleView.setText(title);
-        holder.mDescriptionView.setText(description);
+//        holder.mDescriptionView.setText(description);
     }
 
     @Override
@@ -89,14 +89,14 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mTitleView;
-        private TextView mDescriptionView;
+//        private TextView mDescriptionView;
         private Button mDownButton;
         private Button mUpButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mTitleView = (TextView) itemView.findViewById(R.id.avail_profile_title);
-            mDescriptionView = (TextView) itemView.findViewById(R.id.avail_profile_desc);
+//            mDescriptionView = (TextView) itemView.findViewById(R.id.avail_profile_desc);
             mDownButton = (Button) itemView.findViewById(R.id.down_button);
             mDownButton.setOnClickListener(new View.OnClickListener() {
                 @Override

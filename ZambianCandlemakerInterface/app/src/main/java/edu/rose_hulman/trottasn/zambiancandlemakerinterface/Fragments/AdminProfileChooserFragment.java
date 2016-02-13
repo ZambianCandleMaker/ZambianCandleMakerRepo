@@ -178,10 +178,9 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
                 View view = getActivity().getLayoutInflater().inflate(R.layout.save_program_dialog, null, false);
                 final EditText titleBox = (EditText)view.findViewById(R.id.program_title_box);
                 final EditText descBox = (EditText)view.findViewById(R.id.program_desc_box);
-                final Button saveButton = (Button)view.findViewById(R.id.save_program_button);
-                saveButton.setOnClickListener(new View.OnClickListener() {
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(DialogInterface dialog, int which) {
                         //Need to check for invalidity first
                         mFieldValuePairs.put(CSVUtility.PROGRAM_TITLE_KEY, titleBox.getText().toString());
                         mFieldValuePairs.put(CSVUtility.PROGRAM_DESCRIPTION_KEY, descBox.getText().toString());
@@ -189,6 +188,7 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
                         CSVUtility.writeProgramCSV(mFieldValuePairs, selectedProfiles, getActivity());
                     }
                 });
+
                 builder.setView(view);
 
                 return builder.create();
