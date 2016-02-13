@@ -30,6 +30,14 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
         return new ViewHolder(v);
     }
 
+    public List<String> getTitleList(){
+        List<String> titleList = new ArrayList<>();
+        for(DipProfile dipProfile : mSelectedProfiles){
+            titleList.add(dipProfile.getTitle());
+        }
+        return titleList;
+    }
+
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         DipProfile dipProfile = mSelectedProfiles.get(position);

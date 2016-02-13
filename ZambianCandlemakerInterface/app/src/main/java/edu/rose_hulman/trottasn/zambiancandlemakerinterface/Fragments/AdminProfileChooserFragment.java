@@ -1,5 +1,6 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -45,6 +46,7 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActiv
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.AvailableProfilesAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.SelectedProfilesAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.CSVUtility;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
@@ -181,7 +183,10 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
                     @Override
                     public void onClick(View v) {
                         //Need to check for invalidity first
-                        writeToCSVFile(titleBox.getText().toString(), descBox.getText().toString());
+                        mFieldValuePairs.put(CSVUtility.PROGRAM_TITLE_KEY, titleBox.getText().toString());
+                        mFieldValuePairs.put(CSVUtility.PROGRAM_DESCRIPTION_KEY, descBox.getText().toString());
+                        List<String> selectedProfiles = mSelectedAdapter.getTitleList();
+                        CSVUtility.writeProgramCSV(mFieldValuePairs, selectedProfiles, getActivity());
                     }
                 });
                 builder.setView(view);
@@ -190,69 +195,6 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
             }
         };
         df.show(getFragmentManager(), "");
-    }
-
-    public void writeToCSVFile(String title, String description){
-        File file = new File(CONSTANTS.PROGRAMS_PATH_MAIN + "/" + title + ".csv");
-        file.setWritable(true);
-        int count = 1;
-        while(file.exists()){
-            file = new File(CONSTANTS.PROGRAMS_PATH_MAIN + "/" + title + String.valueOf(count) + ".csv");
-            count = count + 1;
-        }
-        final File finalFile = file;
-        final String filename = finalFile.toString();
-        CharSequence contentTitle = getString(R.string.app_name);
-        final ProgressDialog progDialog = ProgressDialog.show(
-                getActivity(), contentTitle, "Please Wait.",
-                true);//please wait
-        MediaScannerConnection.scanFile(getActivity(), new String[]{filename}, null, new MediaScannerConnection.OnScanCompletedListener() {
-            public void onScanCompleted(String path, Uri uri) {
-                Log.i("EXTERNAL STORAGE", "SCANNED");
-            }
-        });
-        try {
-            CSVWriter writer = new CSVWriter(new FileWriter(filename), '\t');
-            // feed in your array (or convert your data to an array)
-            String parseChar = "!!";
-            String nextLineChar = "!!!";
-            String toParse = title + description + nextLineChar;
-            boolean shouldParse = true;
-            int keysLeft = mFieldValuePairs.size();
-            for(String key : mFieldValuePairs.keySet()){
-                String value = mFieldValuePairs.get(key);
-                if(value != null && !value.equals("")){
-                    if(keysLeft != 0){
-                        if(keysLeft % 2 == 0){
-                            toParse = toParse + nextLineChar;
-                        }
-                        toParse = toParse + value + parseChar;
-                    }
-                    else{
-                        toParse = toParse + value;
-                    }
-                }
-                else{
-                    shouldParse = false;
-                    break;
-                }
-                keysLeft = keysLeft - 1;
-            }
-            if(shouldParse){
-                String[] lines = toParse.split(nextLineChar);
-                for(String line : lines){
-                    String[] stringsOfLine = line.split(parseChar);
-                    writer.writeNext(stringsOfLine);
-                }
-                writer.close();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        progDialog.dismiss();
     }
 
     public void displayOptionsDialog(final boolean fromInvalidOptions, final HashMap<String, String> fieldMap){
@@ -276,27 +218,27 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
                 timeDelayBox.setAdapter(time_delay_array);
 
                 // BELOW : STRATEGY PATTERN FOR THESE? THERE'S GOT TO BE A WAY TO CONDENSE
-                String popTimeDelay = fieldMap.get(CONSTANTS.TIME_DELAY_KEY);
+                String popTimeDelay = fieldMap.get(CSVUtility.PROGRAM_TIME_DELAY_KEY);
                 if(popTimeDelay != null && !popTimeDelay.equals("")) {
                     timeDelayBox.setSelection(time_delay_array.getPosition(String.valueOf(popTimeDelay)));
                 }
                 final EditText maxAccelVertBox = (EditText) view.findViewById(R.id.vert_accel_box);
-                String popMaxAccelVert = fieldMap.get(CONSTANTS.MAX_ACCEL_VERT_KEY);
+                String popMaxAccelVert = fieldMap.get(CSVUtility.PROGRAM_MAX_AV_KEY);
                 if(popMaxAccelVert != null && !popMaxAccelVert.equals("")) {
                     maxAccelVertBox.setText(String.valueOf(popMaxAccelVert));
                 }
                 final EditText maxAccelRotBox = (EditText) view.findViewById(R.id.max_accel_rot_box);
-                String popMaxAccelRot = fieldMap.get(CONSTANTS.MAX_ACCEL_ROT_KEY);
+                String popMaxAccelRot = fieldMap.get(CSVUtility.PROGRAM_MAX_AR_KEY);
                 if(popMaxAccelRot != null && !popMaxAccelRot.equals("")) {
                     maxAccelRotBox.setText(String.valueOf(popMaxAccelRot));
                 }
                 final EditText maxVelVertBox = (EditText) view.findViewById(R.id.def_jog_vel_vert_box);
-                String popMaxVelVert = fieldMap.get(CONSTANTS.MAX_VEL_VERT_KEY);
+                String popMaxVelVert = fieldMap.get(CSVUtility.PROGRAM_MAX_VV_KEY);
                 if(popMaxVelVert != null && !popMaxVelVert.equals("")){
                     maxVelVertBox.setText(String.valueOf(popMaxVelVert));
                 }
                 final EditText maxVelRotBox = (EditText) view.findViewById(R.id.def_jog_vel_rot_box);
-                String popMaxVelRot = fieldMap.get(CONSTANTS.MAX_VEL_ROT_KEY);
+                String popMaxVelRot = fieldMap.get(CSVUtility.PROGRAM_MAX_VR_KEY);
                 if(popMaxVelRot != null && !popMaxVelRot.equals("")){
                     maxVelRotBox.setText(String.valueOf(popMaxVelRot));
                 }
@@ -313,11 +255,11 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
                         String maxVelRot = maxVelRotBox.getText().toString();
 
                         HashMap<String, String> redoHash = new HashMap<String, String>();
-                        redoHash.put(CONSTANTS.TIME_DELAY_KEY, timeDelaySelection);
-                        redoHash.put(CONSTANTS.MAX_ACCEL_VERT_KEY, maxAccelVert);
-                        redoHash.put(CONSTANTS.MAX_ACCEL_ROT_KEY, maxAccelRot);
-                        redoHash.put(CONSTANTS.MAX_VEL_VERT_KEY, maxVelVert);
-                        redoHash.put(CONSTANTS.MAX_VEL_ROT_KEY, maxVelRot);
+                        redoHash.put(CSVUtility.PROGRAM_TIME_DELAY_KEY, timeDelaySelection);
+                        redoHash.put(CSVUtility.PROGRAM_MAX_AV_KEY, maxAccelVert);
+                        redoHash.put(CSVUtility.PROGRAM_MAX_AR_KEY, maxAccelRot);
+                        redoHash.put(CSVUtility.PROGRAM_MAX_VV_KEY, maxVelVert);
+                        redoHash.put(CSVUtility.PROGRAM_MAX_VR_KEY, maxVelRot);
 
                         boolean proceed = true;
 

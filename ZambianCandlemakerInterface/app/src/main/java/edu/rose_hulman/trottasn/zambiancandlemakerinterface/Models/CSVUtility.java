@@ -1,20 +1,28 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.util.Log;
 
 import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 /**
  * Created by TrottaSN on 2/13/2016.
@@ -54,12 +62,12 @@ public class CSVUtility {
             while ((nextLine = reader.readNext()) != null) {
                 if(!informationSectionRead){
                     if(nextLine.length != pairing){
-                        Log.d("INVALID_CSV_FOR_PROFILE", "CSV has unequal \"paring\" of values");
+                        Log.d("CSVCHECK", "CSV has unequal \"paring\" of values");
                         return null;
                     }
                     else if(nextLine[0].equals(NEXT_SECTION_DELIMITER)){
                         if(!nextLine[1].equals(NEXT_SECTION_DELIMITER)){
-                            Log.d("INVALID_CSV_FOR_PROFILE", "CSV needs double delimiter \"#####    #####\" for parsing");
+                            Log.d("CSVCHECK", "CSV needs double delimiter \"#####    #####\" for parsing");
                             return null;
                         }
                         informationSectionRead = true;
@@ -70,7 +78,7 @@ public class CSVUtility {
                 }
                 else{
                     if(nextLine.length != pairing){
-                        Log.d("INVALID_CSV_FOR_PROFILE", "Position and Time pairings must be of length 2");
+                        Log.d("CSVCHECK", "Position and Time pairings must be of length 2");
                         return null;
                     }
                     else{
@@ -151,5 +159,51 @@ public class CSVUtility {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean writeProgramCSV(Map<String, String> typeToValueMap, List<String> profileTitles, Activity activity){
+        File finalFile = new File(CONSTANTS.PROGRAMS_PATH_MAIN + "/" + typeToValueMap.get(PROGRAM_TITLE_KEY) + ".csv");
+        finalFile.setWritable(true);
+        final String filename = finalFile.toString();
+        CharSequence contentTitle = activity.getString(R.string.app_name);
+        final ProgressDialog progDialog = ProgressDialog.show(
+                activity, contentTitle, "Please Wait.",
+                true);//please wait
+        MediaScannerConnection.scanFile(activity, new String[]{filename}, null, new MediaScannerConnection.OnScanCompletedListener() {
+            public void onScanCompleted(String path, Uri uri) {
+                Log.i("EXTERNAL STORAGE", "SCANNED");
+            }
+        });
+        int pairing = 2;
+        int singular = 1;
+        try {
+            CSVWriter writer = new CSVWriter(new FileWriter(filename));
+            // feed in your array (or convert your data to an array)
+            List<String> alphabeticalList = new ArrayList<>();
+            alphabeticalList.addAll(typeToValueMap.keySet());
+            Collections.sort(alphabeticalList);
+            for(String key : alphabeticalList){
+                String[] stringsToWrite = new String[pairing];
+                stringsToWrite[0] = key + "\t";
+                stringsToWrite[1] = typeToValueMap.get(key);
+                writer.writeNext(stringsToWrite);
+            }
+            String[] delimiters = new String[pairing];
+            delimiters[0] = NEXT_SECTION_DELIMITER + "\t";
+            delimiters[1] = NEXT_SECTION_DELIMITER;
+            writer.writeNext(delimiters);
+            for(String profileName : profileTitles){
+                String[] nameToWrite = new String[singular];
+                nameToWrite[0] = profileName;
+                writer.writeNext(nameToWrite);
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        progDialog.dismiss();
+        return true;
     }
 }

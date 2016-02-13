@@ -29,6 +29,7 @@ public class DipProfile implements Parcelable{
     private int maxPos = 0;
 
     public DipProfile(){
+        this.pairList = new ArrayList<>();
     }
 
     public DipProfile(String title, String description, String path){
@@ -36,7 +37,7 @@ public class DipProfile implements Parcelable{
         this.path = path;
         this.title = title;
         this.description = description;
-//        this.pairList = new ArrayList<TimePosPair>();
+        this.pairList = new ArrayList<>();
     }
 
     public DipProfile(DipProfile profile){
@@ -177,7 +178,7 @@ public class DipProfile implements Parcelable{
                 this.maxTime = Integer.parseInt(typeToValueMapping.get(key));
             }
             else{
-                Log.d("UNEXPECTED_PARAMETER", "Unexpected parameter passed to assignFromReading");
+                Log.d("CSVCHECK", "Unexpected parameter passed to assignFromReading");
                 return false;
             }
         }

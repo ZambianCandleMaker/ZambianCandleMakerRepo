@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 
@@ -12,9 +13,9 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
  */
 public class ProfileHashParcel implements Parcelable {
 
-    private HashMap<String, DipProfile> pathToProfileHash;
+    private Map<String, DipProfile> pathToProfileHash;
 
-    public ProfileHashParcel(HashMap<String, DipProfile> inHash){
+    public ProfileHashParcel(Map<String, DipProfile> inHash){
         this.pathToProfileHash = inHash;
     }
 
@@ -33,11 +34,11 @@ public class ProfileHashParcel implements Parcelable {
         }
     };
 
-    public HashMap<String, DipProfile> getHash(){
+    public Map<String, DipProfile> getHash(){
         return this.pathToProfileHash;
     }
 
-    public void setHash(HashMap<String, DipProfile> inHash){
+    public void setHash(Map<String, DipProfile> inHash){
         this.pathToProfileHash = inHash;
     }
 

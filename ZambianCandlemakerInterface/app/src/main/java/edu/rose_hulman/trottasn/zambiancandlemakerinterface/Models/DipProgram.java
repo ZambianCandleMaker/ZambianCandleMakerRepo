@@ -136,7 +136,7 @@ public class DipProgram {
                 this.maxVelRot = Integer.parseInt(typeToValueMapping.get(key));
             }
             else{
-                Log.d("UNEXPECTED_PARAMETER", "AssignFromReading got an unexpected parameter in DipProgram");
+                Log.d("CSVCHECK", "AssignFromReading got an unexpected parameter in DipProgram" + key);
                 return false;
             }
         }

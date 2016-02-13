@@ -1,7 +1,6 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities;
 
 import android.content.SharedPreferences;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -21,35 +20,26 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.opencsv.CSVReader;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.CSVUtility;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverResponder;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.AdminProfileChooserFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.OperatorFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProfileHashParcel;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class MainActivity extends AppCompatActivity
-        implements CallbackActivity, OperatorFragment.OperatorFragmentListener, FileObserverResponder, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener {
+        implements OperatorFragment.OperatorFragmentListener, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener, CallbackActivity {
 
-    private static HashMap<String, DipProfile> pathToProfileHash;
-    private static HashMap<String, DipProgram> pathToProgramHash;
+    private static Map<String, DipProfile> pathToProfileHash;
+    private static Map<String, DipProgram> pathToProgramHash;
 
     private static String PREFS = "activity_prefs";
     public static String PROFILE_HASH = "profileHash";
@@ -74,6 +64,16 @@ public class MainActivity extends AppCompatActivity
 
         // After this is done, read in the program files and link them to the profile from the hash
         repopulateProgramHash();
+
+        if(activityPrefs != null){
+            SharedPreferences.Editor editor = activityPrefs.edit();
+            Gson gson = new Gson();
+            String pathToProfileHashJson = gson.toJson(pathToProfileHash);
+            String pathToProgramHashJson = gson.toJson(pathToProgramHash);
+            editor.putString(PROFILE_HASH, pathToProfileHashJson);
+            editor.putString(PROGRAM_HASH, pathToProgramHashJson);
+            editor.apply();
+        }
 
         // May be able to use this soon
 //        mProfileObserver = new FileObserver(CONSTANTS.PROFILES_PATH_MAIN) {
@@ -121,55 +121,6 @@ public class MainActivity extends AppCompatActivity
             ft.add(R.id.fragment_container, new OperatorFragment());
             ft.commit();
         }
-    }
-
-    /*
-    READS IN A SINGLE PROGRAM FROM THE APPROPRIATE PROGRAM DIRECTORY AND LINKS TO PROFILES
-     */
-    public void readInProgramCSVFile(File file){
-        file.setWritable(true);
-        MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-            public void onScanCompleted(String path, Uri uri) {
-            }
-        });
-        final String filename = file.toString();
-        final List<String> strList = new ArrayList<>();
-        try {
-            CSVReader reader = new CSVReader(new FileReader(filename));
-            String[] nextLine;
-            while ((nextLine = reader.readNext()) != null) {
-                for(int i = 0; i < nextLine.length; i++){
-                    strList.add(nextLine[i]);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        final DipProgram newProgram = new DipProgram(strList);
-        newProgram.setPath(filename);
-        for(int i = 6; i < strList.size(); i+=1){
-            DipProfile nextProfile = pathToProfileHash.get(strList.get(i));
-            Log.d("TEST", strList.get(i));
-            if(nextProfile == null){
-                Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has unidentified path to Profile (non-existent profile)");
-                return;
-            }
-            newProgram.addToProfileList(nextProfile);
-        }
-        Log.d("Name: ", newProgram.getTitle());
-        Log.d("Desc: ", newProgram.getDescription());
-        Log.d("Path: ", newProgram.getPath());
-        Log.d("MAV: ", String.valueOf(newProgram.getMaxAccelVert()));
-        Log.d("MAR: ", String.valueOf(newProgram.getMaxAccelRot()));
-        Log.d("MVV: ", String.valueOf(newProgram.getMaxVelVert()));
-        Log.d("MVR: ", String.valueOf(newProgram.getMaxVelRot()));
-        for(DipProfile dP : newProgram.getProfileList()){
-            Log.d("DPT: ", dP.getTitle());
-            Log.d("DPD: ", dP.getDescription());
-        }
-        pathToProgramHash.put(newProgram.getTitle(), newProgram);
     }
 
     /*
@@ -244,7 +195,6 @@ public class MainActivity extends AppCompatActivity
                 }
                 EditProfileFragment editFrag = EditProfileFragment.newInstance(new ProfileHashParcel(pathToProfileHash));
                 switchTo = editFrag;
-                editFrag.setNewProfileHash(pathToProfileHash);
                 break;
         }
 
@@ -267,7 +217,6 @@ public class MainActivity extends AppCompatActivity
     /*
     Simply reassigns/reads in the profiles to the hash file from the profile directory
      */
-    @Override
     public void repopulateProfileHash() {
         pathToProfileHash = new HashMap<>();
         File innerDir = new File(CONSTANTS.PROFILES_PATH_MAIN);
@@ -290,7 +239,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
     public void repopulateProgramHash() {
         pathToProgramHash = new HashMap<>();
         File innerDir = new File(CONSTANTS.PROGRAMS_PATH_MAIN);
@@ -340,21 +288,21 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        Gson gson = new Gson();
-        if(activityPrefs.contains(PROFILE_HASH)){
-            String json = activityPrefs.getString(PROFILE_HASH, "");
-            Type hashType = new TypeToken<HashMap<String ,DipProfile>>(){}.getType();
-            pathToProfileHash = gson.fromJson(json, hashType);
-        }
-        if(activityPrefs.contains(PROGRAM_HASH)){
-            String jsonPrograms = activityPrefs.getString(PROGRAM_HASH, "");
-            Type progHashType = new TypeToken<HashMap<String, DipProgram>>(){}.getType();
-            pathToProgramHash = gson.fromJson(jsonPrograms, progHashType);
-        }
+//        Gson gson = new Gson();
+//        if(activityPrefs.contains(PROFILE_HASH)){
+//            String json = activityPrefs.getString(PROFILE_HASH, "");
+//            Type hashType = new TypeToken<Map<String ,DipProfile>>(){}.getType();
+//            pathToProfileHash.putAll((Map<String, DipProfile>)gson.fromJson(json, hashType));
+//        }
+//        if(activityPrefs.contains(PROGRAM_HASH)){
+//            String jsonPrograms = activityPrefs.getString(PROGRAM_HASH, "");
+//            Type progHashType = new TypeToken<Map<String, DipProgram>>(){}.getType();
+//            pathToProgramHash.putAll((Map<String, DipProgram>)gson.fromJson(jsonPrograms, progHashType));
+//        }
     }
 
     @Override
-    public void savePathToProfileHash(HashMap<String, DipProfile> hashMap){
+    public void savePathToProfileHash(Map<String, DipProfile> hashMap){
         SharedPreferences.Editor prefsEditor = activityPrefs.edit();
         Gson gson = new Gson();
         String pathToProfileHashJson = gson.toJson(pathToProfileHash);

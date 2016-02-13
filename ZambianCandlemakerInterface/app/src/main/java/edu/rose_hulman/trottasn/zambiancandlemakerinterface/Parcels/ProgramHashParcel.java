@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 
@@ -12,9 +13,9 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
  */
 public class ProgramHashParcel implements Parcelable {
 
-    private HashMap<String, DipProgram> pathToProgramHash;
+    private Map<String, DipProgram> pathToProgramHash;
 
-    public ProgramHashParcel(HashMap<String, DipProgram> inHash){
+    public ProgramHashParcel(Map<String, DipProgram> inHash){
         this.pathToProgramHash = inHash;
     }
 
@@ -33,11 +34,11 @@ public class ProgramHashParcel implements Parcelable {
         }
     };
 
-    public HashMap<String, DipProgram> getHash(){
+    public Map<String, DipProgram> getHash(){
         return this.pathToProgramHash;
     }
 
-    public void setHash(HashMap<String, DipProgram> inHash){
+    public void setHash(Map<String, DipProgram> inHash){
         this.pathToProgramHash = inHash;
     }
 
