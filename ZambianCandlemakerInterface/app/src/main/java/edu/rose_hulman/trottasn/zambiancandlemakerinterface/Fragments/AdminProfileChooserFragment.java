@@ -78,10 +78,6 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
     public static AdminProfileChooserFragment newInstance() {
         AdminProfileChooserFragment fragment = new AdminProfileChooserFragment();
         Bundle args = new Bundle();
-//        args.putParcelable(PROFILE_HASH, inProfileHash);
-//        args.putParcelable(PROGRAM_HASH, inProgramHash);
-//        args.putParcelable(PROFILE_OBSERVER, inProfileObserver);
-//        args.putParcelable(PROGRAM_OBSERVER, inProgramObserver);
         fragment.setArguments(args);
         return fragment;
     }

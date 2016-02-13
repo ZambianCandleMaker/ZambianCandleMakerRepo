@@ -1,7 +1,10 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by TrottaSN on 2/8/2016.
@@ -16,15 +19,17 @@ public class DipProgram {
     private int maxVelRot;
     private String path;
     private List<DipProfile> profileList;
-
     public DipProgram(){
     }
 
-    public DipProgram(String title, String description, String path){
-        this.title = title;
-        this.description = description;
-        this.path = path;
-        this.profileList = new ArrayList<DipProfile>();
+    public DipProgram(List<String> inputStrings){
+        this.title = inputStrings.get(1);
+        this.description = inputStrings.get(2);
+        this.maxAccelVert = Integer.parseInt(inputStrings.get(3));
+        this.maxAccelRot = Integer.parseInt(inputStrings.get(4));
+        this.maxVelVert = Integer.parseInt(inputStrings.get(5));
+        this.maxVelRot = Integer.parseInt(inputStrings.get(6));
+        this.profileList = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -100,7 +105,41 @@ public class DipProgram {
         }
     }
 
-    public List<DipProfile> getProfileList(){
+    public List<DipProfile> getProfileList() {
         return this.profileList;
+    }
+
+    public boolean assignFromReading(Map<String, String> typeToValueMapping, List<DipProfile> readProfiles){
+        if(typeToValueMapping.size() == 0){
+            return false;
+        }
+        for(String key : typeToValueMapping.keySet()){
+            if(CSVUtility.PROGRAM_TITLE_KEY.equals(key)){
+                this.title = typeToValueMapping.get(key);
+            }
+            else if(CSVUtility.PROGRAM_DESCRIPTION_KEY.equals(key)){
+                this.description = typeToValueMapping.get(key);
+            }
+            else if(CSVUtility.PROGRAM_TIME_DELAY_KEY.equals(key)){
+                this.timeDelay = Integer.parseInt(typeToValueMapping.get(key));
+            }
+            else if(CSVUtility.PROGRAM_MAX_AV_KEY.equals(key)){
+                this.maxAccelVert = Integer.parseInt(typeToValueMapping.get(key));
+            }
+            else if(CSVUtility.PROGRAM_MAX_AR_KEY.equals(key)){
+                this.maxAccelRot = Integer.parseInt(typeToValueMapping.get(key));
+            }
+            else if(CSVUtility.PROGRAM_MAX_VV_KEY.equals(key)){
+                this.maxVelVert = Integer.parseInt(typeToValueMapping.get(key));
+            }
+            else if(CSVUtility.PROGRAM_MAX_VR_KEY.equals(key)){
+                this.maxVelRot = Integer.parseInt(typeToValueMapping.get(key));
+            }
+            else{
+                Log.d("UNEXPECTED_PARAMETER", "AssignFromReading got an unexpected parameter in DipProgram");
+                return false;
+            }
+        }
+        return true;
     }
 }

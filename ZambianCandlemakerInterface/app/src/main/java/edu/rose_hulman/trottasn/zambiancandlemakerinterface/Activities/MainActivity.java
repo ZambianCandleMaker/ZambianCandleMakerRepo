@@ -35,6 +35,7 @@ import java.util.List;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.CSVUtility;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverResponder;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.AdminProfileChooserFragment;
@@ -69,21 +70,7 @@ public class MainActivity extends AppCompatActivity
         pathToProfileHash = new HashMap<>();
 
         //Begin the Process of Reading in New Files and Saving Them
-        File innerDir = new File(CONSTANTS.PROFILES_PATH_MAIN);
-        innerDir.mkdirs();
-        innerDir.setWritable(true);
-        innerDir.setReadable(true);
-        if(innerDir.exists()) {
-            File[] files = innerDir.listFiles();
-            for (int i = 0; i < files.length; ++i) {
-                File file = files[i];
-                if (file.isDirectory()) {
-                    Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
-                } else {
-                    readInProfileCSVFile(file);
-                }
-            }
-        }
+        repopulateProfileHash();
 
         // After this is done, read in the program files and link them to the profile from the hash
         repopulateProgramHash();
@@ -137,50 +124,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     /*
-        READS IN A SINGLE PROFILE FROM A PROFILE CSV IN THE APPROPRIATE DIRECTORY
-     */
-    public void readInProfileCSVFile(File file){
-        file.setWritable(true);
-        MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-            public void onScanCompleted(String path, Uri uri) {
-                Log.i("EXTERNAL STORAGE", "SCANNED");
-            }
-        });
-        final String filename = file.toString();
-        final List<String> strList = new ArrayList<String>();
-        final DipProfile newProfile = new DipProfile();
-        try {
-            CSVReader reader = new CSVReader(new FileReader(filename));
-            String[] nextLine;
-            while ((nextLine = reader.readNext()) != null) {
-                for(int i = 0; i < nextLine.length; i++){
-                    strList.add(nextLine[i]);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Log.d("PATHNAME", filename);
-        if(strList.size() < 2){
-            Log.d("INVALID_CSV_FOR_PROFILE", "CSV has less than two entries (no title / description)");
-            return;
-        };
-        if(strList.size()%2 != 0){
-            Log.d("INVALID_CSV_FOR_PROFILE", "CSV has an odd number of entries (there exists an unequal pair)");
-        }
-        newProfile.setTitle(strList.get(0));
-        newProfile.setDescription(strList.get(1));
-        newProfile.setPath(filename);
-        for(int i = 2; i < strList.size(); i+=2){
-            TimePosPair newPair = new TimePosPair(Integer.parseInt(strList.get(i)), Integer.parseInt(strList.get(i+1)));
-            newProfile.addPair(newPair);
-        }
-        pathToProfileHash.put(newProfile.getPath(), newProfile);
-    }
-
-    /*
     READS IN A SINGLE PROGRAM FROM THE APPROPRIATE PROGRAM DIRECTORY AND LINKS TO PROFILES
      */
     public void readInProgramCSVFile(File file){
@@ -190,8 +133,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
         final String filename = file.toString();
-        final List<String> strList = new ArrayList<String>();
-        final DipProgram newProgram = new DipProgram();
+        final List<String> strList = new ArrayList<>();
         try {
             CSVReader reader = new CSVReader(new FileReader(filename));
             String[] nextLine;
@@ -205,18 +147,8 @@ public class MainActivity extends AppCompatActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(strList.size() < 6){
-            Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has less than six entries (not enough information)");
-            return;
-        };
-
-        newProgram.setTitle(strList.get(0));
-        newProgram.setDescription(strList.get(1));
+        final DipProgram newProgram = new DipProgram(strList);
         newProgram.setPath(filename);
-        newProgram.setMaxAccelVert(Integer.parseInt(strList.get(2)));
-        newProgram.setMaxAccelRot(Integer.parseInt(strList.get(3)));
-        newProgram.setMaxVelVert(Integer.parseInt(strList.get(4)));
-        newProgram.setMaxVelRot(Integer.parseInt(strList.get(5)));
         for(int i = 6; i < strList.size(); i+=1){
             DipProfile nextProfile = pathToProfileHash.get(strList.get(i));
             Log.d("TEST", strList.get(i));
@@ -237,7 +169,7 @@ public class MainActivity extends AppCompatActivity
             Log.d("DPT: ", dP.getTitle());
             Log.d("DPD: ", dP.getDescription());
         }
-        pathToProgramHash.put(filename, newProgram);
+        pathToProgramHash.put(newProgram.getTitle(), newProgram);
     }
 
     /*
@@ -318,8 +250,6 @@ public class MainActivity extends AppCompatActivity
 
         if (switchTo != null){
             ft.replace(R.id.fragment_container, switchTo);
-//            for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++){
-//                getSupportFragmentManager().popBackStackImmediate();
 //            }
             ft.commit();
         };
@@ -351,7 +281,10 @@ public class MainActivity extends AppCompatActivity
                 if (file.isDirectory()) {
                     Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
                 } else {
-                    readInProfileCSVFile(file);
+                    DipProfile newProfile = CSVUtility.readProfileCSV(file, this);
+                    if(newProfile != null){
+                        pathToProfileHash.put(newProfile.getTitle(), newProfile);
+                    }
                 }
             }
         }
@@ -371,7 +304,10 @@ public class MainActivity extends AppCompatActivity
                 if (file.isDirectory()) {
                     Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
                 } else {
-                    readInProgramCSVFile(file);
+                    DipProgram newProgram = CSVUtility.readProgramCSV(file, this, pathToProfileHash);
+                    if(newProgram != null){
+                        pathToProgramHash.put(newProgram.getTitle(), newProgram);
+                    }
                 }
             }
         }
