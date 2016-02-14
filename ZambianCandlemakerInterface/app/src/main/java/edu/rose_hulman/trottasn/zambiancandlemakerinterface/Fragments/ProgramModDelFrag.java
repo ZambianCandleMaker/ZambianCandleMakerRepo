@@ -2,9 +2,10 @@ package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -15,8 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.Map;
 
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.ProgModDelAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
@@ -32,7 +39,7 @@ public class ProgramModDelFrag extends Fragment {
         // Required empty public constructor
     }
 
-    public static ProgramModDelFrag newInstance(Parcelable inProgramHash, Parcelable inProfileObserver, Parcelable inProgramObserver) {
+    public static ProgramModDelFrag newInstance() {
         ProgramModDelFrag fragment = new ProgramModDelFrag();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -42,6 +49,11 @@ public class ProgramModDelFrag extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String jsonProgramHash = sharedPreferences.getString(MainActivity.PROGRAM_HASH, "");
+        Gson gson = new Gson();
+        Type progHashType = new TypeToken<Map<String, DipProgram>>(){}.getType();
+        pathToProgramHash = gson.fromJson(jsonProgramHash, progHashType);
         if (getArguments() != null) {
         }
     }

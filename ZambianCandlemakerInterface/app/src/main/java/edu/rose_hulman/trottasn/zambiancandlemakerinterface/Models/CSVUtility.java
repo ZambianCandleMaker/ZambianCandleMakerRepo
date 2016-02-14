@@ -62,10 +62,10 @@ public class CSVUtility {
             while ((nextLine = reader.readNext()) != null) {
                 if(!informationSectionRead){
                     if(nextLine.length != pairing){
-                        Log.d("CSVCHECK", "CSV has unequal \"paring\" of values");
+                        Log.d("CSVCHECK", "CSV has unequal \"pairing\" of values" + " " + nextLine.toString() + " " + String.valueOf(nextLine.length));
                         return null;
                     }
-                    else if(nextLine[0].equals(NEXT_SECTION_DELIMITER)){
+                    else if(nextLine[0].startsWith(NEXT_SECTION_DELIMITER)){
                         if(!nextLine[1].equals(NEXT_SECTION_DELIMITER)){
                             Log.d("CSVCHECK", "CSV needs double delimiter \"#####    #####\" for parsing");
                             return null;
@@ -119,10 +119,10 @@ public class CSVUtility {
             while ((nextLine = reader.readNext()) != null) {
                 if(!informationSectionRead){
                     if(nextLine.length != pairing){
-                        Log.d("INVALID_CSV_FOR_PROFILE", "CSV has unequal \"paring\" of values");
+                        Log.d("INVALID_CSV_FOR_PROFILE", "CSV has unequal \"paring\" of values" + " " + nextLine[0] + " " + String.valueOf(nextLine.length));
                         return null;
                     }
-                    else if(nextLine[0].equals(NEXT_SECTION_DELIMITER)){
+                    else if(nextLine[0].startsWith(NEXT_SECTION_DELIMITER)){
                         if(!nextLine[1].equals(NEXT_SECTION_DELIMITER)){
                             Log.d("INVALID_CSV_FOR_PROFILE", "CSV needs double delimiter \"#####    #####\" for parsing");
                             return null;
@@ -184,12 +184,12 @@ public class CSVUtility {
             Collections.sort(alphabeticalList);
             for(String key : alphabeticalList){
                 String[] stringsToWrite = new String[pairing];
-                stringsToWrite[0] = key + "\t";
+                stringsToWrite[0] = key;
                 stringsToWrite[1] = typeToValueMap.get(key);
                 writer.writeNext(stringsToWrite);
             }
             String[] delimiters = new String[pairing];
-            delimiters[0] = NEXT_SECTION_DELIMITER + "\t";
+            delimiters[0] = NEXT_SECTION_DELIMITER;
             delimiters[1] = NEXT_SECTION_DELIMITER;
             writer.writeNext(delimiters);
             for(String profileName : profileTitles){

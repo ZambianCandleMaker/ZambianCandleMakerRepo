@@ -25,8 +25,10 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.ProgModDelAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.ProgramModDelFrag;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.CSVUtility;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.AdminProfileChooserFragment;
@@ -41,9 +43,8 @@ public class MainActivity extends AppCompatActivity
     private static Map<String, DipProfile> pathToProfileHash;
     private static Map<String, DipProgram> pathToProgramHash;
 
-    private static String PREFS = "activity_prefs";
-    public static String PROFILE_HASH = "profileHash";
-    public static String PROGRAM_HASH = "PROGRAM_HASH";
+    public static final String PROFILE_HASH = "profileHash";
+    public static final String PROGRAM_HASH = "PROGRAM_HASH";
     private SharedPreferences activityPrefs;
 
 
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
         if(savedInstanceState == null){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(R.id.fragment_container, new OperatorFragment());
@@ -180,6 +182,13 @@ public class MainActivity extends AppCompatActivity
                 }
                 switchTo = null;
                 break;
+            case R.id.nav_administrator_mod_del_program:
+                if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))){
+                    ft.addToBackStack(getString(R.string.operator_frag_name));
+                }
+                ProgramModDelFrag modDelFrag = ProgramModDelFrag.newInstance();
+                switchTo = modDelFrag;
+                break;
             case R.id.nav_administrator_program:
                 //Add to backstack like above
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
@@ -188,7 +197,6 @@ public class MainActivity extends AppCompatActivity
                 AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance();
                 switchTo = adminFrag;
                 break;
-
             case R.id.nav_graph_make_profile:
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
                     ft.addToBackStack(getString(R.string.operator_frag_name));

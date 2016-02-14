@@ -1,16 +1,11 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -31,12 +26,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.opencsv.CSVWriter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,11 +35,9 @@ import java.util.List;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.AvailableProfilesAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.SelectedProfilesAdapter;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.CSVUtility;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class AdminProfileChooserFragment extends Fragment implements AvailableProfilesAdapter.ProfileChooserFragmentHelper, SelectedProfilesAdapter.ProfileSelectedHelper {
@@ -305,6 +293,13 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
     }
 
     @Override

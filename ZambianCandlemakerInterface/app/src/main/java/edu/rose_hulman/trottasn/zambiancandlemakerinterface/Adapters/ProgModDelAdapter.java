@@ -60,8 +60,8 @@ public class ProgModDelAdapter extends RecyclerView.Adapter<ProgModDelAdapter.Vi
 
         public ViewHolder(View itemView) {
             super(itemView);
-            mTitleView = (TextView) itemView.findViewById(R.id.avail_profile_title);
-            mDescriptionView = (TextView) itemView.findViewById(R.id.avail_profile_desc);
+            mTitleView = (TextView) itemView.findViewById(R.id.saved_program_title);
+            mDescriptionView = (TextView) itemView.findViewById(R.id.saved_program_description);
         }
     }
 }

@@ -10,6 +10,10 @@
             android:icon="@android:drawable/ic_menu_agenda"
             android:title="@string/admin_make_program" />
         <item
+            android:id="@+id/nav_administrator_mod_del_program"
+            android:icon="@android:drawable/ic_menu_save"
+            android:title="@string/administrator_modify_programs" />
+        <item
             android:id="@+id/nav_administrator_profile"
             android:icon="@android:drawable/ic_menu_directions"
             android:title="@string/admin_make_profile" />
