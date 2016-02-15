@@ -1,6 +1,5 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities;
 
-import android.app.FragmentManager;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity
     public static final String PROFILE_HASH = "profileHash";
     public static final String PROGRAM_HASH = "PROGRAM_HASH";
     private SharedPreferences activityPrefs;
+    private boolean operatorSaved = false;
 
 
     @Override
@@ -114,6 +115,9 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         };
+        if(getSupportFragmentManager().getBackStackEntryCount() == 1){
+            operatorSaved = false;
+        }
         super.onBackPressed();
     }
 
@@ -147,42 +151,44 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         Fragment switchTo = null;
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         int id = item.getItemId();
         switch (id){
             case R.id.nav_operator:
                 //Switch without adding to backstack
                 switchTo = new OperatorFragment();
+                operatorSaved = false;
                 break;
             case R.id.nav_administrator_mod_del_program:
-                if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))){
-                    ft.addToBackStack(getString(R.string.operator_frag_name));
-                }
+                getSupportFragmentManager().beginTransaction().addToBackStack("prev_frag");
                 ProgramModDelFrag modDelFrag = ProgramModDelFrag.newInstance();
                 switchTo = modDelFrag;
                 break;
             case R.id.nav_administrator_program:
                 //Add to backstack like above
-                if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
-                    ft.addToBackStack(getString(R.string.operator_frag_name));
-                }
+                getSupportFragmentManager().beginTransaction().addToBackStack("prev_frag");
                 AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(null);
                 switchTo = adminFrag;
                 break;
             case R.id.nav_graph_make_profile:
-                if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
-                    ft.addToBackStack(getString(R.string.operator_frag_name));
-                }
+                getSupportFragmentManager().beginTransaction().addToBackStack("prev_frag");
                 EditProfileFragment editFrag = EditProfileFragment.newInstance(new ProfileHashParcel(pathToProfileHash));
                 switchTo = editFrag;
                 break;
         }
 
         if (switchTo != null){
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
             ft.replace(R.id.fragment_container, switchTo);
+            for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++){
+                getSupportFragmentManager().popBackStackImmediate();
+            }
+            if(getSupportFragmentManager().getBackStackEntryCount() == 0 && !operatorSaved){
+                ft.addToBackStack("operator_fragment");
+                operatorSaved = true;
+            }
             ft.commit();
         };
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -279,13 +285,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void switchToProgramEdit(DipProgram dipProgram) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
-            ft.addToBackStack(getString(R.string.operator_frag_name));
-        }
         AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(dipProgram);
+        ft.addToBackStack("admin_frag");
         ft.replace(R.id.fragment_container, adminFrag);
         ft.commit();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
     }
 }
