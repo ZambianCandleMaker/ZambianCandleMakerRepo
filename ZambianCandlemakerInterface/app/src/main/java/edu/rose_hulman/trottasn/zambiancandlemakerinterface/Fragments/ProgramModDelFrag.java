@@ -23,17 +23,21 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.CallbackActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.ProgModDelAdapter;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.ProgramEditFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
-public class ProgramModDelFrag extends Fragment {
+public class ProgramModDelFrag extends Fragment implements ProgramEditFragment {
 
     private RecyclerView mProgramsRecycler;
     private ProgModDelAdapter mProgramsAdapter;
 
     private static Map<String, DipProgram> pathToProgramHash;
+
+    private CallbackActivity mCallback;
 
     public ProgramModDelFrag() {
         // Required empty public constructor
@@ -67,7 +71,7 @@ public class ProgramModDelFrag extends Fragment {
         mProgramsRecycler.setHasFixedSize(true);
         mProgramsRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mProgramsAdapter = new ProgModDelAdapter();
+        mProgramsAdapter = new ProgModDelAdapter(this);
         mProgramsRecycler.setAdapter(mProgramsAdapter);
 
         populateFromHash();
@@ -114,21 +118,22 @@ public class ProgramModDelFrag extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnAdminProfileChosenListener) {
-//            mListener = (OnAdminProfileChosenListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
+        if (context instanceof CallbackActivity) {
+            mCallback = (CallbackActivity) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-//        mListener = null;
+        mCallback = null;
     }
 
-    public interface OnProgramModDelChosenListener {
-        void onProgramModDelChosen(Uri uri);
+    @Override
+    public void switchToEditing(DipProgram dipProgram) {
+        mCallback.switchToProgramEdit(dipProgram);
     }
 }

@@ -31,6 +31,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.AvailableProfilesAdapter;
@@ -49,14 +50,19 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
     private Button mOptionsButton;
     private Button mSaveButton;
 
-    private HashMap<String, String> mFieldValuePairs;
+    private DipProgram startingProgram;
+    private boolean startFromProgram;
+
+    private Map<String, String> mFieldValuePairs;
 
     private boolean mSavePreparedness;
 
     private OnAdminProfileChosenListener mListener;
 
-    private static HashMap<String, DipProfile> pathToProfileHash;
-    private static HashMap<String, DipProgram> pathToProgramHash;
+    private static final String STARTING_PROGRAM = "STARTING_PROGRAM";
+
+    private static Map<String, DipProfile> pathToProfileHash;
+    private static Map<String, DipProgram> pathToProgramHash;
 
     public static final int MAX_TIME_DELAY = 60;
 
@@ -65,9 +71,13 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
         // Required empty public constructor
     }
 
-    public static AdminProfileChooserFragment newInstance() {
+    public static AdminProfileChooserFragment newInstance(DipProgram dipProgram) {
         AdminProfileChooserFragment fragment = new AdminProfileChooserFragment();
         Bundle args = new Bundle();
+        if(dipProgram != null){
+            Log.d("BREAK", "GIVE ME ONE");
+            args.putParcelable(STARTING_PROGRAM, dipProgram);
+        }
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,7 +85,7 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFieldValuePairs = new HashMap<String, String>();
+        mFieldValuePairs = new HashMap<>();
         Gson gson = new Gson();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if(sharedPreferences != null){
@@ -85,6 +95,14 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
             Type progHashType = new TypeToken<HashMap<String, DipProgram>>(){}.getType();
             pathToProfileHash = gson.fromJson(profileHashString, hashType);
             pathToProgramHash = gson.fromJson(programHashString, progHashType);
+        }
+        Bundle args = getArguments();
+        if(args != null){
+            Log.d("BREAK", "GIVE ME 2");
+            startingProgram = args.getParcelable(STARTING_PROGRAM);
+            if(startingProgram != null){
+                startFromProgram = true;
+            }
         }
     }
 
@@ -137,6 +155,9 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
             mSaveButton.setVisibility(View.GONE);
         };
         populateFromHash();
+        if(startFromProgram){
+            populateStartingData(startingProgram);
+        }
         return totalView;
     }
 
@@ -340,5 +361,12 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
 
     public interface OnAdminProfileChosenListener {
         void onProfileChosen(Uri uri);
+    }
+
+    public void populateStartingData(DipProgram dipProgram){
+        mFieldValuePairs = dipProgram.getFieldHash();
+        List<DipProfile> prevSelectedProfs = dipProgram.getProfileList();
+        mSelectedAdapter.setSelectedProfiles(prevSelectedProfs);
+        mAvailableAdapter.subtractProfiles(prevSelectedProfs);
     }
 }

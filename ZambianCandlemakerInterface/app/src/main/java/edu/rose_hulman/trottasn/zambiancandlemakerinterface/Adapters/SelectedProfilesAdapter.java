@@ -114,6 +114,13 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
         }
     }
 
+    public void setSelectedProfiles(List<DipProfile> dipProfiles){
+        if(dipProfiles != null){
+            mSelectedProfiles = dipProfiles;
+            notifyDataSetChanged();
+        }
+    }
+
     public interface ProfileSelectedHelper {
         void returnSelectedToTop();
         void slideSelectedToPosition(int position);

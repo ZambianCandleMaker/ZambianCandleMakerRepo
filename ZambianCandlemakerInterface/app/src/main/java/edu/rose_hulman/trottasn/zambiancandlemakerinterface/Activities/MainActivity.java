@@ -1,5 +1,6 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities;
 
+import android.app.FragmentManager;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,8 +25,6 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.ProgModDelAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.ProgramModDelFrag;
@@ -43,6 +42,8 @@ public class MainActivity extends AppCompatActivity
     private static Map<String, DipProfile> pathToProfileHash;
     private static Map<String, DipProgram> pathToProgramHash;
 
+    private ActionBarDrawerToggle mToggle;
+
     public static final String PROFILE_HASH = "profileHash";
     public static final String PROGRAM_HASH = "PROGRAM_HASH";
     private SharedPreferences activityPrefs;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity
 
         // Create the pathToProfileHash HashMap
         pathToProfileHash = new HashMap<>();
+        pathToProgramHash = new HashMap<>();
 
         //Begin the Process of Reading in New Files and Saving Them
         repopulateProfileHash();
@@ -66,35 +68,13 @@ public class MainActivity extends AppCompatActivity
         // After this is done, read in the program files and link them to the profile from the hash
         repopulateProgramHash();
 
-        if(activityPrefs != null){
-            SharedPreferences.Editor editor = activityPrefs.edit();
-            Gson gson = new Gson();
-            String pathToProfileHashJson = gson.toJson(pathToProfileHash);
-            String pathToProgramHashJson = gson.toJson(pathToProgramHash);
-            editor.putString(PROFILE_HASH, pathToProfileHashJson);
-            editor.putString(PROGRAM_HASH, pathToProgramHashJson);
-            editor.apply();
-        }
-
-        // May be able to use this soon
-//        mProfileObserver = new FileObserver(CONSTANTS.PROFILES_PATH_MAIN) {
-//            @Override
-//            public void onEvent(int event, String path) {
-//                if(event == FileObserver.ALL_EVENTS){
-//                    repopulateProfileHash();
-//                }
-//            }
-//        };
-//        mProgramObserver = new FileObserver(CONSTANTS.PROGRAMS_PATH_MAIN) {
-//            @Override
-//            public void onEvent(int event, String path) {
-//                if(event == FileObserver.ALL_EVENTS){
-//                    repopulateProgramHash();
-//                }
-//            }
-//        };
-//        mProfileObserver.startWatching();
-//        mProgramObserver.startWatching();
+        SharedPreferences.Editor editor = activityPrefs.edit();
+        Gson gson = new Gson();
+        String pathToProfileHashJson = gson.toJson(pathToProfileHash);
+        String pathToProgramHashJson = gson.toJson(pathToProgramHash);
+        editor.putString(PROFILE_HASH, pathToProfileHashJson);
+        editor.putString(PROGRAM_HASH, pathToProgramHashJson);
+        editor.apply();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -110,10 +90,10 @@ public class MainActivity extends AppCompatActivity
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        mToggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        drawer.setDrawerListener(mToggle);
+        mToggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -134,7 +114,6 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         };
-        drawer.setSelected(false);
         super.onBackPressed();
     }
 
@@ -175,13 +154,6 @@ public class MainActivity extends AppCompatActivity
                 //Switch without adding to backstack
                 switchTo = new OperatorFragment();
                 break;
-            case R.id.nav_administrator_profile:
-                //Add to backstack if nothing there or if Operator is not there
-                if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
-                    ft.addToBackStack(getString(R.string.operator_frag_name));
-                }
-                switchTo = null;
-                break;
             case R.id.nav_administrator_mod_del_program:
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))){
                     ft.addToBackStack(getString(R.string.operator_frag_name));
@@ -194,7 +166,7 @@ public class MainActivity extends AppCompatActivity
                 if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
                     ft.addToBackStack(getString(R.string.operator_frag_name));
                 }
-                AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance();
+                AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(null);
                 switchTo = adminFrag;
                 break;
             case R.id.nav_graph_make_profile:
@@ -208,7 +180,6 @@ public class MainActivity extends AppCompatActivity
 
         if (switchTo != null){
             ft.replace(R.id.fragment_container, switchTo);
-//            }
             ft.commit();
         };
 
@@ -272,18 +243,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        SharedPreferences.Editor prefsEditor = activityPrefs.edit();
-        Gson gson = new Gson();
-        String pathToProfileHashJson = gson.toJson(pathToProfileHash);
-        String pathToProgramHashJson = gson.toJson(pathToProgramHash);
-        prefsEditor.putString(PROFILE_HASH, pathToProfileHashJson);
-        prefsEditor.putString(PROGRAM_HASH, pathToProgramHashJson);
-        prefsEditor.apply();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        storeHashData();
+    }
+
+    public void storeHashData(){
         SharedPreferences.Editor prefsEditor = activityPrefs.edit();
         Gson gson = new Gson();
         String pathToProfileHashJson = gson.toJson(pathToProfileHash);
@@ -296,17 +264,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-//        Gson gson = new Gson();
-//        if(activityPrefs.contains(PROFILE_HASH)){
-//            String json = activityPrefs.getString(PROFILE_HASH, "");
-//            Type hashType = new TypeToken<Map<String ,DipProfile>>(){}.getType();
-//            pathToProfileHash.putAll((Map<String, DipProfile>)gson.fromJson(json, hashType));
-//        }
-//        if(activityPrefs.contains(PROGRAM_HASH)){
-//            String jsonPrograms = activityPrefs.getString(PROGRAM_HASH, "");
-//            Type progHashType = new TypeToken<Map<String, DipProgram>>(){}.getType();
-//            pathToProgramHash.putAll((Map<String, DipProgram>)gson.fromJson(jsonPrograms, progHashType));
-//        }
     }
 
     @Override
@@ -317,5 +274,18 @@ public class MainActivity extends AppCompatActivity
 
         prefsEditor.putString(PROFILE_HASH, pathToProfileHashJson);
         prefsEditor.apply();
+    }
+
+    @Override
+    public void switchToProgramEdit(DipProgram dipProgram) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        if(getSupportFragmentManager().getBackStackEntryCount() == 0 || !getSupportFragmentManager().getBackStackEntryAt(0).getName().equals(getString(R.string.operator_frag_name))) {
+            ft.addToBackStack(getString(R.string.operator_frag_name));
+        }
+        AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(dipProgram);
+        ft.replace(R.id.fragment_container, adminFrag);
+        ft.commit();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
     }
 }

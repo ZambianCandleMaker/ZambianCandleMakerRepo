@@ -1,15 +1,18 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by TrottaSN on 2/8/2016.
  */
-public class DipProgram {
+public class DipProgram implements Parcelable{
     private String title;
     private String description;
     private int timeDelay;
@@ -31,6 +34,30 @@ public class DipProgram {
         this.maxVelRot = Integer.parseInt(inputStrings.get(6));
         this.profileList = new ArrayList<>();
     }
+
+    protected DipProgram(Parcel in) {
+        title = in.readString();
+        description = in.readString();
+        timeDelay = in.readInt();
+        maxAccelVert = in.readInt();
+        maxAccelRot = in.readInt();
+        maxVelVert = in.readInt();
+        maxVelRot = in.readInt();
+        path = in.readString();
+        profileList = in.createTypedArrayList(DipProfile.CREATOR);
+    }
+
+    public static final Creator<DipProgram> CREATOR = new Creator<DipProgram>() {
+        @Override
+        public DipProgram createFromParcel(Parcel in) {
+            return new DipProgram(in);
+        }
+
+        @Override
+        public DipProgram[] newArray(int size) {
+            return new DipProgram[size];
+        }
+    };
 
     public String getTitle() {
         return title;
@@ -105,6 +132,18 @@ public class DipProgram {
         }
     }
 
+    public Map<String, String> getFieldHash(){
+        Map<String, String> toReturn = new HashMap<>();
+        toReturn.put(CSVUtility.PROGRAM_MAX_VR_KEY, String.valueOf(getMaxVelRot()));
+        toReturn.put(CSVUtility.PROGRAM_MAX_VV_KEY, String.valueOf(getMaxVelVert()));
+        toReturn.put(CSVUtility.PROGRAM_MAX_AR_KEY, String.valueOf(getMaxAccelRot()));
+        toReturn.put(CSVUtility.PROGRAM_MAX_AV_KEY, String.valueOf(getMaxAccelVert()));
+        toReturn.put(CSVUtility.PROGRAM_TIME_DELAY_KEY, String.valueOf(getTimeDelay()));
+        toReturn.put(CSVUtility.PROGRAM_TITLE_KEY, getTitle());
+        toReturn.put(CSVUtility.PROGRAM_DESCRIPTION_KEY, getDescription());
+        return toReturn;
+    }
+
     public List<DipProfile> getProfileList() {
         return this.profileList;
     }
@@ -140,6 +179,25 @@ public class DipProgram {
                 return false;
             }
         }
+        profileList = readProfiles;
         return true;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeInt(timeDelay);
+        dest.writeInt(maxAccelVert);
+        dest.writeInt(maxAccelRot);
+        dest.writeInt(maxVelVert);
+        dest.writeInt(maxVelRot);
+        dest.writeString(path);
+        dest.writeTypedList(profileList);
     }
 }
