@@ -16,8 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,8 +65,6 @@ public class ProgramModDelFrag extends Fragment implements ProgramEditFragment {
         Gson gson = new Gson();
         Type progHashType = new TypeToken<Map<String, DipProgram>>(){}.getType();
         pathToProgramHash = gson.fromJson(jsonProgramHash, progHashType);
-        if (getArguments() != null) {
-        }
     }
 
     @Override
@@ -108,6 +104,10 @@ public class ProgramModDelFrag extends Fragment implements ProgramEditFragment {
                 builder.setIcon(android.R.drawable.ic_menu_delete);
                 builder.setTitle("Are You Sure You Want To Delete: " + choppingBlockProg.getTitle());
                 View view = getActivity().getLayoutInflater().inflate(R.layout.delete_program_dialog, null, false);
+                TextView titleText = (TextView)view.findViewById(R.id.program_title_delete_dialog);
+                titleText.setText(choppingBlockProg.getTitle());
+                TextView descText = (TextView)view.findViewById(R.id.program_desc_delete_dialog);
+                descText.setText(choppingBlockProg.getDescription());
                 builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

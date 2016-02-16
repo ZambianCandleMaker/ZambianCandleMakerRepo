@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -59,13 +58,10 @@ public class EditProfileFragment extends Fragment {
     private SharedPreferences prefs;
     private TextView profileTitleView;
 
-
     private static final String HASH = "hash";
     private static final String EDIT_PROFILE = "edit_profile";
     private static final String CURRENT_PROFILE = "current_profile";
     private CallbackActivity mCallback;
-
-    private static final LineGraphSeries<DataPoint> oldSeries = new LineGraphSeries<DataPoint>();
 
     private static DipProfile currentProfile;
 
@@ -225,7 +221,6 @@ public class EditProfileFragment extends Fragment {
 
     private void createNewCurrentProfile() {
         currentProfile = new DipProfile();
-
         for(int i = 1; ; i++){
             String title = "New Profile "+ i;
             if(!pathToProfileHash.containsKey(title)) {

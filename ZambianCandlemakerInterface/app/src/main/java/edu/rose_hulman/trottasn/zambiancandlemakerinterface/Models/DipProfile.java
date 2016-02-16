@@ -7,10 +7,7 @@ import android.util.Log;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-import java.lang.reflect.Type;
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -62,6 +59,7 @@ public class DipProfile implements Parcelable{
         title = in.readString();
         description = in.readString();
         path = in.readString();
+        maxYCoord = in.createTypedArrayList(TimePosPair.CREATOR);
     }
 
     public static final Creator<DipProfile> CREATOR = new Creator<DipProfile>() {
@@ -157,6 +155,7 @@ public class DipProfile implements Parcelable{
         dest.writeString(title);
         dest.writeString(description);
         dest.writeString(path);
+        dest.writeTypedList(maxYCoord);
     }
 
 //    public LinkedList<TimePosPair> getLinkedList(){
@@ -205,6 +204,9 @@ public class DipProfile implements Parcelable{
             }
 //            else if(CSVUtility.PROFILE_MAX_POS_KEY.equals(key)){
 //                this.maxPos = Integer.parseInt(typeToValueMapping.get(key));
+//            }
+//            else if(CSVUtility.PROFILE_MAX_TIME_KEY.equals(key)){
+//                this.maxTime = Integer.parseInt(typeToValueMapping.get(key));
 //            }
             else{
                 Log.d("CSVCHECK", "Unexpected parameter passed to assignFromReading");

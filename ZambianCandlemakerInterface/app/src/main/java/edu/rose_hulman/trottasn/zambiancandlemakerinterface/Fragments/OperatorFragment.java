@@ -3,8 +3,10 @@ package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -16,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -25,12 +26,17 @@ import java.util.ArrayList;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class OperatorFragment extends Fragment {
+    private static final String VERTICAL_SELECTION_KEY = "VERTICAL_SELECTION";
+    private static final String ROTATIONAL_SELECTION_KEY = "ROTATIONAL_SELECTION";
+    private static final String DIPS_SELECTION_KEY = "DIPS_SELECTION";
+    private static final String UNIT_SELECTION_KEY = "UNIT_SELECTION";
     private static final int MAX_DIPS_PER_REV = 25;
     private static final int MIN_DIPS_PER_REV = 1;
     private String vertical_units;
     private int vertical_selection;
     private int rotational_selection;
     private int dips_selection;
+    private int unit_selection;
     private OperatorFragmentListener mCallback;
     private ArrayAdapter<CharSequence> vertical_adapter_cm;
     private ArrayAdapter<CharSequence> vertical_adapter_mm;
@@ -53,8 +59,22 @@ public class OperatorFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        dips_selection = sharedPref.getInt(DIPS_SELECTION_KEY, 0);
+        unit_selection = sharedPref.getInt(UNIT_SELECTION_KEY, 0);
+        vertical_selection = sharedPref.getInt(VERTICAL_SELECTION_KEY, 0);
+        rotational_selection = sharedPref.getInt(ROTATIONAL_SELECTION_KEY, 0);
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(VERTICAL_SELECTION_KEY, vertical_selection);
+        editor.putInt(ROTATIONAL_SELECTION_KEY, rotational_selection);
+        editor.putInt(DIPS_SELECTION_KEY, dips_selection);
+        editor.putInt(UNIT_SELECTION_KEY, unit_selection);
     }
 
     @Override
@@ -84,10 +104,8 @@ public class OperatorFragment extends Fragment {
             }
         };
 
-        RelativeLayout opView = (RelativeLayout) view.findViewById(R.id.operator_view);
-
         // ArrayAdapter to be used when centimeters are selected on the unit spinner
-        ArrayAdapter<CharSequence> adapter_cm = new ArrayAdapter<CharSequence>(getContext(), android.R.layout.simple_spinner_item, new ArrayList<CharSequence>());
+        ArrayAdapter<CharSequence> adapter_cm = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, new ArrayList<CharSequence>());
         for (int i = 1; i < 16; i++) {
             adapter_cm.add(String.valueOf(i));
         }
@@ -97,11 +115,12 @@ public class OperatorFragment extends Fragment {
         // ArrayAdapter to be used when millimeters are selected on the unit spinner
         ArrayAdapter<CharSequence> adapter_mm = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, new ArrayList<CharSequence>());
         for (int i = 1; i < 11; i++) {
-            adapter_mm.add((CharSequence) String.valueOf(i));
+            adapter_mm.add(String.valueOf(i));
         }
         adapter_mm.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.vertical_adapter_mm = adapter_mm;
         final Spinner vertJogSpinner = (Spinner) view.findViewById(R.id.vert_spinner);
+        vertJogSpinner.setSelection(vertical_selection);
 
         final Spinner unitSpinner = (Spinner) view.findViewById(R.id.unit_spinner);
         ArrayAdapter<CharSequence> adapter_units = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, new ArrayList<CharSequence>());
@@ -115,8 +134,10 @@ public class OperatorFragment extends Fragment {
                 vertical_units = parent.getItemAtPosition(position).toString();
                 if (vertical_units.equals("cm")) {
                     vertJogSpinner.setAdapter(vertical_adapter_cm);
+                    unit_selection = 0;
                 } else if (vertical_units.equals("mm")) {
                     vertJogSpinner.setAdapter(vertical_adapter_mm);
+                    unit_selection = 1;
                 }
             }
 
@@ -124,27 +145,31 @@ public class OperatorFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
                 vertical_units = "cm";
                 vertJogSpinner.setAdapter(vertical_adapter_cm);
+                unit_selection = 0;
             }
         });
+        unitSpinner.setSelection(unit_selection);
 
         // ArrayAdapter to be used when millimeters are selected on the unit spinner
         ArrayAdapter<CharSequence> adapter_rot = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, new ArrayList<CharSequence>());
         for (int i = 15; i <= 360; i += 15) {
-            adapter_rot.add((CharSequence) String.valueOf(i));
+            adapter_rot.add(String.valueOf(i));
         }
         adapter_rot.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.rotational_adapter = adapter_rot;
         final Spinner rotJogSpinner = (Spinner) view.findViewById(R.id.rot_spinner);
         rotJogSpinner.setAdapter(this.rotational_adapter);
+        rotJogSpinner.setSelection(rotational_selection);
 
         // ArrayAdapter to be used for the number of dips per revolution spinner
         ArrayAdapter<CharSequence> dips_per_rev_array = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, new ArrayList<CharSequence>());
         for (int i = MIN_DIPS_PER_REV; i < MAX_DIPS_PER_REV; i++) {
-            dips_per_rev_array.add((CharSequence) String.valueOf(i));
+            dips_per_rev_array.add(String.valueOf(i));
         }
         dips_per_rev_array.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         final Spinner dipsPerRevSpinner = (Spinner) view.findViewById(R.id.dips_per_rev_spinner);
         dipsPerRevSpinner.setAdapter(dips_per_rev_array);
+        dipsPerRevSpinner.setSelection(dips_selection);
 
         final Button vertJogButton = (Button) view.findViewById(R.id.apply_vert_jog_button);
         final Button rotJogButton = (Button) view.findViewById(R.id.apply_rot_jog_button);
