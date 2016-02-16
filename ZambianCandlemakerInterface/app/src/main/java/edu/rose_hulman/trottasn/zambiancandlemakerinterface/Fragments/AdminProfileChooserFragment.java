@@ -57,7 +57,7 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
 
     private boolean mSavePreparedness;
 
-    private OnAdminProfileChosenListener mListener;
+    private OnProgramSavedListener mListener;
 
     private static final String STARTING_PROGRAM = "STARTING_PROGRAM";
 
@@ -163,7 +163,6 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
 
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onProfileChosen(uri);
         }
     }
 
@@ -186,15 +185,57 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
                 builder.setTitle(getResources().getString(R.string.save_new_program));
                 View view = getActivity().getLayoutInflater().inflate(R.layout.save_program_dialog, null, false);
                 final EditText titleBox = (EditText)view.findViewById(R.id.program_title_box);
+                String possTitleText = mFieldValuePairs.get(CSVUtility.PROGRAM_TITLE_KEY);
+                if(possTitleText != null && possTitleText != ""){
+                    titleBox.setText(possTitleText);
+                }
                 final EditText descBox = (EditText)view.findViewById(R.id.program_desc_box);
+                String possDescriptionText = mFieldValuePairs.get(CSVUtility.PROGRAM_DESCRIPTION_KEY);
+                if(possDescriptionText != null && possDescriptionText != ""){
+                    descBox.setText(possDescriptionText);
+                }
                 builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //Need to check for invalidity first
+                        String titleGet = titleBox.getText().toString();
+                        String descGet = descBox.getText().toString();
+                        if(titleGet == null || titleGet.equals("")){
+                            Toast.makeText(getContext(), R.string.please_enter_a_title, Toast.LENGTH_SHORT).show();
+                            mFieldValuePairs.put(CSVUtility.PROGRAM_TITLE_KEY, "");
+                            displaySaveDialog();
+                            return;
+                        }
+                        if(descGet == null && descGet.equals("")){
+                            Toast.makeText(getContext(), R.string.please_enter_a_description, Toast.LENGTH_SHORT).show();
+                            mFieldValuePairs.put(CSVUtility.PROGRAM_DESCRIPTION_KEY, "");
+                            displaySaveDialog();
+                            return;
+                        }
                         mFieldValuePairs.put(CSVUtility.PROGRAM_TITLE_KEY, titleBox.getText().toString());
                         mFieldValuePairs.put(CSVUtility.PROGRAM_DESCRIPTION_KEY, descBox.getText().toString());
                         List<String> selectedProfiles = mSelectedAdapter.getTitleList();
+                        List<DipProfile> dipProfs = new ArrayList<>();
+                        for(String name : selectedProfiles) {
+                            DipProfile dipProf = pathToProfileHash.get(name);
+                            if(dipProf == null){
+                                Toast.makeText(getContext(), "Could Not Save Program - Data Out of Sync. Sorry for the inconvenience. Please restart the Application.", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            dipProfs.add(pathToProfileHash.get(name));
+                        }
+                        Toast.makeText(getContext(), "Saving Program to CSV file and in Cache", Toast.LENGTH_SHORT).show();
+                        DipProgram newProgram = new DipProgram();
+                        newProgram.assignFromReading(mFieldValuePairs, dipProfs);
+                        pathToProgramHash.put(mFieldValuePairs.get(CSVUtility.PROGRAM_TITLE_KEY), newProgram);
                         CSVUtility.writeProgramCSV(mFieldValuePairs, selectedProfiles, getActivity());
+                        SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                        Gson gson = new Gson();
+                        String pathToProfileHashJson = gson.toJson(pathToProfileHash);
+                        String pathToProgramHashJson = gson.toJson(pathToProgramHash);
+                        prefsEditor.putString(MainActivity.PROFILE_HASH, pathToProfileHashJson);
+                        prefsEditor.putString(MainActivity.PROGRAM_HASH, pathToProgramHashJson);
+                        prefsEditor.apply();
                     }
                 });
 
@@ -308,19 +349,12 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnAdminProfileChosenListener) {
-            mListener = (OnAdminProfileChosenListener) context;
+        if (context instanceof OnProgramSavedListener) {
+            mListener = (OnProgramSavedListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
     }
 
     @Override
@@ -359,8 +393,8 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
         mAvailableAdapter.addProfile(dipProfile);
     }
 
-    public interface OnAdminProfileChosenListener {
-        void onProfileChosen(Uri uri);
+    public interface OnProgramSavedListener {
+        void onProgramSaved();
     }
 
     public void populateStartingData(DipProgram dipProgram){

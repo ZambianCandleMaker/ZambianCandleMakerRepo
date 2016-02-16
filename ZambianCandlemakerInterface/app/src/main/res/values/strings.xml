@@ -54,4 +54,9 @@
     <string name="dialog_delete_profile_message">"Are you sure you want to delete the profile "</string>
     <string name="question_mark">\?</string>
     <string name="administrator_modify_programs">Administrator - Modify Programs</string>
+    <string name="default_title_save_dialog">DefaultTitle</string>
+    <string name="default_description_save_dialog">DefaultDescription</string>
+    <string name="please_enter_a_title">Please Enter a Title</string>
+    <string name="please_enter_a_description">Please Enter a Description</string>
+    <string name="administrator_lock">Administrator Lock</string>
 </resources>
