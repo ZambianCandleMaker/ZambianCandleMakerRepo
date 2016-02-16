@@ -2,18 +2,24 @@ package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.lang.reflect.Type;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 /**
  * Created by TrottaSN on 2/4/2016.
  */
 public class DipProfile implements Parcelable{
+    private List<TimePosPair> pairList;
     private String title;
     private String description;
     private String path;
@@ -26,6 +32,7 @@ public class DipProfile implements Parcelable{
     public DipProfile(){
         this.pairList = new ArrayList<TimePosPair>();
         addPair(0,0);
+        this.pairList = new ArrayList<>();
     }
 
     public DipProfile(String title, String description, String path){
@@ -33,6 +40,7 @@ public class DipProfile implements Parcelable{
         this.title = title;
         this.description = description;
         this.pairList = new ArrayList<TimePosPair>();
+        this.pairList = new ArrayList<>();
     }
 
     public DipProfile(DipProfile profile){
@@ -48,9 +56,12 @@ public class DipProfile implements Parcelable{
     }
 
     protected DipProfile(Parcel in) {
+        pairList = in.createTypedArrayList(TimePosPair.CREATOR);
         title = in.readString();
         description = in.readString();
         path = in.readString();
+        maxTime = in.readInt();
+        maxPos = in.readInt();
     }
 
     public static final Creator<DipProfile> CREATOR = new Creator<DipProfile>() {
@@ -122,7 +133,9 @@ public class DipProfile implements Parcelable{
         if(getMaxYCoordinate() <= current.getPosition()) this.maxYCoord.add(current);
     }
 
-    public ArrayList<TimePosPair> getPairList() {return this.pairList; }
+    public List<TimePosPair> getPairList() {
+        return this.pairList;
+    }
 
     public String getPath(){
         return this.path;
@@ -139,9 +152,12 @@ public class DipProfile implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedList(pairList);
         dest.writeString(title);
         dest.writeString(description);
         dest.writeString(path);
+        dest.writeInt(maxTime);
+        dest.writeInt(maxPos);
     }
 
 //    public LinkedList<TimePosPair> getLinkedList(){
@@ -162,7 +178,7 @@ public class DipProfile implements Parcelable{
 
         DataPoint[] dp = arrayList.toArray(new DataPoint[arrayList.size()]);
 
-        return new LineGraphSeries<DataPoint>(dp);
+        return new LineGraphSeries<>(dp);
     }
 
     public double getMaxTime() {
@@ -173,7 +189,32 @@ public class DipProfile implements Parcelable{
 
     public int getMaxYCoordinate() {
         return this.maxYCoord.get(maxYCoord.size()-1).getPosition();
+
+
+
+    protected boolean assignFromReading(Map<String, String> typeToValueMapping, List<TimePosPair> timePosPairs){
+        if(typeToValueMapping.size() == 0){
+            return false;
+        }
+        for(String key : typeToValueMapping.keySet()){
+            if(CSVUtility.PROFILE_TITLE_KEY.equals(key)){
+                this.title = typeToValueMapping.get(key);
+            }
+            else if(CSVUtility.PROFILE_DESCRIPTION_KEY.equals(key)){
+                this.description = typeToValueMapping.get(key);
+            }
+            else if(CSVUtility.PROFILE_MAX_POS_KEY.equals(key)){
+                this.maxPos = Integer.parseInt(typeToValueMapping.get(key));
+            }
+            else if(CSVUtility.PROFILE_MAX_TIME_KEY.equals(key)){
+                this.maxTime = Integer.parseInt(typeToValueMapping.get(key));
+            }
+            else{
+                Log.d("CSVCHECK", "Unexpected parameter passed to assignFromReading");
+                return false;
+            }
+        }
+        pairList.addAll(timePosPairs);
+        return true;
     }
-
-
 }

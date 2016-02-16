@@ -14,8 +14,10 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 public class ProgModDelAdapter extends RecyclerView.Adapter<ProgModDelAdapter.ViewHolder> {
 
     private List<DipProgram> mPrograms;
+    private ProgramEditFragment mProgEditFrag;
 
-    public ProgModDelAdapter() {
+    public ProgModDelAdapter(ProgramEditFragment progEditFrag) {
+        mProgEditFrag = progEditFrag;
         mPrograms = new ArrayList<>();
     }
 
@@ -54,14 +56,20 @@ public class ProgModDelAdapter extends RecyclerView.Adapter<ProgModDelAdapter.Vi
         notifyItemRemoved(position);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView mTitleView;
         private TextView mDescriptionView;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            mTitleView = (TextView) itemView.findViewById(R.id.avail_profile_title);
-            mDescriptionView = (TextView) itemView.findViewById(R.id.avail_profile_desc);
+            mTitleView = (TextView) itemView.findViewById(R.id.saved_program_title);
+            mDescriptionView = (TextView) itemView.findViewById(R.id.saved_program_description);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mProgEditFrag.switchToEditing(mPrograms.get(getAdapterPosition()));
         }
     }
 }

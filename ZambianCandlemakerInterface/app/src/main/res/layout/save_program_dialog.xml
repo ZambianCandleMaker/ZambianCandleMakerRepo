@@ -10,8 +10,8 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Please Select a Title:"
         android:id="@+id/program_title_prompt"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -40,12 +40,4 @@
         android:layout_below="@+id/program_description_prompt"
         android:layout_alignStart="@+id/program_title_prompt" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save Program"
-        android:id="@+id/save_program_button"
-        android:layout_below="@+id/program_desc_box"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp" />
 </RelativeLayout>

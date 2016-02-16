@@ -1,68 +1,51 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.media.MediaScannerConnection;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.FileObserver;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.opencsv.CSVWriter;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.lang.reflect.Type;
+import java.util.Map;
 
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.CallbackActivity;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.ProgModDelAdapter;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.ProgramEditFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.FileObserverParcel;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProgramHashParcel;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
-public class ProgramModDelFrag extends Fragment {
+public class ProgramModDelFrag extends Fragment implements ProgramEditFragment {
 
     private RecyclerView mProgramsRecycler;
     private ProgModDelAdapter mProgramsAdapter;
 
-    private static HashMap<String, DipProgram> pathToProgramHash;
-    private static final String PROGRAM_HASH = "PROGRAM_HASH";
+    private static Map<String, DipProgram> pathToProgramHash;
 
-    private FileObserver mProfileObserver;
-    private static final String PROFILE_OBSERVER = "PROFILE_OBSERVER";
-
-    private FileObserver mProgramObserver;
-    private static final String PROGRAM_OBSERVER = "PROGRAM_OBSERVER";
-
+    private CallbackActivity mCallback;
 
     public ProgramModDelFrag() {
         // Required empty public constructor
     }
 
-    public static ProgramModDelFrag newInstance(Parcelable inProgramHash, Parcelable inProfileObserver, Parcelable inProgramObserver) {
+    public static ProgramModDelFrag newInstance() {
         ProgramModDelFrag fragment = new ProgramModDelFrag();
         Bundle args = new Bundle();
-        args.putParcelable(PROGRAM_HASH, inProgramHash);
-        args.putParcelable(PROFILE_OBSERVER, inProfileObserver);
-        args.putParcelable(PROGRAM_OBSERVER, inProgramObserver);
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,13 +53,12 @@ public class ProgramModDelFrag extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String jsonProgramHash = sharedPreferences.getString(MainActivity.PROGRAM_HASH, "");
+        Gson gson = new Gson();
+        Type progHashType = new TypeToken<Map<String, DipProgram>>(){}.getType();
+        pathToProgramHash = gson.fromJson(jsonProgramHash, progHashType);
         if (getArguments() != null) {
-            ProgramHashParcel programParcel = getArguments().getParcelable(PROGRAM_HASH);
-            FileObserverParcel profileObserverParcel = getArguments().getParcelable(PROFILE_OBSERVER);
-            FileObserverParcel programObserverParcel = getArguments().getParcelable(PROGRAM_OBSERVER);
-            pathToProgramHash = programParcel.getHash();
-            mProfileObserver = profileObserverParcel.getFileObserver();
-            mProgramObserver = programObserverParcel.getFileObserver();
         }
     }
 
@@ -89,7 +71,7 @@ public class ProgramModDelFrag extends Fragment {
         mProgramsRecycler.setHasFixedSize(true);
         mProgramsRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mProgramsAdapter = new ProgModDelAdapter();
+        mProgramsAdapter = new ProgModDelAdapter(this);
         mProgramsRecycler.setAdapter(mProgramsAdapter);
 
         populateFromHash();
@@ -133,76 +115,25 @@ public class ProgramModDelFrag extends Fragment {
         df.show(getFragmentManager(), "");
     }
 
-    public void writeToCSVFile(File file){
-        file.setWritable(true);
-        MediaScannerConnection.scanFile(getActivity(), new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-            public void onScanCompleted(String path, Uri uri) {
-                Log.i("EXTERNAL STORAGE", "SCANNED");
-            }
-        });
-        final String filename = file.toString();
-        CharSequence contentTitle = getString(R.string.app_name);
-        final List<String> strList = new ArrayList<String>();
-        final ProgressDialog progDialog = ProgressDialog.show(
-                getActivity(), contentTitle, "Please Wait.",
-                true);//please wait
-        final DipProgram newProgram = new DipProgram();
-        final Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                if(strList.size() < 2){
-                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has less than two entries (no title / description)");
-                    return;
-                };
-                if(strList.size()%2 != 0){
-                    Log.d("INVALID_CSV_FOR_PROGRAM", "CSV has an odd number of entries (there exists an unequal pair)");
-                }
-                newProgram.setTitle(strList.get(0));
-                newProgram.setDescription(strList.get(1));
-                newProgram.setPath(filename);
-                pathToProgramHash.put(filename, newProgram);
-            }
-        };
-        new Thread(){
-            public void run(){
-                try {
-                    CSVWriter writer = new CSVWriter(new FileWriter("yourfile.csv"), '\t');
-                    // feed in your array (or convert your data to an array)
-                    String[] entries = "first#second#third".split("#");
-//                    while (true) {
-//                        writer.writeNext(entries);
-//                    }
-                    writer.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                handler.sendEmptyMessage(0);
-                progDialog.dismiss();
-            }
-        }.start();
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnAdminProfileChosenListener) {
-//            mListener = (OnAdminProfileChosenListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
+        if (context instanceof CallbackActivity) {
+            mCallback = (CallbackActivity) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-//        mListener = null;
+        mCallback = null;
     }
 
-    public interface OnProgramModDelChosenListener {
-        void onProgramModDelChosen(Uri uri);
+    @Override
+    public void switchToEditing(DipProgram dipProgram) {
+        mCallback.switchToProgramEdit(dipProgram);
     }
 }

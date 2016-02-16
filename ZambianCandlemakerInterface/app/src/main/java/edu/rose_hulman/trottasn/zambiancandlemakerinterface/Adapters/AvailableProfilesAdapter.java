@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
@@ -58,6 +59,13 @@ public class AvailableProfilesAdapter extends RecyclerView.Adapter<AvailableProf
         mAvailableProfiles.clear();
         mProfileChooserHelper.returnAvailableToTop();
         notifyDataSetChanged();
+    }
+
+    public void subtractProfiles(List<DipProfile> dipProfiles){
+        if(dipProfiles != null){
+            mAvailableProfiles.removeAll(dipProfiles);
+            notifyDataSetChanged();
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

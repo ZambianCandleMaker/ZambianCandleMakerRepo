@@ -30,7 +30,6 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -41,21 +40,18 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
 
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.CallbackActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.EditProfileAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProfileHashParcel;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 
-public class EditProfileFragment extends Fragment implements ProfileHashFragment {
-
-    OperatorFragment.OperatorFragmentListener mCallback;
-
+public class EditProfileFragment extends Fragment {
     private RecyclerView pointRecycler;
     private EditProfileAdapter mAdapter;
     private GraphView graph;
@@ -67,12 +63,13 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     private static final String HASH = "hash";
     private static final String EDIT_PROFILE = "edit_profile";
     private static final String CURRENT_PROFILE = "current_profile";
+    private CallbackActivity mCallback;
 
     private static final LineGraphSeries<DataPoint> oldSeries = new LineGraphSeries<DataPoint>();
 
     private static DipProfile currentProfile;
 
-    private static HashMap<String, DipProfile> pathToProfileHash;
+    private static Map<String, DipProfile> pathToProfileHash;
 
     private EditText timeText;
     private EditText depthText;
@@ -330,8 +327,8 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OperatorFragment.OperatorFragmentListener) {
-            mCallback = (OperatorFragment.OperatorFragmentListener) context;
+        if (context instanceof CallbackActivity) {
+            mCallback = (CallbackActivity) context;
         }
         else {
             throw new RuntimeException(context.toString()
@@ -402,7 +399,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
                 builder.setTitle("Save Profile?");
                 builder.setView(view);
-                builder.setNegativeButton(android.R.string.cancel , new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -423,18 +420,18 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
                     @Override
                     public void onClick(View v) {
                         String title = profileName.getText().toString();
-                        MainActivity mainActivity = (MainActivity) getActivity();
 
                         if(confirmationCheckbox.isChecked()) {
                             title = dropdown.getSelectedItem().toString();
 
-                        }else if(title != "" && title !=" " && !title.contains("  ")){
+                        } else if (title != "" && title != " " && !title.contains("  ")) {
                             currentProfile = new DipProfile(currentProfile);
+
 
                         }
                         currentProfile.setTitle(title);
                         pathToProfileHash.put(title,currentProfile);
-                        mainActivity.savePathToProfileHash(pathToProfileHash);
+                        mCallback.savePathToProfileHash(pathToProfileHash);
                         profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
                         dismiss();
 
@@ -459,6 +456,7 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
 
                         pathToProfileHash.remove(currentProfile.getTitle());
                         createNewCurrentProfile();
+                        pathToProfileHash.remove("derp");
                     }
                 });
 
@@ -517,25 +515,4 @@ public class EditProfileFragment extends Fragment implements ProfileHashFragment
         df.show(getActivity().getSupportFragmentManager(),"select");
 
     }
-
-    @Override
-    public void setNewProfileHash(HashMap<String, DipProfile> newHash) {
-        pathToProfileHash = newHash;
-    }
-
-    @Override
-    public void setNewProgramHash(HashMap<String, DipProgram> newHash) {
-
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
 }

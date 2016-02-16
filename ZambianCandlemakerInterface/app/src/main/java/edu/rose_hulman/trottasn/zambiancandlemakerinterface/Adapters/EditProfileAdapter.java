@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
@@ -29,7 +30,7 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
     private View mView;
     private EditProfileFragment mFragment;
 
-    private ArrayList<TimePosPair> mPoints;
+    private List<TimePosPair> mPoints;
 
     public EditProfileAdapter(Context context, EditProfileFragment fragment, View view, DipProfile profile){
         this.mProfile = profile;

@@ -1,15 +1,11 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -30,24 +26,19 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.opencsv.CSVWriter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.AvailableProfilesAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.SelectedProfilesAdapter;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.CSVUtility;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class AdminProfileChooserFragment extends Fragment implements AvailableProfilesAdapter.ProfileChooserFragmentHelper, SelectedProfilesAdapter.ProfileSelectedHelper {
@@ -59,14 +50,19 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
     private Button mOptionsButton;
     private Button mSaveButton;
 
-    private HashMap<String, String> mFieldValuePairs;
+    private DipProgram startingProgram;
+    private boolean startFromProgram;
+
+    private Map<String, String> mFieldValuePairs;
 
     private boolean mSavePreparedness;
 
     private OnAdminProfileChosenListener mListener;
 
-    private static HashMap<String, DipProfile> pathToProfileHash;
-    private static HashMap<String, DipProgram> pathToProgramHash;
+    private static final String STARTING_PROGRAM = "STARTING_PROGRAM";
+
+    private static Map<String, DipProfile> pathToProfileHash;
+    private static Map<String, DipProgram> pathToProgramHash;
 
     public static final int MAX_TIME_DELAY = 60;
 
@@ -75,13 +71,13 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
         // Required empty public constructor
     }
 
-    public static AdminProfileChooserFragment newInstance() {
+    public static AdminProfileChooserFragment newInstance(DipProgram dipProgram) {
         AdminProfileChooserFragment fragment = new AdminProfileChooserFragment();
         Bundle args = new Bundle();
-//        args.putParcelable(PROFILE_HASH, inProfileHash);
-//        args.putParcelable(PROGRAM_HASH, inProgramHash);
-//        args.putParcelable(PROFILE_OBSERVER, inProfileObserver);
-//        args.putParcelable(PROGRAM_OBSERVER, inProgramObserver);
+        if(dipProgram != null){
+            Log.d("BREAK", "GIVE ME ONE");
+            args.putParcelable(STARTING_PROGRAM, dipProgram);
+        }
         fragment.setArguments(args);
         return fragment;
     }
@@ -89,7 +85,7 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFieldValuePairs = new HashMap<String, String>();
+        mFieldValuePairs = new HashMap<>();
         Gson gson = new Gson();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if(sharedPreferences != null){
@@ -99,6 +95,14 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
             Type progHashType = new TypeToken<HashMap<String, DipProgram>>(){}.getType();
             pathToProfileHash = gson.fromJson(profileHashString, hashType);
             pathToProgramHash = gson.fromJson(programHashString, progHashType);
+        }
+        Bundle args = getArguments();
+        if(args != null){
+            Log.d("BREAK", "GIVE ME 2");
+            startingProgram = args.getParcelable(STARTING_PROGRAM);
+            if(startingProgram != null){
+                startFromProgram = true;
+            }
         }
     }
 
@@ -151,6 +155,9 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
             mSaveButton.setVisibility(View.GONE);
         };
         populateFromHash();
+        if(startFromProgram){
+            populateStartingData(startingProgram);
+        }
         return totalView;
     }
 
@@ -180,83 +187,23 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
                 View view = getActivity().getLayoutInflater().inflate(R.layout.save_program_dialog, null, false);
                 final EditText titleBox = (EditText)view.findViewById(R.id.program_title_box);
                 final EditText descBox = (EditText)view.findViewById(R.id.program_desc_box);
-                final Button saveButton = (Button)view.findViewById(R.id.save_program_button);
-                saveButton.setOnClickListener(new View.OnClickListener() {
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(DialogInterface dialog, int which) {
                         //Need to check for invalidity first
-                        writeToCSVFile(titleBox.getText().toString(), descBox.getText().toString());
+                        mFieldValuePairs.put(CSVUtility.PROGRAM_TITLE_KEY, titleBox.getText().toString());
+                        mFieldValuePairs.put(CSVUtility.PROGRAM_DESCRIPTION_KEY, descBox.getText().toString());
+                        List<String> selectedProfiles = mSelectedAdapter.getTitleList();
+                        CSVUtility.writeProgramCSV(mFieldValuePairs, selectedProfiles, getActivity());
                     }
                 });
+
                 builder.setView(view);
 
                 return builder.create();
             }
         };
         df.show(getFragmentManager(), "");
-    }
-
-    public void writeToCSVFile(String title, String description){
-        File file = new File(CONSTANTS.PROGRAMS_PATH_MAIN + "/" + title + ".csv");
-        file.setWritable(true);
-        int count = 1;
-        while(file.exists()){
-            file = new File(CONSTANTS.PROGRAMS_PATH_MAIN + "/" + title + String.valueOf(count) + ".csv");
-            count = count + 1;
-        }
-        final File finalFile = file;
-        final String filename = finalFile.toString();
-        CharSequence contentTitle = getString(R.string.app_name);
-        final ProgressDialog progDialog = ProgressDialog.show(
-                getActivity(), contentTitle, "Please Wait.",
-                true);//please wait
-        MediaScannerConnection.scanFile(getActivity(), new String[]{filename}, null, new MediaScannerConnection.OnScanCompletedListener() {
-            public void onScanCompleted(String path, Uri uri) {
-                Log.i("EXTERNAL STORAGE", "SCANNED");
-            }
-        });
-        try {
-            CSVWriter writer = new CSVWriter(new FileWriter(filename), '\t');
-            // feed in your array (or convert your data to an array)
-            String parseChar = "!!";
-            String nextLineChar = "!!!";
-            String toParse = title + description + nextLineChar;
-            boolean shouldParse = true;
-            int keysLeft = mFieldValuePairs.size();
-            for(String key : mFieldValuePairs.keySet()){
-                String value = mFieldValuePairs.get(key);
-                if(value != null && !value.equals("")){
-                    if(keysLeft != 0){
-                        if(keysLeft % 2 == 0){
-                            toParse = toParse + nextLineChar;
-                        }
-                        toParse = toParse + value + parseChar;
-                    }
-                    else{
-                        toParse = toParse + value;
-                    }
-                }
-                else{
-                    shouldParse = false;
-                    break;
-                }
-                keysLeft = keysLeft - 1;
-            }
-            if(shouldParse){
-                String[] lines = toParse.split(nextLineChar);
-                for(String line : lines){
-                    String[] stringsOfLine = line.split(parseChar);
-                    writer.writeNext(stringsOfLine);
-                }
-                writer.close();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        progDialog.dismiss();
     }
 
     public void displayOptionsDialog(final boolean fromInvalidOptions, final HashMap<String, String> fieldMap){
@@ -280,27 +227,27 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
                 timeDelayBox.setAdapter(time_delay_array);
 
                 // BELOW : STRATEGY PATTERN FOR THESE? THERE'S GOT TO BE A WAY TO CONDENSE
-                String popTimeDelay = fieldMap.get(CONSTANTS.TIME_DELAY_KEY);
+                String popTimeDelay = fieldMap.get(CSVUtility.PROGRAM_TIME_DELAY_KEY);
                 if(popTimeDelay != null && !popTimeDelay.equals("")) {
                     timeDelayBox.setSelection(time_delay_array.getPosition(String.valueOf(popTimeDelay)));
                 }
                 final EditText maxAccelVertBox = (EditText) view.findViewById(R.id.vert_accel_box);
-                String popMaxAccelVert = fieldMap.get(CONSTANTS.MAX_ACCEL_VERT_KEY);
+                String popMaxAccelVert = fieldMap.get(CSVUtility.PROGRAM_MAX_AV_KEY);
                 if(popMaxAccelVert != null && !popMaxAccelVert.equals("")) {
                     maxAccelVertBox.setText(String.valueOf(popMaxAccelVert));
                 }
                 final EditText maxAccelRotBox = (EditText) view.findViewById(R.id.max_accel_rot_box);
-                String popMaxAccelRot = fieldMap.get(CONSTANTS.MAX_ACCEL_ROT_KEY);
+                String popMaxAccelRot = fieldMap.get(CSVUtility.PROGRAM_MAX_AR_KEY);
                 if(popMaxAccelRot != null && !popMaxAccelRot.equals("")) {
                     maxAccelRotBox.setText(String.valueOf(popMaxAccelRot));
                 }
                 final EditText maxVelVertBox = (EditText) view.findViewById(R.id.def_jog_vel_vert_box);
-                String popMaxVelVert = fieldMap.get(CONSTANTS.MAX_VEL_VERT_KEY);
+                String popMaxVelVert = fieldMap.get(CSVUtility.PROGRAM_MAX_VV_KEY);
                 if(popMaxVelVert != null && !popMaxVelVert.equals("")){
                     maxVelVertBox.setText(String.valueOf(popMaxVelVert));
                 }
                 final EditText maxVelRotBox = (EditText) view.findViewById(R.id.def_jog_vel_rot_box);
-                String popMaxVelRot = fieldMap.get(CONSTANTS.MAX_VEL_ROT_KEY);
+                String popMaxVelRot = fieldMap.get(CSVUtility.PROGRAM_MAX_VR_KEY);
                 if(popMaxVelRot != null && !popMaxVelRot.equals("")){
                     maxVelRotBox.setText(String.valueOf(popMaxVelRot));
                 }
@@ -317,11 +264,11 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
                         String maxVelRot = maxVelRotBox.getText().toString();
 
                         HashMap<String, String> redoHash = new HashMap<String, String>();
-                        redoHash.put(CONSTANTS.TIME_DELAY_KEY, timeDelaySelection);
-                        redoHash.put(CONSTANTS.MAX_ACCEL_VERT_KEY, maxAccelVert);
-                        redoHash.put(CONSTANTS.MAX_ACCEL_ROT_KEY, maxAccelRot);
-                        redoHash.put(CONSTANTS.MAX_VEL_VERT_KEY, maxVelVert);
-                        redoHash.put(CONSTANTS.MAX_VEL_ROT_KEY, maxVelRot);
+                        redoHash.put(CSVUtility.PROGRAM_TIME_DELAY_KEY, timeDelaySelection);
+                        redoHash.put(CSVUtility.PROGRAM_MAX_AV_KEY, maxAccelVert);
+                        redoHash.put(CSVUtility.PROGRAM_MAX_AR_KEY, maxAccelRot);
+                        redoHash.put(CSVUtility.PROGRAM_MAX_VV_KEY, maxVelVert);
+                        redoHash.put(CSVUtility.PROGRAM_MAX_VR_KEY, maxVelRot);
 
                         boolean proceed = true;
 
@@ -370,6 +317,13 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -407,5 +361,12 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
 
     public interface OnAdminProfileChosenListener {
         void onProfileChosen(Uri uri);
+    }
+
+    public void populateStartingData(DipProgram dipProgram){
+        mFieldValuePairs = dipProgram.getFieldHash();
+        List<DipProfile> prevSelectedProfs = dipProgram.getProfileList();
+        mSelectedAdapter.setSelectedProfiles(prevSelectedProfs);
+        mAvailableAdapter.subtractProfiles(prevSelectedProfs);
     }
 }
