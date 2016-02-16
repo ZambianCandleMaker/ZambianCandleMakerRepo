@@ -29,10 +29,15 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -161,10 +166,14 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
 
-        if (id == R.id.action_logout){
+        else if (id == R.id.action_logout){
             this.canAllow = false;
             SharedPreferences.Editor editor = activityPrefs.edit();
             editor.putBoolean(PASSWORD_KEEPING_KEY, false);
+        }
+
+        else if (id == R.id.action_change_password){
+            displayChangePasswordDialog();
         }
 
         return super.onOptionsItemSelected(item);
@@ -175,13 +184,91 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         this.tempIdSave = item.getItemId();
-        if(true){
-//        if(this.tempIdSave == R.id.nav_operator || this.canAllow){
+        if(this.tempIdSave == R.id.nav_operator || this.canAllow){
             this.allowFragmentToReplace();
             return true;
         }
 //        displayPasswordDialog();
         return true;
+    }
+
+    public void displayChangePasswordDialog(){
+        final DialogFragment df = new DialogFragment() {
+
+            @Override
+            public Dialog onCreateDialog(Bundle b) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setIcon(android.R.drawable.ic_dialog_alert);
+                builder.setTitle(getString(R.string.change_administrator_password));
+                View view = getActivity().getLayoutInflater().inflate(R.layout.password_change_dialog, null, false);
+                final EditText oldPasswordBox = (EditText)view.findViewById(R.id.old_password_box);
+                final EditText newPasswordBox = (EditText)view.findViewById(R.id.new_password_box);
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Need to check for invalidity first
+                        String oldPassword = oldPasswordBox.getText().toString();
+                        String newPassword = newPasswordBox.getText().toString();
+                        File passwordFile = new File(CONSTANTS.PASSWORD_FILE_LOCATION);
+                        String line = "";
+                        if(!passwordFile.exists()){
+                            try {
+                                File passwordDir = new File(CONSTANTS.ADMINISTRATOR_FILES);
+                                passwordDir.setWritable(true);
+                                passwordDir.mkdirs();
+                                passwordFile.createNewFile();
+                                Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(passwordFile.getPath()), "utf-8"));
+                                writer.write(oldPassword);
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        else{
+                            try {
+                                FileReader fileReader = new FileReader(passwordFile.getPath());
+                                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                                line = bufferedReader.readLine();
+                                if(line == null || oldPassword.equals(line.trim())){
+                                    canAllow = true;
+                                    activityPrefs.edit().putBoolean(PASSWORD_KEEPING_KEY, true);
+                                    try {
+                                        Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(passwordFile.getPath()), "utf-8"));
+                                        writer.write(newPassword);
+                                    } catch (UnsupportedEncodingException e) {
+                                        Log.e("ERR_FILE", "ERROR in Encoding");
+                                        e.printStackTrace();
+                                    } catch (FileNotFoundException e) {
+                                        Log.e("ERR_FILE", "ERROR, file doesn't exist");
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                else{
+                                    Toast.makeText(MainActivity.this, "Sorry, wrong password!", Toast.LENGTH_SHORT).show();
+                                    displayChangePasswordDialog();
+                                }
+
+                                bufferedReader.close();
+                            }
+
+                            catch(FileNotFoundException ex) {
+                                Log.e("PSWRD", "Unable to access password location");
+                            }
+
+                            catch(IOException ex) {
+                                Log.e("PSWR", "Found password, but unable to read password");
+                            }
+                        }
+                    }
+                });
+
+                builder.setView(view);
+
+                return builder.create();
+            }
+        };
+        df.show(getSupportFragmentManager(), "");
     }
 
     public void displayPasswordDialog(){
@@ -223,8 +310,19 @@ public class MainActivity extends AppCompatActivity
                                 
                                 if(line == null){
                                     Toast.makeText(MainActivity.this, "Administrator Needs to Initialize Password", Toast.LENGTH_SHORT).show();
+                                    displayPasswordDialog();
                                 }
-                                
+
+                                else if(password.equals(line.trim())){
+                                    canAllow = true;
+                                    activityPrefs.edit().putBoolean(PASSWORD_KEEPING_KEY, true);
+                                    allowFragmentToReplace();
+                                }
+                                else{
+                                    Toast.makeText(MainActivity.this, "Sorry, wrong password!", Toast.LENGTH_SHORT).show();
+                                    displayPasswordDialog();
+                                }
+
                                 bufferedReader.close();
                             }
                             catch(FileNotFoundException ex) {
@@ -232,15 +330,6 @@ public class MainActivity extends AppCompatActivity
                             }
                             catch(IOException ex) {
                                 Log.e("PSWR", "Found password, but unable to read password");
-                            }
-                            if(password.equals(line.trim())){
-                                canAllow = true;
-                                activityPrefs.edit().putBoolean(PASSWORD_KEEPING_KEY, true);
-                                allowFragmentToReplace();
-                            }
-                            else{
-                                Toast.makeText(MainActivity.this, "Sorry, wrong password!", Toast.LENGTH_SHORT).show();
-                                displayPasswordDialog();
                             }
                         }
                     }

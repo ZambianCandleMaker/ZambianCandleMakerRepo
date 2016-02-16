@@ -29,6 +29,7 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 public class CSVUtility {
 
     public static final String NEXT_SECTION_DELIMITER = "#####";
+
     public static final String PROFILE_TITLE_KEY = "TITLE";
     public static final String PROFILE_DESCRIPTION_KEY = "DESCRIPTION";
     public static final String PROFILE_MAX_POS_KEY = "MAX_POS";

@@ -70,6 +70,7 @@ public class ProgramModDelFrag extends Fragment implements ProgramEditFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View totalView = inflater.inflate(R.layout.fragment_program_mod_del, container, false);
 
         mProgramsRecycler = (RecyclerView) totalView.findViewById(R.id.saved_programs_recycler);
