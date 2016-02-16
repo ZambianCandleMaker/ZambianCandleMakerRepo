@@ -67,4 +67,8 @@
     <string name="change_administrator_password">Change Administrator Password</string>
     <string name="mm">mm</string>
     <string name="ms">ms</string>
+    <string name="log_off_admin_functions">Log Off Administrator Functions</string>
+    <string name="admin_mod_del_frag_name">ADMIN_MOD_DEL</string>
+    <string name="admin_program_frag_name">ADMIN_PROGRAM</string>
+    <string name="graph_make_prog_frag_name">GRAPH_MAKE_PROFILE</string>
 </resources>

@@ -1,18 +1,13 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters;
 
 import android.content.Context;
-import android.provider.Settings;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.sql.Time;
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
@@ -90,9 +85,9 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
          */
         @Override
         public void onClick(View v) {
-            timeEditText.setText(timeView.getText());
-            depthEditText.setText(depthView.getText().toString());
-//            Toast.makeText(ViewHolder.this, , Toast.LENGTH_SHORT).show();
+//            timeEditText.setText(timeView.getText());
+//            depthEditText.setText(depthView.getText().toString());
+////            Toast.makeText(ViewHolder.this, , Toast.LENGTH_SHORT).show();
         }
 
 

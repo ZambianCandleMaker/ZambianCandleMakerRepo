@@ -6,22 +6,22 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -40,14 +40,15 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.AdminProfileChooserFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.OperatorFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.ProgramModDelFrag;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.CSVUtility;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.AdminProfileChooserFragment;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.OperatorFragment;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProfileHashParcel;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
@@ -175,7 +176,6 @@ public class MainActivity extends AppCompatActivity
             displayChangePasswordDialog();
         }
 
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity
             this.allowFragmentToReplace();
             return true;
         }
-        displayPasswordDialog();
+//        displayPasswordDialog();
         return true;
     }
 
