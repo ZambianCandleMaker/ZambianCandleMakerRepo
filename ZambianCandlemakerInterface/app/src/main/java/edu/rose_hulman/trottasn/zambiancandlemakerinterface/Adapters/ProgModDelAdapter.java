@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,11 +60,21 @@ public class ProgModDelAdapter extends RecyclerView.Adapter<ProgModDelAdapter.Vi
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView mTitleView;
         private TextView mDescriptionView;
+        private Button mDeleteButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mTitleView = (TextView) itemView.findViewById(R.id.saved_program_title);
             mDescriptionView = (TextView) itemView.findViewById(R.id.saved_program_description);
+            mDeleteButton = (Button) itemView.findViewById(R.id.del_button);
+            mDeleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int adapterPos = getAdapterPosition();
+                    DipProgram dProg = mPrograms.get(adapterPos);
+                    mProgEditFrag.onProgramDeleted(dProg, adapterPos);
+                }
+            });
             itemView.setOnClickListener(this);
         }
 

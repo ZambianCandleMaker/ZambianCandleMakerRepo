@@ -37,7 +37,7 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProfileHashP
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class MainActivity extends AppCompatActivity
-        implements OperatorFragment.OperatorFragmentListener, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnAdminProfileChosenListener, CallbackActivity {
+        implements OperatorFragment.OperatorFragmentListener, NavigationView.OnNavigationItemSelectedListener, AdminProfileChooserFragment.OnProgramSavedListener, CallbackActivity {
 
     private static Map<String, DipProfile> pathToProfileHash;
     private static Map<String, DipProgram> pathToProgramHash;
@@ -156,21 +156,18 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_operator:
                 //Switch without adding to backstack
                 switchTo = new OperatorFragment();
-                operatorSaved = false;
+                operatorSaved = true;
                 break;
             case R.id.nav_administrator_mod_del_program:
-                getSupportFragmentManager().beginTransaction().addToBackStack("prev_frag");
                 ProgramModDelFrag modDelFrag = ProgramModDelFrag.newInstance();
                 switchTo = modDelFrag;
                 break;
             case R.id.nav_administrator_program:
                 //Add to backstack like above
-                getSupportFragmentManager().beginTransaction().addToBackStack("prev_frag");
                 AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(null);
                 switchTo = adminFrag;
                 break;
             case R.id.nav_graph_make_profile:
-                getSupportFragmentManager().beginTransaction().addToBackStack("prev_frag");
                 EditProfileFragment editFrag = EditProfileFragment.newInstance(new ProfileHashParcel(pathToProfileHash));
                 switchTo = editFrag;
                 break;
@@ -181,7 +178,7 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = fm.beginTransaction();
             ft.replace(R.id.fragment_container, switchTo);
             for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++){
-                getSupportFragmentManager().popBackStackImmediate();
+                fm.popBackStackImmediate();
             }
             if(getSupportFragmentManager().getBackStackEntryCount() == 0 && !operatorSaved){
                 ft.addToBackStack("operator_fragment");
@@ -195,7 +192,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onProfileChosen(Uri uri) {
+    public void onProgramSaved() {
         // Nothing - Possibly Always Nothing
     }
 
@@ -284,9 +281,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void switchToProgramEdit(DipProgram dipProgram) {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(dipProgram);
-        ft.addToBackStack("admin_frag");
+        Fragment adminFrag = AdminProfileChooserFragment.newInstance(dipProgram);
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++){
+            fm.popBackStack();
+        }
+        ft.addToBackStack("prev_page");
         ft.replace(R.id.fragment_container, adminFrag);
         ft.commit();
     }

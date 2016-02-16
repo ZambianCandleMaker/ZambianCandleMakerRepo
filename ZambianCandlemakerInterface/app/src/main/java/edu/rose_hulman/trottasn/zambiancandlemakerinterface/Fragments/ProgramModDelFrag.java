@@ -2,6 +2,7 @@ package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,15 +12,19 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Map;
 
@@ -27,6 +32,7 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.CallbackA
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.ProgModDelAdapter;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.ProgramEditFragment;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
@@ -34,6 +40,9 @@ public class ProgramModDelFrag extends Fragment implements ProgramEditFragment {
 
     private RecyclerView mProgramsRecycler;
     private ProgModDelAdapter mProgramsAdapter;
+
+    private DipProgram choppingBlockProg;
+    private int choppingBlockPos;
 
     private static Map<String, DipProgram> pathToProgramHash;
 
@@ -96,15 +105,33 @@ public class ProgramModDelFrag extends Fragment implements ProgramEditFragment {
             @Override
             public Dialog onCreateDialog(Bundle b) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setIcon(android.R.drawable.ic_menu_save);
-                builder.setTitle(getResources().getString(R.string.save_new_program));
-                View view = getActivity().getLayoutInflater().inflate(R.layout.save_program_dialog, null, false);
-                final EditText titleBox = (EditText)view.findViewById(R.id.program_title_box);
-                final EditText descBox = (EditText)view.findViewById(R.id.program_desc_box);
-                final Button saveButton = (Button)view.findViewById(R.id.save_button);
-                saveButton.setOnClickListener(new View.OnClickListener() {
+                builder.setIcon(android.R.drawable.ic_menu_delete);
+                builder.setTitle("Are You Sure You Want To Delete: " + choppingBlockProg.getTitle());
+                View view = getActivity().getLayoutInflater().inflate(R.layout.delete_program_dialog, null, false);
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(DialogInterface dialog, int which) {
+                        String nameKey = choppingBlockProg.getTitle();
+                        pathToProgramHash.remove(nameKey);
+                        mProgramsAdapter.removeProgram(choppingBlockPos);
+                        File specificFile = new File(CONSTANTS.PROGRAMS_PATH_MAIN + "/" + choppingBlockProg.getTitle() + ".csv");
+                        String specificFilePath = specificFile.getPath();
+                        Log.d("TAGGGG", specificFilePath);
+                        if(specificFile.exists()) {
+                            specificFile.setWritable(true);
+                            specificFile.setReadable(true);
+                            specificFile.delete();
+                            File otherFile = new File(CONSTANTS.PROGRAMS_PATH_MAIN_INTERNAL + "/" + choppingBlockProg.getTitle() + ".csv");
+                            otherFile.setWritable(true);
+                            otherFile.setReadable(true);
+                            otherFile.delete();
+                            SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                            Gson gson = new Gson();
+                            String pathToProgramHashJson = gson.toJson(pathToProgramHash);
+                            prefsEditor.putString(MainActivity.PROGRAM_HASH, pathToProgramHashJson);
+                            prefsEditor.apply();
+                            Toast.makeText(getContext(), "Program successfully deleted!", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
                 builder.setView(view);
@@ -135,5 +162,12 @@ public class ProgramModDelFrag extends Fragment implements ProgramEditFragment {
     @Override
     public void switchToEditing(DipProgram dipProgram) {
         mCallback.switchToProgramEdit(dipProgram);
+    }
+
+    @Override
+    public void onProgramDeleted(DipProgram dipProgram, int positionInAdapter) {
+        choppingBlockPos = positionInAdapter;
+        choppingBlockProg = dipProgram;
+        displaySaveDialog();
     }
 }
