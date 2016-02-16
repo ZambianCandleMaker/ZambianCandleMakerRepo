@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ZambianCandlemakerInterface</string>
+    <string name="app_name">Zambian Candlemaker</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -53,4 +53,8 @@
     <string name="please_enter_a_title">Please Enter a Title</string>
     <string name="please_enter_a_description">Please Enter a Description</string>
     <string name="administrator_lock">Administrator Lock</string>
+    <string name="log_off_admin_functions">Log Off Administrator Functions</string>
+    <string name="admin_mod_del_frag_name">ADMIN_MOD_DEL</string>
+    <string name="admin_program_frag_name">ADMIN_PROGRAM</string>
+    <string name="graph_make_prog_frag_name">GRAPH_MAKE_PROFILE</string>
 </resources>
