@@ -206,4 +206,50 @@ public class CSVUtility {
         progDialog.dismiss();
         return true;
     }
+
+    public static boolean writeProfileCSV(Map<String, String> typeToValueMap, List<TimePosPair> timePosPairs, Activity activity){
+        File finalFile = new File(CONSTANTS.PROFILES_PATH_MAIN + "/" + typeToValueMap.get(PROFILE_TITLE_KEY) + ".csv");
+        finalFile.setWritable(true);
+        final String filename = finalFile.toString();
+        CharSequence contentTitle = activity.getString(R.string.app_name);
+        final ProgressDialog progDialog = ProgressDialog.show(
+                activity, contentTitle, "Please Wait.",
+                true);//please wait
+        MediaScannerConnection.scanFile(activity, new String[]{filename}, null, new MediaScannerConnection.OnScanCompletedListener() {
+            public void onScanCompleted(String path, Uri uri) {
+                Log.i("EXTERNAL STORAGE", "SCANNED");
+            }
+        });
+        int pairing = 2;
+        try {
+            CSVWriter writer = new CSVWriter(new FileWriter(filename));
+            // feed in your array (or convert your data to an array)
+            List<String> alphabeticalList = new ArrayList<>();
+            alphabeticalList.addAll(typeToValueMap.keySet());
+            Collections.sort(alphabeticalList);
+            for(String key : alphabeticalList){
+                String[] stringsToWrite = new String[pairing];
+                stringsToWrite[0] = key;
+                stringsToWrite[1] = typeToValueMap.get(key);
+                writer.writeNext(stringsToWrite);
+            }
+            String[] delimiters = new String[pairing];
+            delimiters[0] = NEXT_SECTION_DELIMITER;
+            delimiters[1] = NEXT_SECTION_DELIMITER;
+            writer.writeNext(delimiters);
+            for(TimePosPair pair : timePosPairs){
+                String[] nameToWrite = new String[pairing];
+                nameToWrite[0] = String.valueOf(pair.getPosition());
+                nameToWrite[1] = String.valueOf(pair.getTime());
+                writer.writeNext(nameToWrite);
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        progDialog.dismiss();
+        return true;
+    }
 }

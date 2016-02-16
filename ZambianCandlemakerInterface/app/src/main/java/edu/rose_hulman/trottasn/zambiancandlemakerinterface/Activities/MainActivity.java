@@ -1,9 +1,9 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities;
 
 import android.app.Dialog;
+import android.app.FragmentContainer;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment;
@@ -57,9 +59,10 @@ public class MainActivity extends AppCompatActivity
     public static final String PROFILE_HASH = "profileHash";
     public static final String PROGRAM_HASH = "PROGRAM_HASH";
     private SharedPreferences activityPrefs;
-    private boolean operatorSaved = false;
     private int tempIdSave;
     private FloatingActionButton fab;
+    public static final String PASSWORD_KEEPING_KEY = "PASSWORD_KEEPING";
+    private boolean canAllow;
 
 
     @Override
@@ -70,6 +73,9 @@ public class MainActivity extends AppCompatActivity
 
         // Save the Default SharedPreferences off to activityPrefs variable
         activityPrefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        SharedPreferences.Editor editor = activityPrefs.edit();
+        editor.putBoolean(PASSWORD_KEEPING_KEY, false);
+        this.canAllow = false;
 
         // Create the pathToProfileHash HashMap
         pathToProfileHash = new HashMap<>();
@@ -81,7 +87,6 @@ public class MainActivity extends AppCompatActivity
         // After this is done, read in the program files and link them to the profile from the hash
         repopulateProgramHash();
 
-        SharedPreferences.Editor editor = activityPrefs.edit();
         Gson gson = new Gson();
         String pathToProfileHashJson = gson.toJson(pathToProfileHash);
         String pathToProgramHashJson = gson.toJson(pathToProgramHash);
@@ -113,7 +118,7 @@ public class MainActivity extends AppCompatActivity
 
         if(savedInstanceState == null){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.fragment_container, new OperatorFragment());
+            ft.add(new OperatorFragment(), getString(R.string.operator_frag_name));
             ft.commit();
         }
     }
@@ -128,8 +133,9 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
             return;
         };
-        if(getSupportFragmentManager().getBackStackEntryCount() == 1){
-            operatorSaved = false;
+        ViewGroup fragCont = ((ViewGroup)findViewById(R.id.fragment_container));
+        if(fragCont != null){
+            fragCont.removeAllViews();
         }
         super.onBackPressed();
     }
@@ -156,6 +162,12 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
 
+        if (id == R.id.action_logout){
+            this.canAllow = false;
+            SharedPreferences.Editor editor = activityPrefs.edit();
+            editor.putBoolean(PASSWORD_KEEPING_KEY, false);
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -164,11 +176,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         this.tempIdSave = item.getItemId();
-        /**
-         * swap if statments if you need to test without password
-         */
-//        if(true){
-        if(this.tempIdSave == R.id.nav_operator){
+        if(this.tempIdSave == R.id.nav_operator || this.canAllow){
             this.allowFragmentToReplace();
             return true;
         }
@@ -226,6 +234,8 @@ public class MainActivity extends AppCompatActivity
                                 Log.e("PSWR", "Found password, but unable to read password");
                             }
                             if(password.equals(line.trim())){
+                                canAllow = true;
+                                activityPrefs.edit().putBoolean(PASSWORD_KEEPING_KEY, true);
                                 allowFragmentToReplace();
                             }
                             else{
@@ -246,22 +256,26 @@ public class MainActivity extends AppCompatActivity
 
     private void allowFragmentToReplace(){
         Fragment switchTo = null;
+        String typeString = "";
         switch (this.tempIdSave){
             case R.id.nav_operator:
                 //Switch without adding to backstack
                 this.fab.setVisibility(View.VISIBLE);
-                switchTo = new OperatorFragment();
-                operatorSaved = true;
+                OperatorFragment opFrag = new OperatorFragment();
+                switchTo = opFrag;
+                typeString = getString(R.string.operator_frag_name);
                 break;
             case R.id.nav_administrator_mod_del_program:
                 this.fab.setVisibility(View.VISIBLE);
                 ProgramModDelFrag modDelFrag = ProgramModDelFrag.newInstance();
                 switchTo = modDelFrag;
+                typeString = getString(R.string.admin_mod_del_frag_name);
                 break;
             case R.id.nav_administrator_program:
                 //Add to backstack like above
                 this.fab.setVisibility(View.VISIBLE);
                 AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(null);
+                typeString = getString(R.string.admin_program_frag_name);
                 switchTo = adminFrag;
                 break;
             case R.id.nav_graph_make_profile:
@@ -269,20 +283,25 @@ public class MainActivity extends AppCompatActivity
                 this.fab.setVisibility(View.GONE);
                 EditProfileFragment editFrag = EditProfileFragment.newInstance(new ProfileHashParcel(pathToProfileHash));
                 switchTo = editFrag;
+                typeString = getString(R.string.graph_make_prog_frag_name);
                 break;
+        }
+
+        ViewGroup fragCont = ((ViewGroup)findViewById(R.id.fragment_container));
+        if(fragCont != null){
+            fragCont.removeAllViews();
         }
 
         if (switchTo != null){
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
+            Fragment myFragment = fm.findFragmentByTag(typeString);
+            if(myFragment != null){
+                ft.addToBackStack(getString(R.string.operator_frag_name));
+                ft.replace(R.id.fragment_container, myFragment);
+            }
+            ft.addToBackStack(typeString);
             ft.replace(R.id.fragment_container, switchTo);
-            for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++){
-                fm.popBackStackImmediate();
-            }
-            if(getSupportFragmentManager().getBackStackEntryCount() == 0 && !operatorSaved){
-                ft.addToBackStack("operator_fragment");
-                operatorSaved = true;
-            }
             ft.commit();
         };
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
