@@ -19,7 +19,6 @@ import java.util.Map;
  * Created by TrottaSN on 2/4/2016.
  */
 public class DipProfile implements Parcelable{
-    private List<TimePosPair> pairList;
     private String title;
     private String description;
     private String path;
@@ -30,21 +29,24 @@ public class DipProfile implements Parcelable{
     }};
 
     public DipProfile(){
-        this.pairList = new ArrayList<TimePosPair>();
-        addPair(0,0);
         this.pairList = new ArrayList<>();
+        addPair(0,0);
+
     }
 
     public DipProfile(String title, String description, String path){
+        this();
         this.path = path;
         this.title = title;
         this.description = description;
-        this.pairList = new ArrayList<TimePosPair>();
-        this.pairList = new ArrayList<>();
+
     }
 
     public DipProfile(DipProfile profile){
-        this(profile.getTitle(),profile.getDescription(),profile.getPath());
+        this.path = profile.getPath();
+        this.title = profile.getTitle();
+        this.description = profile.getDescription();
+        this.pairList = new ArrayList<>();
         this.pairList.addAll(profile.getPairList());
 
         ListIterator<TimePosPair> i = this.pairList.listIterator();
@@ -60,8 +62,6 @@ public class DipProfile implements Parcelable{
         title = in.readString();
         description = in.readString();
         path = in.readString();
-        maxTime = in.readInt();
-        maxPos = in.readInt();
     }
 
     public static final Creator<DipProfile> CREATOR = new Creator<DipProfile>() {
@@ -134,6 +134,7 @@ public class DipProfile implements Parcelable{
     }
 
     public List<TimePosPair> getPairList() {
+        if(this.pairList == null) addPair(0,0);
         return this.pairList;
     }
 
@@ -156,8 +157,6 @@ public class DipProfile implements Parcelable{
         dest.writeString(title);
         dest.writeString(description);
         dest.writeString(path);
-        dest.writeInt(maxTime);
-        dest.writeInt(maxPos);
     }
 
 //    public LinkedList<TimePosPair> getLinkedList(){
@@ -182,14 +181,15 @@ public class DipProfile implements Parcelable{
     }
 
     public double getMaxTime() {
+        if(pairList.size() == 0) return 1000;
         int time = this.pairList.get(this.pairList.size()-1).getTime();
         if(time < 1000) return 1000;
         return this.pairList.get(this.pairList.size()-1).getTime();
     }
 
     public int getMaxYCoordinate() {
-        return this.maxYCoord.get(maxYCoord.size()-1).getPosition();
-
+        return this.maxYCoord.get(maxYCoord.size() - 1).getPosition();
+    }
 
 
     protected boolean assignFromReading(Map<String, String> typeToValueMapping, List<TimePosPair> timePosPairs){
@@ -203,12 +203,9 @@ public class DipProfile implements Parcelable{
             else if(CSVUtility.PROFILE_DESCRIPTION_KEY.equals(key)){
                 this.description = typeToValueMapping.get(key);
             }
-            else if(CSVUtility.PROFILE_MAX_POS_KEY.equals(key)){
-                this.maxPos = Integer.parseInt(typeToValueMapping.get(key));
-            }
-            else if(CSVUtility.PROFILE_MAX_TIME_KEY.equals(key)){
-                this.maxTime = Integer.parseInt(typeToValueMapping.get(key));
-            }
+//            else if(CSVUtility.PROFILE_MAX_POS_KEY.equals(key)){
+//                this.maxPos = Integer.parseInt(typeToValueMapping.get(key));
+//            }
             else{
                 Log.d("CSVCHECK", "Unexpected parameter passed to assignFromReading");
                 return false;
