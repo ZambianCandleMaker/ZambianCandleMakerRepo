@@ -1,14 +1,18 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,10 +23,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
@@ -48,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     public static final String PROGRAM_HASH = "PROGRAM_HASH";
     private SharedPreferences activityPrefs;
     private boolean operatorSaved = false;
+    private int tempIdSave;
 
 
     @Override
@@ -114,6 +125,7 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+            return;
         };
         if(getSupportFragmentManager().getBackStackEntryCount() == 1){
             operatorSaved = false;
@@ -150,9 +162,86 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+        this.tempIdSave = item.getItemId();
+        if(this.tempIdSave == R.id.nav_operator){
+            this.allowFragmentToReplace();
+            return true;
+        }
+        displayPasswordDialog();
+        return true;
+    }
+
+    public void displayPasswordDialog(){
+        final DialogFragment df = new DialogFragment() {
+
+            @Override
+            public Dialog onCreateDialog(Bundle b) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setIcon(android.R.drawable.ic_dialog_alert);
+                builder.setTitle(getString(R.string.administrator_lock));
+                View view = getActivity().getLayoutInflater().inflate(R.layout.semisecure_login_between_fragments, null, false);
+                final EditText passwordBox = (EditText)view.findViewById(R.id.password_edit_text);
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Need to check for invalidity first
+                        String password = passwordBox.getText().toString();
+                        File passwordFile = new File(CONSTANTS.PASSWORD_FILE_LOCATION);
+                        String line = "";
+                        if(!passwordFile.exists()){
+                            try {
+                                File passwordDir = new File(CONSTANTS.ADMINISTRATOR_FILES);
+                                passwordDir.setWritable(true);
+                                passwordDir.mkdirs();
+                                passwordFile.createNewFile();
+                                Toast.makeText(MainActivity.this, "Administrator needed to initialize password! Sorry.", Toast.LENGTH_SHORT).show();
+                                Log.e("PSWRD", "Created new password location, Administrator needed to initialize");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        else{
+                            try {
+                                FileReader fileReader = new FileReader(passwordFile.getPath());
+
+                                BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+                                line = bufferedReader.readLine();
+                                
+                                if(line == null){
+                                    Toast.makeText(MainActivity.this, "Administrator Needs to Initialize Password", Toast.LENGTH_SHORT).show();
+                                }
+                                
+                                bufferedReader.close();
+                            }
+                            catch(FileNotFoundException ex) {
+                                Log.e("PSWRD", "Unable to access password location");
+                            }
+                            catch(IOException ex) {
+                                Log.e("PSWR", "Found password, but unable to read password");
+                            }
+                            if(password.equals(line.trim())){
+                                allowFragmentToReplace();
+                            }
+                            else{
+                                Toast.makeText(MainActivity.this, "Sorry, wrong password!", Toast.LENGTH_SHORT).show();
+                                displayPasswordDialog();
+                            }
+                        }
+                    }
+                });
+
+                builder.setView(view);
+
+                return builder.create();
+            }
+        };
+        df.show(getSupportFragmentManager(), "");
+    }
+
+    private void allowFragmentToReplace(){
         Fragment switchTo = null;
-        int id = item.getItemId();
-        switch (id){
+        switch (this.tempIdSave){
             case R.id.nav_operator:
                 //Switch without adding to backstack
                 switchTo = new OperatorFragment();
@@ -188,8 +277,9 @@ public class MainActivity extends AppCompatActivity
         };
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
+
+
 
     @Override
     public void onProgramSaved() {

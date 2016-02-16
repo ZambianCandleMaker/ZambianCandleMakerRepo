@@ -52,4 +52,5 @@
     <string name="default_description_save_dialog">DefaultDescription</string>
     <string name="please_enter_a_title">Please Enter a Title</string>
     <string name="please_enter_a_description">Please Enter a Description</string>
+    <string name="administrator_lock">Administrator Lock</string>
 </resources>
