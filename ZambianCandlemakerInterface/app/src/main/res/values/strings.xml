@@ -33,7 +33,6 @@
     <string name="time_delay">Time Delay:</string>
     <string name="general_program_settings_prompt">General Program Settings and Parameters</string>
     <string name="save_new_program">Save New Program</string>
-<<<<<<< Updated upstream
     <string name="graph_make_profile">Make Graph Profile</string>
     <string name="choose_profile">Choose Profile</string>
     <string name="depth">Depth</string>
@@ -64,15 +63,8 @@
     <string name="admin_mod_del_frag_name">ADMIN_MOD_DEL</string>
     <string name="admin_program_frag_name">ADMIN_PROGRAM</string>
     <string name="graph_make_prog_frag_name">GRAPH_MAKE_PROFILE</string>
-<<<<<<< HEAD
     <string name="change_password">Change Administrator Password</string>
     <string name="change_administrator_password">Change Administrator Password</string>
-=======
     <string name="mm">mm</string>
     <string name="ms">ms</string>
-=======
-    <string name="graph_make_profile">Edit/Make Profile</string>
-    <string name="choose_profile">Choose Profile</string>
->>>>>>> Stashed changes
->>>>>>> origin/master
 </resources>
