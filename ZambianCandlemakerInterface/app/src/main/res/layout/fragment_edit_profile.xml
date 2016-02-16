@@ -48,6 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="number"
+            android:hint="@string/ms"
             android:ems="10"
             android:height="30dp"
             android:width="70dp"
@@ -70,6 +71,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="number"
+            android:hint="@string/mm"
+
             android:ems="10"
             android:height="50dp"
             android:width="70dp"

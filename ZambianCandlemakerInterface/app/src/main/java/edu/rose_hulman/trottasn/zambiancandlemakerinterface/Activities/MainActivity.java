@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity
     private SharedPreferences activityPrefs;
     private boolean operatorSaved = false;
     private int tempIdSave;
+    private FloatingActionButton fab;
 
 
     @Override
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         //changed scope so can hide it
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -163,6 +164,10 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         this.tempIdSave = item.getItemId();
+        /**
+         * swap if statments if you need to test without password
+         */
+//        if(true){
         if(this.tempIdSave == R.id.nav_operator){
             this.allowFragmentToReplace();
             return true;
@@ -244,19 +249,24 @@ public class MainActivity extends AppCompatActivity
         switch (this.tempIdSave){
             case R.id.nav_operator:
                 //Switch without adding to backstack
+                this.fab.setVisibility(View.VISIBLE);
                 switchTo = new OperatorFragment();
                 operatorSaved = true;
                 break;
             case R.id.nav_administrator_mod_del_program:
+                this.fab.setVisibility(View.VISIBLE);
                 ProgramModDelFrag modDelFrag = ProgramModDelFrag.newInstance();
                 switchTo = modDelFrag;
                 break;
             case R.id.nav_administrator_program:
                 //Add to backstack like above
+                this.fab.setVisibility(View.VISIBLE);
                 AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(null);
                 switchTo = adminFrag;
                 break;
             case R.id.nav_graph_make_profile:
+
+                this.fab.setVisibility(View.GONE);
                 EditProfileFragment editFrag = EditProfileFragment.newInstance(new ProfileHashParcel(pathToProfileHash));
                 switchTo = editFrag;
                 break;

@@ -35,7 +35,7 @@
     <string name="save_new_program">Save New Program</string>
     <string name="graph_make_profile">Make Graph Profile</string>
     <string name="choose_profile">Choose Profile</string>
-    <string name="depth">Depth</string>
+    <string name="depth">Depth(mm)</string>
     <string name="time">Time(ms)</string>
     <string name="edit_current_profile">Edit Profile</string>
     <string name="time_title">Time:</string>
@@ -59,4 +59,6 @@
     <string name="please_enter_a_title">Please Enter a Title</string>
     <string name="please_enter_a_description">Please Enter a Description</string>
     <string name="administrator_lock">Administrator Lock</string>
+    <string name="mm">mm</string>
+    <string name="ms">ms</string>
 </resources>
