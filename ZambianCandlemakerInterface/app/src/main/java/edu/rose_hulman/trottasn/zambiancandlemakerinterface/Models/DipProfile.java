@@ -158,14 +158,6 @@ public class DipProfile implements Parcelable{
         dest.writeTypedList(maxYCoord);
     }
 
-//    public LinkedList<TimePosPair> getLinkedList(){
-//        LinkedList<TimePosPair> linkedList = new LinkedList<TimePosPair>();
-//        for(TimePosPair p : pairList){
-//            linkedList.add(p);
-//        }
-//        return linkedList;
-//    }
-
     public LineGraphSeries<DataPoint> getLineGraphSeries(){
 
         ArrayList<DataPoint> arrayList = new ArrayList<DataPoint>();
