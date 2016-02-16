@@ -8,6 +8,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/new_profile_name"
         android:hint="@string/profile_name"
+        android:maxLines="1"
         android:layout_alignRight="@+id/save_profile_spinner"
         />
 

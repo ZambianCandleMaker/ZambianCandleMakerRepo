@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     public static final String PROGRAM_HASH = "PROGRAM_HASH";
     private SharedPreferences activityPrefs;
     private int tempIdSave;
+    private FloatingActionButton fab;
     public static final String PASSWORD_KEEPING_KEY = "PASSWORD_KEEPING";
     private boolean canAllow;
 
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         //changed scope so can hide it
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -348,22 +349,27 @@ public class MainActivity extends AppCompatActivity
         switch (this.tempIdSave){
             case R.id.nav_operator:
                 //Switch without adding to backstack
+                this.fab.setVisibility(View.VISIBLE);
                 OperatorFragment opFrag = new OperatorFragment();
                 switchTo = opFrag;
                 typeString = getString(R.string.operator_frag_name);
                 break;
             case R.id.nav_administrator_mod_del_program:
+                this.fab.setVisibility(View.VISIBLE);
                 ProgramModDelFrag modDelFrag = ProgramModDelFrag.newInstance();
                 switchTo = modDelFrag;
                 typeString = getString(R.string.admin_mod_del_frag_name);
                 break;
             case R.id.nav_administrator_program:
                 //Add to backstack like above
+                this.fab.setVisibility(View.VISIBLE);
                 AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(null);
                 typeString = getString(R.string.admin_program_frag_name);
                 switchTo = adminFrag;
                 break;
             case R.id.nav_graph_make_profile:
+
+                this.fab.setVisibility(View.GONE);
                 EditProfileFragment editFrag = EditProfileFragment.newInstance(new ProfileHashParcel(pathToProfileHash));
                 switchTo = editFrag;
                 typeString = getString(R.string.graph_make_prog_frag_name);

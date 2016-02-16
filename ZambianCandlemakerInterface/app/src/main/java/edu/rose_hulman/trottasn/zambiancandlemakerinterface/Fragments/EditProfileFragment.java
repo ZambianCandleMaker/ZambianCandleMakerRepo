@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -27,10 +28,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -52,14 +59,20 @@ public class EditProfileFragment extends Fragment {
     private SharedPreferences prefs;
     private TextView profileTitleView;
 
+
     private static final String HASH = "hash";
     private static final String EDIT_PROFILE = "edit_profile";
     private static final String CURRENT_PROFILE = "current_profile";
     private CallbackActivity mCallback;
 
+    private static final LineGraphSeries<DataPoint> oldSeries = new LineGraphSeries<DataPoint>();
+
     private static DipProfile currentProfile;
 
     private static Map<String, DipProfile> pathToProfileHash;
+
+    private EditText timeText;
+    private EditText depthText;
 
 
 
@@ -91,15 +104,17 @@ public class EditProfileFragment extends Fragment {
     public void onStop() {
         super.onStop();
 
-        SharedPreferences.Editor prefsEditor = prefs.edit();
-        Gson gson = new Gson();
-        String currentJson = gson.toJson(currentProfile);
+        if((currentProfile.getTitle().contains("New Profile") && !pathToProfileHash.containsKey(currentProfile.getTitle())) || pathToProfileHash.containsKey(currentProfile.getTitle())) {
+            SharedPreferences.Editor prefsEditor = prefs.edit();
+            Gson gson = new Gson();
+            String currentJson = gson.toJson(currentProfile);
 
-        prefsEditor.putString(CURRENT_PROFILE, currentJson);
-        prefsEditor.apply();
+            prefsEditor.putString(CURRENT_PROFILE, currentJson);
+            prefsEditor.apply();
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.savePathToProfileHash(pathToProfileHash);
+            MainActivity mainActivity = (MainActivity) getActivity();
+            mainActivity.savePathToProfileHash(pathToProfileHash);
+        }
     }
 
     @Override
@@ -112,7 +127,7 @@ public class EditProfileFragment extends Fragment {
             json = prefs.getString(CURRENT_PROFILE, "");
             currentProfile = gson.fromJson(json, DipProfile.class);
 
-            mAdapter = new EditProfileAdapter(getContext(),currentProfile);
+            mAdapter = new EditProfileAdapter(getContext(),this,getView(),currentProfile);
             pointRecycler.setAdapter(mAdapter);
 
             profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
@@ -133,7 +148,28 @@ public class EditProfileFragment extends Fragment {
         setHasOptionsMenu(true);
 
         pointRecycler = (RecyclerView) view.findViewById(R.id.profile_point_recycler);
+
         graph = (GraphView) view.findViewById(R.id.edit_graph);
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setYAxisBoundsManual(true);
+
+        graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+            @Override
+            public String formatLabel(double value, boolean isValueX) {
+                if (isValueX) {
+                    // show normal x values
+                    NumberFormat formatter = new DecimalFormat("#0.0");
+
+//                    return super.formatLabel(value/1000, isValueX);
+                    return formatter.format(value/1000.0);
+                } else {
+                    // show currency for y values
+                    return super.formatLabel(Math.abs(value-currentProfile.getMaxYCoordinate()), isValueX);
+                }
+            }
+        });
+
+
         profileTitleView = (TextView) view.findViewById(R.id.edit_point_title);
 
         if(currentProfile == null) createNewCurrentProfile();
@@ -142,23 +178,25 @@ public class EditProfileFragment extends Fragment {
         pointRecycler.setHasFixedSize(true);
 
         final Button confirmationButton = (Button) view.findViewById(R.id.insert_point_button);
-        final EditText timeText = (EditText) view.findViewById(R.id.edit_time_text);
-        final EditText depthText = (EditText) view.findViewById(R.id.edit_depth_text);
+        timeText = (EditText) view.findViewById(R.id.edit_time_text);
+        depthText = (EditText) view.findViewById(R.id.edit_depth_text);
 
         confirmationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int size = currentProfile.getPairList().size();
-                int time = Integer.parseInt(timeText.getText().toString());
-                int depth = Integer.parseInt(depthText.getText().toString());
-                int pos = currentProfile.addPair(new TimePosPair(depth,time));
+                    int size = currentProfile.getPairList().size();
+                    try {
+                        int time = Integer.parseInt(timeText.getText().toString());
+                        int depth = Integer.parseInt(depthText.getText().toString());
+                        int pos = currentProfile.addPair(new TimePosPair(depth, time));
 
-                if(currentProfile.getPairList().size() > size) mAdapter.notifyItemInserted(pos);
-                else mAdapter.notifyItemChanged(pos);
+                        if (currentProfile.getPairList().size() > size)
+                            mAdapter.notifyItemInserted(pos);
+                        else mAdapter.notifyItemChanged(pos);
 
-                updateGraph();
-
-
+                        updateGraph();
+                    }
+                    catch (Exception e){}
             }
         });
 
@@ -187,6 +225,7 @@ public class EditProfileFragment extends Fragment {
 
     private void createNewCurrentProfile() {
         currentProfile = new DipProfile();
+
         for(int i = 1; ; i++){
             String title = "New Profile "+ i;
             if(!pathToProfileHash.containsKey(title)) {
@@ -204,24 +243,42 @@ public class EditProfileFragment extends Fragment {
         else {
             currentProfile = new DipProfile();
             currentProfile.setTitle(title);
-        }
+
+            }
         updateAdapter();
     }
 
     private void updateAdapter(){
         profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
-        mAdapter = new EditProfileAdapter(getContext(), currentProfile);
+        mAdapter = new EditProfileAdapter(getContext(),this, getView(), currentProfile);
         pointRecycler.setAdapter(mAdapter);
         updateGraph();
     }
 
-    private void updateGraph(){
+    public void updateGraph(){
         graph.removeAllSeries();
         LineGraphSeries<DataPoint> series = currentProfile.getLineGraphSeries();
         series.setDrawDataPoints(true);
         series.setDataPointsRadius(10);
         series.setColor(getResources().getColor(R.color.graphSeriesLine));
         graph.addSeries(series);
+        graph.onDataChanged(true,false);
+
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(currentProfile.getMaxTime());
+
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(currentProfile.getMaxYCoordinate());
+
+        series.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                String time = Integer.toString((int)dataPoint.getX());
+                String depth = Integer.toString((int)Math.abs(dataPoint.getY()-currentProfile.getMaxYCoordinate()));
+                timeText.setText(time);
+                depthText.setText(depth);
+            }
+        });
     }
 
     //TODO
@@ -305,7 +362,12 @@ public class EditProfileFragment extends Fragment {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if(isChecked){
                             profileName.setEnabled(false);
+//                            if(profileList.size()>0) {
+//                                dropdown.setEnabled(true);
+//                            }
+                            profileName.setEnabled(false);
                             dropdown.setEnabled(true);
+
                         }
                         else{
                             profileName.setEnabled(true);
@@ -321,9 +383,15 @@ public class EditProfileFragment extends Fragment {
 
                 if(profileList.contains(currentProfile.getTitle())){
                     confirmationCheckbox.setChecked(true);
+                    confirmationCheckbox.setEnabled(true);
+                    dropdown.setEnabled(true);
                     dropdown.setSelection(profileList.indexOf(currentProfile.getTitle()));
-                }else {
+                } else{
+                if(profileList.size() == 0) {
+                    confirmationCheckbox.setEnabled(false);
+                }
                     confirmationCheckbox.setChecked(false);
+                    dropdown.setEnabled(false);
                     profileName.setText(currentProfile.getTitle());
 
                 }
@@ -353,20 +421,21 @@ public class EditProfileFragment extends Fragment {
                     public void onClick(View v) {
                         String title = profileName.getText().toString();
 
-                        if (confirmationCheckbox.isChecked()) {
-                            pathToProfileHash.put(dropdown.getSelectedItem().toString(), currentProfile);
-                            mCallback.savePathToProfileHash(pathToProfileHash);
-                            dismiss();
+                        if(confirmationCheckbox.isChecked()) {
+                            title = dropdown.getSelectedItem().toString();
 
                         } else if (title != "" && title != " " && !title.contains("  ")) {
                             currentProfile = new DipProfile(currentProfile);
-                            currentProfile.setTitle(title);
-                            pathToProfileHash.put(title, currentProfile);
-                            mCallback.savePathToProfileHash(pathToProfileHash);
-                            profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
-                            dismiss();
+
 
                         }
+                        currentProfile.setTitle(title);
+                        pathToProfileHash.put(title,currentProfile);
+                        mCallback.savePathToProfileHash(pathToProfileHash);
+                        profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
+                        dismiss();
+
+
                     }
                 });
 
@@ -379,8 +448,8 @@ public class EditProfileFragment extends Fragment {
 
     private void deleteProfileDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Delete Profile?");
-        builder.setMessage("Are you sure you want to delete the profile "+currentProfile.getTitle()+"?");
+        builder.setTitle(getString(R.string.dialog_delete_profile_title));
+        builder.setMessage(getString(R.string.dialog_delete_profile_message)+currentProfile.getTitle()+ getString(R.string.question_mark));
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -418,15 +487,15 @@ public class EditProfileFragment extends Fragment {
                 dropdown.setAdapter(adapter);
 
                 builder.setView(view);
-                builder.setTitle("Choose Profile");
-                builder.setMessage("Please select a profile:");
+                builder.setTitle(getString(R.string.dialog_choose_profile_title));
+                builder.setMessage(getString(R.string.dialog_select_profile_message));
                 builder.setNegativeButton(android.R.string.cancel , new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                     }
                 });
-                builder.setPositiveButton("ACCEPT", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(getString(R.string.accept_string), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
