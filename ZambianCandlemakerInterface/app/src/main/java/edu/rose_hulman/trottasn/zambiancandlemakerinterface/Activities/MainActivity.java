@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity
 
         if(savedInstanceState == null){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(new OperatorFragment(), getString(R.string.operator_frag_name));
+            ft.replace(R.id.fragment_container, new OperatorFragment());
             ft.commit();
         }
     }
@@ -133,10 +133,10 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
             return;
         };
-        ViewGroup fragCont = ((ViewGroup)findViewById(R.id.fragment_container));
-        if(fragCont != null){
-            fragCont.removeAllViews();
-        }
+//        ViewGroup fragCont = ((ViewGroup)findViewById(R.id.fragment_container));
+//        if(fragCont != null){
+//            fragCont.removeAllViews();
+//        }
         super.onBackPressed();
     }
 
@@ -297,7 +297,7 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = fm.beginTransaction();
             Fragment myFragment = fm.findFragmentByTag(typeString);
             if(myFragment != null){
-                ft.addToBackStack(getString(R.string.operator_frag_name));
+                ft.addToBackStack(typeString);
                 ft.replace(R.id.fragment_container, myFragment);
             }
             ft.addToBackStack(typeString);
