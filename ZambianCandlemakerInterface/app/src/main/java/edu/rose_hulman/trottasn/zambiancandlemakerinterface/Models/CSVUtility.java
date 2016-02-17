@@ -32,8 +32,6 @@ public class CSVUtility {
 
     public static final String PROFILE_TITLE_KEY = "TITLE";
     public static final String PROFILE_DESCRIPTION_KEY = "DESCRIPTION";
-    public static final String PROFILE_MAX_POS_KEY = "MAX_POS";
-    public static final String PROFILE_MAX_TIME_KEY = "MAX_TIME";
 
     public static final String PROGRAM_TITLE_KEY = "TITLE";
     public static final String PROGRAM_DESCRIPTION_KEY = "DESCRIPTION";

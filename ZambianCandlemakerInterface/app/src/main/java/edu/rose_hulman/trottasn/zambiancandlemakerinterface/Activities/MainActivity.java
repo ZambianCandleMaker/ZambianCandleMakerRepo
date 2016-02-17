@@ -38,7 +38,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
@@ -122,7 +124,7 @@ public class MainActivity extends AppCompatActivity
 
         if(savedInstanceState == null){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container, new OperatorFragment());
+            ft.replace(R.id.fragment_container, new OperatorFragment(), getString(R.string.operator_frag_name));
             ft.commit();
         }
     }
@@ -137,10 +139,10 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
             return;
         };
-//        ViewGroup fragCont = ((ViewGroup)findViewById(R.id.fragment_container));
-//        if(fragCont != null){
-//            fragCont.removeAllViews();
-//        }
+        ViewGroup fragCont = ((ViewGroup)findViewById(R.id.fragment_container));
+        if(fragCont != null){
+            fragCont.removeAllViews();
+        }
         super.onBackPressed();
     }
 
@@ -188,7 +190,7 @@ public class MainActivity extends AppCompatActivity
             this.allowFragmentToReplace();
             return true;
         }
-//        displayPasswordDialog();
+        displayPasswordDialog();
         return true;
     }
 
@@ -213,13 +215,14 @@ public class MainActivity extends AppCompatActivity
                         String line = "";
                         if(!passwordFile.exists()){
                             try {
+                                Log.d("PSWRD", "File Didnt Register");
                                 File passwordDir = new File(CONSTANTS.ADMINISTRATOR_FILES);
                                 passwordDir.setWritable(true);
                                 passwordDir.mkdirs();
                                 passwordFile.createNewFile();
                                 Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(passwordFile.getPath()), "utf-8"));
                                 writer.write(oldPassword);
-
+                                writer.close();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -233,8 +236,10 @@ public class MainActivity extends AppCompatActivity
                                     canAllow = true;
                                     activityPrefs.edit().putBoolean(PASSWORD_KEEPING_KEY, true);
                                     try {
+                                        Log.d("PSWRD", "File \" writing \" new password");
                                         Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(passwordFile.getPath()), "utf-8"));
                                         writer.write(newPassword);
+                                        writer.close();
                                     } catch (UnsupportedEncodingException e) {
                                         Log.e("ERR_FILE", "ERROR in Encoding");
                                         e.printStackTrace();
@@ -346,6 +351,7 @@ public class MainActivity extends AppCompatActivity
     private void allowFragmentToReplace(){
         Fragment switchTo = null;
         String typeString = "";
+        String[] typeList = new String[]{getString(R.string.operator_frag_name), getString(R.string.admin_mod_del_frag_name), getString(R.string.admin_program_frag_name), getString(R.string.graph_make_prog_frag_name)};
         switch (this.tempIdSave){
             case R.id.nav_operator:
                 //Switch without adding to backstack
@@ -386,11 +392,15 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = fm.beginTransaction();
             Fragment myFragment = fm.findFragmentByTag(typeString);
             if(myFragment != null){
-                ft.addToBackStack(typeString);
-                ft.replace(R.id.fragment_container, myFragment);
+                if(fm.getBackStackEntryCount() == 0 || (fm.getBackStackEntryCount() != 0 && !fm.getBackStackEntryAt(0).getName().equals(typeString))){
+                    ft.addToBackStack(typeString);
+                }
+                ft.replace(R.id.fragment_container, myFragment, typeString);
             }
-            ft.addToBackStack(typeString);
-            ft.replace(R.id.fragment_container, switchTo);
+            if(fm.getBackStackEntryCount() == 0 || (fm.getBackStackEntryCount() != 0 && !fm.getBackStackEntryAt(0).getName().equals(typeString))){
+                ft.addToBackStack(typeString);
+            }
+            ft.replace(R.id.fragment_container, switchTo, typeString);
             ft.commit();
         };
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
