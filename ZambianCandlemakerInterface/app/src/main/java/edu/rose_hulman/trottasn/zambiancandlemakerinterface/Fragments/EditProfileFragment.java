@@ -39,11 +39,13 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.CallbackActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters.EditProfileAdapter;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.CSVUtility;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.TimePosPair;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Parcels.ProfileHashParcel;
@@ -225,11 +227,19 @@ public class EditProfileFragment extends Fragment {
             String title = "New Profile "+ i;
             if(!pathToProfileHash.containsKey(title)) {
                 currentProfile.setTitle(title);
+//                pathToProfileHash.put(title,currentProfile);
                 updateAdapter();
                 return;
             }
 
         }
+    }
+
+    private void saveToCSV(DipProfile profile) {
+        Map<String, String> map = new HashMap<>();
+        map.put(CSVUtility.PROFILE_TITLE_KEY, profile.getTitle());
+        map.put(CSVUtility.PROFILE_DESCRIPTION_KEY, profile.getDescription());
+        CSVUtility.writeProfileCSV(map, profile.getPairList(),getActivity());
     }
 
     private void resetCurrentProfile(){
@@ -428,6 +438,8 @@ public class EditProfileFragment extends Fragment {
                         pathToProfileHash.put(title,currentProfile);
                         mCallback.savePathToProfileHash(pathToProfileHash);
                         profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
+                        saveToCSV(currentProfile);
+
                         dismiss();
 
 

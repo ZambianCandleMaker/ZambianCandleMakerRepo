@@ -38,9 +38,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.CONSTANTS;
@@ -186,6 +184,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         this.tempIdSave = item.getItemId();
+        this.canAllow = true;
         if(this.tempIdSave == R.id.nav_operator || this.canAllow){
             this.allowFragmentToReplace();
             return true;
@@ -502,10 +501,9 @@ public class MainActivity extends AppCompatActivity
         Fragment adminFrag = AdminProfileChooserFragment.newInstance(dipProgram);
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++){
-            fm.popBackStack();
+        if(fm.getBackStackEntryCount() == 0 || (fm.getBackStackEntryCount() != 0 && !fm.getBackStackEntryAt(0).getName().equals(getString(R.string.admin_mod_del_frag_name)))){
+            ft.addToBackStack(getString(R.string.admin_program_frag_name));
         }
-        ft.addToBackStack("prev_page");
         ft.replace(R.id.fragment_container, adminFrag);
         ft.commit();
     }
