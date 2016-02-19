@@ -390,12 +390,12 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = fm.beginTransaction();
             Fragment myFragment = fm.findFragmentByTag(typeString);
             if(myFragment != null){
-                if(fm.getBackStackEntryCount() == 0 || !fm.getBackStackEntryAt(0).getName().equals(typeString)){
+                if((fm.getBackStackEntryCount() == 0 && !typeString.equals(getString(R.string.operator_frag_name))) || (fm.getBackStackEntryCount() != 0 && !fm.getBackStackEntryAt(0).getName().equals(typeString))){
                     ft.addToBackStack(typeString);
                 }
                 ft.replace(R.id.fragment_container, myFragment, typeString);
             }
-            if(fm.getBackStackEntryCount() == 0 || (fm.getBackStackEntryCount() != 0 && !fm.getBackStackEntryAt(0).getName().equals(typeString))){
+            if(fm.getBackStackEntryCount() == 0 && !typeString.equals(getString(R.string.operator_frag_name)) || (fm.getBackStackEntryCount() != 0 && !fm.getBackStackEntryAt(0).getName().equals(typeString))){
                 ft.addToBackStack(typeString);
             }
             ft.replace(R.id.fragment_container, switchTo, typeString);
