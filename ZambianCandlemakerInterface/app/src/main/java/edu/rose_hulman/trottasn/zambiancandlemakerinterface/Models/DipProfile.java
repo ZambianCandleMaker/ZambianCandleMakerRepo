@@ -183,6 +183,22 @@ public class DipProfile implements Parcelable{
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DipProfile that = (DipProfile) o;
+
+        return !(title != null ? !title.equals(that.title) : that.title != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return title != null ? title.hashCode() : 0;
+    }
+
     protected boolean assignFromReading(Map<String, String> typeToValueMapping, List<TimePosPair> timePosPairs){
         if(typeToValueMapping.size() == 0){
             return false;
@@ -194,12 +210,6 @@ public class DipProfile implements Parcelable{
             else if(CSVUtility.PROFILE_DESCRIPTION_KEY.equals(key)){
                 this.description = typeToValueMapping.get(key);
             }
-//            else if(CSVUtility.PROFILE_MAX_POS_KEY.equals(key)){
-//                this.maxPos = Integer.parseInt(typeToValueMapping.get(key));
-//            }
-//            else if(CSVUtility.PROFILE_MAX_TIME_KEY.equals(key)){
-//                this.maxTime = Integer.parseInt(typeToValueMapping.get(key));
-//            }
             else{
                 Log.d("CSVCHECK", "Unexpected parameter passed to assignFromReading");
                 return false;

@@ -21,6 +21,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -122,7 +123,8 @@ public class MainActivity extends AppCompatActivity
 
         if(savedInstanceState == null){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container, new OperatorFragment(), getString(R.string.operator_frag_name));
+            OperatorFragment newFrag = new OperatorFragment();
+            ft.replace(R.id.fragment_container, newFrag, newFrag.getClass().getName());
             ft.commit();
         }
     }
@@ -137,9 +139,19 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
             return;
         };
-        ViewGroup fragCont = ((ViewGroup)findViewById(R.id.fragment_container));
-        if(fragCont != null){
-            fragCont.removeAllViews();
+        NavigationView navView = (NavigationView)findViewById(R.id.nav_view);
+        Menu menu = navView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.hasSubMenu()) {
+                SubMenu subMenu = item.getSubMenu();
+                for (int j = 0; j < subMenu.size(); j++) {
+                    MenuItem subMenuItem = subMenu.getItem(j);
+                    subMenuItem.setChecked(false);
+                }
+            } else {
+                item.setChecked(false);
+            }
         }
         super.onBackPressed();
     }
@@ -349,26 +361,22 @@ public class MainActivity extends AppCompatActivity
 
     private void allowFragmentToReplace(){
         Fragment switchTo = null;
-        String typeString = "";
         switch (this.tempIdSave){
             case R.id.nav_operator:
                 //Switch without adding to backstack
                 this.fab.setVisibility(View.VISIBLE);
                 OperatorFragment opFrag = new OperatorFragment();
                 switchTo = opFrag;
-                typeString = getString(R.string.operator_frag_name);
                 break;
             case R.id.nav_administrator_mod_del_program:
                 this.fab.setVisibility(View.VISIBLE);
                 ProgramModDelFrag modDelFrag = ProgramModDelFrag.newInstance();
                 switchTo = modDelFrag;
-                typeString = getString(R.string.admin_mod_del_frag_name);
                 break;
             case R.id.nav_administrator_program:
                 //Add to backstack like above
                 this.fab.setVisibility(View.VISIBLE);
                 AdminProfileChooserFragment adminFrag = AdminProfileChooserFragment.newInstance(null);
-                typeString = getString(R.string.admin_program_frag_name);
                 switchTo = adminFrag;
                 break;
             case R.id.nav_graph_make_profile:
@@ -376,30 +384,28 @@ public class MainActivity extends AppCompatActivity
                 this.fab.setVisibility(View.GONE);
                 EditProfileFragment editFrag = EditProfileFragment.newInstance(new ProfileHashParcel(pathToProfileHash));
                 switchTo = editFrag;
-                typeString = getString(R.string.graph_make_prog_frag_name);
                 break;
         }
 
-        ViewGroup fragCont = ((ViewGroup)findViewById(R.id.fragment_container));
-        if(fragCont != null){
-            fragCont.removeAllViews();
-        }
+//        ViewGroup fragCont = ((ViewGroup)findViewById(R.id.fragment_container));
+//        if(fragCont != null){
+//            fragCont.removeAllViews();
+//        }
 
         if (switchTo != null){
-            FragmentManager fm = getSupportFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-            Fragment myFragment = fm.findFragmentByTag(typeString);
-            if(myFragment != null){
-                if((fm.getBackStackEntryCount() == 0 && !typeString.equals(getString(R.string.operator_frag_name))) || (fm.getBackStackEntryCount() != 0 && !fm.getBackStackEntryAt(0).getName().equals(typeString))){
-                    ft.addToBackStack(typeString);
-                }
-                ft.replace(R.id.fragment_container, myFragment, typeString);
+            String backStateName =  switchTo.getClass().getName();
+            String fragmentTag = backStateName;
+
+            FragmentManager manager = getSupportFragmentManager();
+            boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
+
+            if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null){ //fragment not in back stack, create it.
+                FragmentTransaction ft = manager.beginTransaction();
+                ft.replace(R.id.fragment_container, switchTo, fragmentTag);
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                ft.addToBackStack(backStateName);
+                ft.commit();
             }
-            if(fm.getBackStackEntryCount() == 0 && !typeString.equals(getString(R.string.operator_frag_name)) || (fm.getBackStackEntryCount() != 0 && !fm.getBackStackEntryAt(0).getName().equals(typeString))){
-                ft.addToBackStack(typeString);
-            }
-            ft.replace(R.id.fragment_container, switchTo, typeString);
-            ft.commit();
         };
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -421,16 +427,18 @@ public class MainActivity extends AppCompatActivity
         innerDir.mkdirs();
         innerDir.setWritable(true);
         innerDir.setReadable(true);
-        if(innerDir.exists()) {
+        if(innerDir.exists() && innerDir.isDirectory()) {
             File[] files = innerDir.listFiles();
-            for (int i = 0; i < files.length; ++i) {
-                File file = files[i];
-                if (file.isDirectory()) {
-                    Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
-                } else {
-                    DipProfile newProfile = CSVUtility.readProfileCSV(file, this);
-                    if(newProfile != null){
-                        pathToProfileHash.put(newProfile.getTitle(), newProfile);
+            if(files != null){
+                for (int i = 0; i < files.length; ++i) {
+                    File file = files[i];
+                    if (file.isDirectory()) {
+                        Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+                    } else {
+                        DipProfile newProfile = CSVUtility.readProfileCSV(file, this);
+                        if(newProfile != null){
+                            pathToProfileHash.put(newProfile.getTitle(), newProfile);
+                        }
                     }
                 }
             }
@@ -445,14 +453,16 @@ public class MainActivity extends AppCompatActivity
         innerDir.setReadable(true);
         if(innerDir.exists()) {
             File[] files = innerDir.listFiles();
-            for (int i = 0; i < files.length; ++i) {
-                File file = files[i];
-                if (file.isDirectory()) {
-                    Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
-                } else {
-                    DipProgram newProgram = CSVUtility.readProgramCSV(file, this, pathToProfileHash);
-                    if(newProgram != null){
-                        pathToProgramHash.put(newProgram.getTitle(), newProgram);
+            if(files != null){
+                for (int i = 0; i < files.length; ++i) {
+                    File file = files[i];
+                    if (file.isDirectory()) {
+                        Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+                    } else {
+                        DipProgram newProgram = CSVUtility.readProgramCSV(file, this, pathToProfileHash);
+                        if(newProgram != null){
+                            pathToProgramHash.put(newProgram.getTitle(), newProgram);
+                        }
                     }
                 }
             }

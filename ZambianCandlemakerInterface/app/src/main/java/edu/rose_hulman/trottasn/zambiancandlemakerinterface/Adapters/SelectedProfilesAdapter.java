@@ -1,5 +1,6 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -89,14 +90,12 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mTitleView;
-//        private TextView mDescriptionView;
         private Button mDownButton;
         private Button mUpButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mTitleView = (TextView) itemView.findViewById(R.id.avail_profile_title);
-//            mDescriptionView = (TextView) itemView.findViewById(R.id.avail_profile_desc);
             mDownButton = (Button) itemView.findViewById(R.id.down_button);
             mDownButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -111,6 +110,8 @@ public class SelectedProfilesAdapter extends RecyclerView.Adapter<SelectedProfil
                     onItemMove(getAdapterPosition(), getAdapterPosition() - 1);
                 }
             });
+            CardView selCard = (CardView)itemView.findViewById(R.id.sel_card_prof);
+            selCard.setRadius(30);
         }
     }
 

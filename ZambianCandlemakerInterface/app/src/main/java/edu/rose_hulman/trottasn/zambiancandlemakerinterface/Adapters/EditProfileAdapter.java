@@ -60,8 +60,6 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
     }
 
     public class ViewHolder extends  RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        private EditText timeEditText;
-        private EditText depthEditText;
 
         private TextView timeView;
         private TextView depthView;
@@ -70,9 +68,6 @@ public class EditProfileAdapter extends RecyclerView.Adapter<EditProfileAdapter.
             super(itemView);
             timeView  = (TextView) itemView.findViewById(R.id.profile_point_time);
             depthView = (TextView) itemView.findViewById(R.id.profile_point_depth);
-
-            timeEditText = (EditText) mView.findViewById(R.id.edit_time_text);
-            depthEditText = (EditText) mView.findViewById(R.id.edit_depth_text);
 //            itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }

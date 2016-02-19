@@ -1,5 +1,6 @@
 package edu.rose_hulman.trottasn.zambiancandlemakerinterface.Adapters;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -77,6 +78,8 @@ public class AvailableProfilesAdapter extends RecyclerView.Adapter<AvailableProf
             super(itemView);
             mTitleView = (TextView) itemView.findViewById(R.id.avail_profile_title);
             mDescriptionView = (TextView) itemView.findViewById(R.id.avail_profile_desc);
+            CardView card = (CardView)itemView.findViewById(R.id.av_prof_card);
+            card.setRadius(30);
             itemView.setOnClickListener(this);
         }
 
