@@ -16,7 +16,9 @@
             android:layout_height="75dp"
             android:id="@+id/rot_right"
             android:background="@drawable/ic_right_rotate"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"
+            android:backgroundTint="@android:color/transparent"
+            android:backgroundTintMode="src_over" />
 
         <Button
             android:layout_width="75dp"
@@ -24,7 +26,9 @@
             android:id="@+id/pause_button"
             android:background="@drawable/ic_pause_button"
             android:layout_alignParentBottom="true"
-            android:layout_toStartOf="@+id/vert_down" />
+            android:layout_toStartOf="@+id/vert_down"
+            android:backgroundTint="@android:color/transparent"
+            android:backgroundTintMode="src_over" />
 
         <Button
             android:layout_width="75dp"
@@ -32,7 +36,9 @@
             android:id="@+id/rot_left"
             android:background="@drawable/ic_left_rotate"
             android:layout_alignTop="@+id/rot_right"
-            android:layout_toStartOf="@+id/rot_right" />
+            android:layout_toStartOf="@+id/rot_right"
+            android:backgroundTint="@android:color/transparent"
+            android:backgroundTintMode="src_over" />
 
         <Button
             android:layout_width="75dp"
@@ -40,7 +46,9 @@
             android:id="@+id/vert_down"
             android:background="@drawable/ic_down_jog"
             android:layout_below="@+id/rot_left"
-            android:layout_alignStart="@+id/rot_left" />
+            android:layout_alignStart="@+id/rot_left"
+            android:backgroundTint="@android:color/transparent"
+            android:backgroundTintMode="src_over" />
 
         <Button
             android:layout_width="75dp"
@@ -48,7 +56,9 @@
             android:id="@+id/vert_up"
             android:background="@drawable/ic_up_jog"
             android:layout_below="@+id/rot_right"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"
+            android:backgroundTint="@android:color/transparent"
+            android:backgroundTintMode="src_over" />
     </RelativeLayout>
 
     <LinearLayout

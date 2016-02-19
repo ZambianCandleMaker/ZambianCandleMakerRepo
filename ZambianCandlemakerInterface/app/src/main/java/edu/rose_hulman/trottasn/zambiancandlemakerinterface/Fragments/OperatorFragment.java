@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,6 +42,15 @@ public class OperatorFragment extends Fragment {
     private ArrayAdapter<CharSequence> vertical_adapter_cm;
     private ArrayAdapter<CharSequence> vertical_adapter_mm;
     private ArrayAdapter<CharSequence> rotational_adapter;
+
+    private Button vertJogButton;
+    private Button rotJogButton;
+    private Button dipsButton;
+    private Button softPauseButton;
+    private Button manualVertUp;
+    private Button manualVertDown;
+    private Button manualRotLeft;
+    private Button manualRotRight;
     private Handler mHandler;
     private String mDirection;
 
@@ -171,14 +181,14 @@ public class OperatorFragment extends Fragment {
         dipsPerRevSpinner.setAdapter(dips_per_rev_array);
         dipsPerRevSpinner.setSelection(dips_selection);
 
-        final Button vertJogButton = (Button) view.findViewById(R.id.apply_vert_jog_button);
-        final Button rotJogButton = (Button) view.findViewById(R.id.apply_rot_jog_button);
-        final Button dipsButton = (Button) view.findViewById(R.id.apply_dips_button);
-        final Button softPauseButton = (Button) view.findViewById(R.id.pause_button);
-        final Button manualVertUp = (Button) view.findViewById(R.id.vert_up);
-        final Button manualVertDown = (Button) view.findViewById(R.id.vert_down);
-        final Button manualRotLeft = (Button) view.findViewById(R.id.rot_left);
-        final Button manualRotRight = (Button) view.findViewById(R.id.rot_right);
+        vertJogButton = (Button) view.findViewById(R.id.apply_vert_jog_button);
+        rotJogButton = (Button) view.findViewById(R.id.apply_rot_jog_button);
+        dipsButton = (Button) view.findViewById(R.id.apply_dips_button);
+        softPauseButton = (Button) view.findViewById(R.id.pause_button);
+        manualVertUp = (Button) view.findViewById(R.id.vert_up);
+        manualVertDown = (Button) view.findViewById(R.id.vert_down);
+        manualRotLeft = (Button) view.findViewById(R.id.rot_left);
+        manualRotRight = (Button) view.findViewById(R.id.rot_right);
 
         vertJogButton.setOnClickListener(new View.OnClickListener() {
             @Override
