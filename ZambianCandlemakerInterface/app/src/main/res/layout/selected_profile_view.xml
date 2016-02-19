@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="50dp">
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent">
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum = "8">
+            android:layout_height="match_parent"
+            android:background="@color/colorAccent">
             <Button
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
                 android:id="@+id/down_button"
                 android:layout_marginRight="10dp"
-                android:layout_weight = "1"
                 android:background="@drawable/ic_down_jog" />
             <TextView
                 android:id="@+id/avail_profile_title"
@@ -25,20 +26,12 @@
                 android:layout_height="50dp"
                 android:inputType="text"
                 android:singleLine="true"
-                android:ellipsize="end"/>
-            <!--<TextView-->
-                <!--android:id="@+id/avail_profile_desc"-->
-                <!--android:text="@string/default_description"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="50dp"-->
-                <!--android:layout_weight="3"-->
-                <!--android:layout_marginLeft="20dp"-->
-                <!--android:singleLine="true"-->
-                <!--android:ellipsize="end"/>-->
+                android:ellipsize="end"
+                android:layout_gravity="center"
+                android:gravity="center" />
             <Button
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_weight="1"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
                 android:id="@+id/up_button"
                 android:layout_marginLeft="10dp"
                 android:background="@drawable/ic_up_jog" />

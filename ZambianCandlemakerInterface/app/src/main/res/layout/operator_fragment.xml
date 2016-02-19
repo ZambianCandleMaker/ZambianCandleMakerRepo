@@ -68,6 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/apply"
+                android:background="@color/colorPrimary"
                 android:id="@+id/apply_vert_jog_button"
                 android:layout_alignTop="@+id/unit_spinner"
                 android:layout_alignParentEnd="true" />
@@ -76,7 +77,10 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/jog_vert_prompt"
-                android:text="@string/vertical_jog"/>
+                android:text="@string/vertical_jog"
+                android:textColor="@color/colorPrimary"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true" />
             <Spinner
                 android:layout_width="75dp"
                 android:layout_height="50dp"
@@ -102,6 +106,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/apply"
+                android:background="@color/colorPrimary"
                 android:id="@+id/apply_rot_jog_button"
                 android:layout_below="@+id/jog_rot_prompt"
                 android:layout_alignParentEnd="true" />
@@ -110,7 +115,10 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/rotational_jog"
-                android:id="@+id/jog_rot_prompt" />
+                android:id="@+id/jog_rot_prompt"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:textColor="@color/colorPrimary" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -132,7 +140,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:layout_marginBottom="10dp">
             <Spinner
                 android:layout_width="75dp"
                 android:layout_height="50dp"
@@ -149,20 +158,21 @@
                 android:text="@string/dips_per_revolution"
                 android:id="@+id/dips_per_prompt"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true" />
+                android:layout_alignParentLeft="true"
+                android:textColor="@color/colorPrimary" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/apply"
+                android:background="@color/colorPrimary"
                 android:id="@+id/apply_dips_button"
                 android:layout_below="@+id/dips_per_prompt"
                 android:layout_alignParentEnd="true" />
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_height="50dp">
             <ToggleButton
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
@@ -170,7 +180,13 @@
                 android:id="@+id/e_mode_toggle"
                 android:checked="true"
                 android:textOff="@string/efficiency_off"
-                android:textOn="@string/efficiency_on" />
+                android:textOn="@string/efficiency_on"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="false"
+                android:gravity="center_vertical|center_horizontal"
+                android:backgroundTint="@color/colorPrimary"
+                android:textStyle="bold|italic"
+                android:foregroundTint="@color/colorAccent" />
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>
