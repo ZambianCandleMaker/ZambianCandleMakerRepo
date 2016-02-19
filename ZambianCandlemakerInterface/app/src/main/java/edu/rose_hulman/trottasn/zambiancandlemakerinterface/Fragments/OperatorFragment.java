@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -194,49 +195,85 @@ public class OperatorFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 vertical_selection = Integer.parseInt(vertJogSpinner.getSelectedItem().toString());
+                Toast.makeText(getContext(), R.string.applying_vert_jog, Toast.LENGTH_SHORT).show();
             }
         });
+
         rotJogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 rotational_selection = Integer.parseInt(rotJogSpinner.getSelectedItem().toString());
+                Toast.makeText(getContext(), R.string.applying_rot_jog, Toast.LENGTH_SHORT).show();
             }
         });
+
         dipsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dips_selection = Integer.parseInt(dipsPerRevSpinner.getSelectedItem().toString());
+                Toast.makeText(getContext(), R.string.applying_dips_per, Toast.LENGTH_SHORT).show();
             }
         });
 
-        softPauseButton.setOnClickListener(new View.OnClickListener() {
+        softPauseButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                sendCautionaryPauseDialog();
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    softPauseButton.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.pause_button_red));
+                    sendCautionaryPauseDialog();
+                }
+                else if(event.getAction() == MotionEvent.ACTION_UP){
+                    softPauseButton.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.ic_pause_button));
+                }
+                return true;
             }
         });
 
         manualRotLeft.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    manualRotLeft.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.left_rotate_red));
+                }
+                else if(event.getAction() == MotionEvent.ACTION_UP){
+                    manualRotLeft.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.ic_left_rotate));
+                }
                 return setForRepetition("LEFT", event, mAction);
             }
         });
         manualRotRight.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    manualRotRight.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.right_rotate_red));
+                }
+                else if(event.getAction() == MotionEvent.ACTION_UP){
+                    manualRotRight.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.ic_right_rotate));
+                }
                 return setForRepetition("RIGHT", event, mAction);
             }
         });
         manualVertUp.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    manualVertUp.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.arrow_up_red));
+                }
+                else if(event.getAction() == MotionEvent.ACTION_UP){
+                    manualVertUp.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.ic_up_jog));
+                }
                 return setForRepetition("UP", event, mAction);
             }
         });
         manualVertDown.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    manualVertDown.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.arrow_down_red));
+                }
+                else if(event.getAction() == MotionEvent.ACTION_UP){
+                    manualVertDown.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.ic_down_jog));
+                }
                 return setForRepetition("DOWN", event, mAction);
             }
         });

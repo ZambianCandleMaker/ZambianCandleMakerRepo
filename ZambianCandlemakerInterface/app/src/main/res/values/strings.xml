@@ -67,4 +67,7 @@
     <string name="change_administrator_password">Change Administrator Password</string>
     <string name="mm">mm</string>
     <string name="ms">ms</string>
+    <string name="applying_vert_jog">Applying Vertical Jog Selection</string>
+    <string name="applying_rot_jog">Applying Rotational Jog Selection</string>
+    <string name="applying_dips_per">Applying Dips Per Rev. Selection</string>
 </resources>
