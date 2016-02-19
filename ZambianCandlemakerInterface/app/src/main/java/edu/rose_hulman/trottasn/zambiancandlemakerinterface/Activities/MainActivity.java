@@ -350,7 +350,6 @@ public class MainActivity extends AppCompatActivity
     private void allowFragmentToReplace(){
         Fragment switchTo = null;
         String typeString = "";
-        String[] typeList = new String[]{getString(R.string.operator_frag_name), getString(R.string.admin_mod_del_frag_name), getString(R.string.admin_program_frag_name), getString(R.string.graph_make_prog_frag_name)};
         switch (this.tempIdSave){
             case R.id.nav_operator:
                 //Switch without adding to backstack
@@ -391,7 +390,7 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = fm.beginTransaction();
             Fragment myFragment = fm.findFragmentByTag(typeString);
             if(myFragment != null){
-                if(fm.getBackStackEntryCount() == 0 || (fm.getBackStackEntryCount() != 0 && !fm.getBackStackEntryAt(0).getName().equals(typeString))){
+                if(fm.getBackStackEntryCount() == 0 || !fm.getBackStackEntryAt(0).getName().equals(typeString)){
                     ft.addToBackStack(typeString);
                 }
                 ft.replace(R.id.fragment_container, myFragment, typeString);
