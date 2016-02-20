@@ -70,4 +70,5 @@
     <string name="applying_vert_jog">Applying Vertical Jog Selection</string>
     <string name="applying_rot_jog">Applying Rotational Jog Selection</string>
     <string name="applying_dips_per">Applying Dips Per Rev. Selection</string>
+    <string name="available_programs">Available Programs:</string>
 </resources>

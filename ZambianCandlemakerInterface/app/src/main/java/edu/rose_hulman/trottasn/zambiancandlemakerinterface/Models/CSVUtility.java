@@ -45,7 +45,7 @@ public class CSVUtility {
         file.setWritable(true);
         MediaScannerConnection.scanFile(activity, new String[]{file.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
             public void onScanCompleted(String path, Uri uri) {
-                Log.i("EXTERNAL STORAGE", "SCANNED");
+                Log.i("EXTERNAL STORAGE", "SCND");
             }
         });
         final String filename = file.toString();
@@ -57,6 +57,7 @@ public class CSVUtility {
             String[] nextLine;
             boolean informationSectionRead = false;
             int pairing = 2;
+            Log.d("SUCCESS", "SUCCESS");
             while ((nextLine = reader.readNext()) != null) {
                 if(!informationSectionRead){
                     if(nextLine.length != pairing){
@@ -87,6 +88,7 @@ public class CSVUtility {
             }
             boolean success = newProfile.assignFromReading(typeToValueMapping, timePosPairs);
             if(success){
+                Log.d("SUCCESS", "SUCCESS");
                 return newProfile;
             }
             return null;
@@ -159,8 +161,8 @@ public class CSVUtility {
         return null;
     }
 
-    public static boolean writeProgramCSV(Map<String, String> typeToValueMap, List<String> profileTitles, Activity activity){
-        File finalFile = new File(CONSTANTS.PROGRAMS_PATH_MAIN + "/" + typeToValueMap.get(PROGRAM_TITLE_KEY) + ".csv");
+    public static boolean writeProgramCSV(Map<String, String> typeToValueMap, List<String> profileTitles, Activity activity, String fileDir){
+        File finalFile = new File(fileDir, CONSTANTS.PROGRAMS_PATH_MAIN + "/" + typeToValueMap.get(PROGRAM_TITLE_KEY) + ".csv");
         finalFile.setWritable(true);
         final String filename = finalFile.toString();
         CharSequence contentTitle = activity.getString(R.string.app_name);
@@ -175,6 +177,7 @@ public class CSVUtility {
         int pairing = 2;
         int singular = 1;
         try {
+            Log.d("WROTE", "WROTE");
             CSVWriter writer = new CSVWriter(new FileWriter(filename));
             // feed in your array (or convert your data to an array)
             List<String> alphabeticalList = new ArrayList<>();
@@ -205,8 +208,8 @@ public class CSVUtility {
         return true;
     }
 
-    public static boolean writeProfileCSV(Map<String, String> typeToValueMap, List<TimePosPair> timePosPairs, Activity activity){
-        File finalFile = new File(CONSTANTS.PROFILES_PATH_MAIN + "/" + typeToValueMap.get(PROFILE_TITLE_KEY) + ".csv");
+    public static boolean writeProfileCSV(Map<String, String> typeToValueMap, List<TimePosPair> timePosPairs, Activity activity, String fileDir){
+        File finalFile = new File(fileDir, CONSTANTS.PROFILES_PATH_MAIN + "/" + typeToValueMap.get(PROFILE_TITLE_KEY) + ".csv");
         finalFile.setWritable(true);
         final String filename = finalFile.toString();
         CharSequence contentTitle = activity.getString(R.string.app_name);

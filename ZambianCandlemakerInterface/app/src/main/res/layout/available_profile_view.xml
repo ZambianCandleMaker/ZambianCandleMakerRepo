@@ -21,7 +21,8 @@
                 android:layout_alignParentStart="true"
                 android:layout_marginLeft="50dp"
                 android:gravity="center_vertical|center_horizontal"
-                android:textStyle="bold|italic" />
+                android:textStyle="bold|italic"
+                android:textColor="@android:color/white" />
             <TextView
                 android:id="@+id/avail_profile_desc"
                 android:text="@string/default_description"
@@ -34,7 +35,8 @@
                 android:layout_marginRight="50dp"
                 android:layout_marginLeft="20dp"
                 android:gravity="center_vertical|center_horizontal"
-                android:textStyle="bold|italic" />
+                android:textStyle="bold|italic"
+                android:textColor="@android:color/white" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 </RelativeLayout>

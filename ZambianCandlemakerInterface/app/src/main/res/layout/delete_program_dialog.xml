@@ -6,10 +6,21 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/program_title_delete_dialog"/>
+        android:id="@+id/program_title_delete_dialog"
+        android:textStyle="bold|italic"
+        android:textColor="@android:color/white"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="Test Title"
+        android:layout_marginBottom="10dp" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/program_desc_delete_dialog"
-        android:layout_below="@id/program_title_delete_dialog"/>
+        android:layout_below="@id/program_title_delete_dialog"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="Test Description"
+        android:textColor="@android:color/white"
+        android:textStyle="bold|italic" />
 </RelativeLayout>

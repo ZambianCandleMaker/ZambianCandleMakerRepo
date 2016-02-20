@@ -93,7 +93,7 @@ public class EditProfileFragment extends Fragment {
         if (getArguments() != null) {
             prefs = this.getActivity().getSharedPreferences("profilePrefs", Context.MODE_PRIVATE);
 
-            ProfileHashParcel profileHashParcel = (ProfileHashParcel) getArguments().getParcelable(HASH);
+            ProfileHashParcel profileHashParcel = getArguments().getParcelable(HASH);
             pathToProfileHash = profileHashParcel.getHash();
         }
     }
@@ -101,7 +101,6 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-
         if((currentProfile.getTitle().contains("New Profile") && !pathToProfileHash.containsKey(currentProfile.getTitle())) || pathToProfileHash.containsKey(currentProfile.getTitle())) {
             SharedPreferences.Editor prefsEditor = prefs.edit();
             Gson gson = new Gson();
@@ -121,19 +120,28 @@ public class EditProfileFragment extends Fragment {
         Gson gson = new Gson();
         String json;
         if(prefs.contains(CURRENT_PROFILE)){
-
             json = prefs.getString(CURRENT_PROFILE, "");
             currentProfile = gson.fromJson(json, DipProfile.class);
-
             mAdapter = new EditProfileAdapter(getContext(),this,getView(),currentProfile);
             pointRecycler.setAdapter(mAdapter);
-
             profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
-
             updateGraph();
-
         }
+    }
 
+    @Override
+    public void onResume() {
+        Gson gson = new Gson();
+        String json;
+        if(prefs.contains(CURRENT_PROFILE)){
+            json = prefs.getString(CURRENT_PROFILE, "");
+            currentProfile = gson.fromJson(json, DipProfile.class);
+            mAdapter = new EditProfileAdapter(getContext(),this,getView(),currentProfile);
+            pointRecycler.setAdapter(mAdapter);
+            profileTitleView.setText(getResources().getString(R.string.edit_points) + " " + currentProfile.getTitle());
+            updateGraph();
+        }
+        super.onResume();
     }
 
 
@@ -239,7 +247,7 @@ public class EditProfileFragment extends Fragment {
         Map<String, String> map = new HashMap<>();
         map.put(CSVUtility.PROFILE_TITLE_KEY, profile.getTitle());
         map.put(CSVUtility.PROFILE_DESCRIPTION_KEY, profile.getDescription());
-        CSVUtility.writeProfileCSV(map, profile.getPairList(),getActivity());
+        CSVUtility.writeProfileCSV(map, profile.getPairList(),getActivity(), getContext().getFilesDir().getPath());
     }
 
     private void resetCurrentProfile(){

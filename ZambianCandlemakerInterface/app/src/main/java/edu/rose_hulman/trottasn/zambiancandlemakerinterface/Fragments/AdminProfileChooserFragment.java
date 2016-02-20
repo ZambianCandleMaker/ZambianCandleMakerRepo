@@ -107,6 +107,21 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
     }
 
     @Override
+    public void onResume(){
+        Gson gson = new Gson();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if(sharedPreferences != null){
+            String profileHashString = sharedPreferences.getString(MainActivity.PROFILE_HASH, "");
+            String programHashString = sharedPreferences.getString(MainActivity.PROGRAM_HASH, "");
+            Type hashType = new TypeToken<HashMap<String ,DipProfile>>(){}.getType();
+            Type progHashType = new TypeToken<HashMap<String, DipProgram>>(){}.getType();
+            pathToProfileHash = gson.fromJson(profileHashString, hashType);
+            pathToProgramHash = gson.fromJson(programHashString, progHashType);
+        }
+        super.onResume();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View totalView = inflater.inflate(R.layout.fragment_admin_profile_chooser, container, false);
@@ -228,7 +243,7 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
                         DipProgram newProgram = new DipProgram();
                         newProgram.assignFromReading(mFieldValuePairs, dipProfs);
                         pathToProgramHash.put(mFieldValuePairs.get(CSVUtility.PROGRAM_TITLE_KEY), newProgram);
-                        CSVUtility.writeProgramCSV(mFieldValuePairs, selectedProfiles, getActivity());
+                        CSVUtility.writeProgramCSV(mFieldValuePairs, selectedProfiles, getActivity(), getContext().getFilesDir().getPath());
                         SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
                         Gson gson = new Gson();
                         String pathToProfileHashJson = gson.toJson(pathToProfileHash);

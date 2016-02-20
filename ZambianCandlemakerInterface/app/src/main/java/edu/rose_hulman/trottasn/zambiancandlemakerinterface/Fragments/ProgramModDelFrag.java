@@ -68,6 +68,16 @@ public class ProgramModDelFrag extends Fragment implements ProgramEditFragment {
     }
 
     @Override
+    public void onResume(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String jsonProgramHash = sharedPreferences.getString(MainActivity.PROGRAM_HASH, "");
+        Gson gson = new Gson();
+        Type progHashType = new TypeToken<Map<String, DipProgram>>(){}.getType();
+        pathToProgramHash = gson.fromJson(jsonProgramHash, progHashType);
+        super.onResume();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -115,17 +125,13 @@ public class ProgramModDelFrag extends Fragment implements ProgramEditFragment {
                         String nameKey = choppingBlockProg.getTitle();
                         pathToProgramHash.remove(nameKey);
                         mProgramsAdapter.removeProgram(choppingBlockPos);
-                        File specificFile = new File(CONSTANTS.PROGRAMS_PATH_MAIN + "/" + choppingBlockProg.getTitle() + ".csv");
+                        File specificFile = new File(getContext().getFilesDir(), CONSTANTS.PROGRAMS_PATH_MAIN + "/" + choppingBlockProg.getTitle() + ".csv");
                         String specificFilePath = specificFile.getPath();
                         Log.d("TAGGGG", specificFilePath);
                         if(specificFile.exists()) {
                             specificFile.setWritable(true);
                             specificFile.setReadable(true);
                             specificFile.delete();
-                            File otherFile = new File(CONSTANTS.PROGRAMS_PATH_MAIN_INTERNAL + "/" + choppingBlockProg.getTitle() + ".csv");
-                            otherFile.setWritable(true);
-                            otherFile.setReadable(true);
-                            otherFile.delete();
                             SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
                             Gson gson = new Gson();
                             String pathToProgramHashJson = gson.toJson(pathToProgramHash);

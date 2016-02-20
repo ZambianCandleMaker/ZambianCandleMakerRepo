@@ -423,35 +423,69 @@ public class MainActivity extends AppCompatActivity
      */
     public void repopulateProfileHash() {
         pathToProfileHash = new HashMap<>();
-        File innerDir = new File(CONSTANTS.PROFILES_PATH_MAIN);
-        innerDir.mkdirs();
+        File innerDir = new File(this.getFilesDir(), CONSTANTS.PROFILES_PATH_MAIN);
+        innerDir.mkdir();
         innerDir.setWritable(true);
         innerDir.setReadable(true);
-        if(innerDir.exists() && innerDir.isDirectory()) {
-            File[] files = innerDir.listFiles();
-            if(files != null){
-                for (int i = 0; i < files.length; ++i) {
-                    File file = files[i];
-                    if (file.isDirectory()) {
-                        Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
-                    } else {
-                        DipProfile newProfile = CSVUtility.readProfileCSV(file, this);
-                        if(newProfile != null){
-                            pathToProfileHash.put(newProfile.getTitle(), newProfile);
-                        }
-                    }
+        File[] files = innerDir.listFiles();
+        Log.d("TRYING", "TRYING");
+        for (int i = 0; i < files.length; ++i) {
+            File file = files[i];
+            if (file.isDirectory()) {
+                Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+            } else {
+                DipProfile newProfile = CSVUtility.readProfileCSV(file, this);
+                if(newProfile != null){
+                    pathToProfileHash.put(newProfile.getTitle(), newProfile);
                 }
             }
         }
+//        if(innerDir.exists() && innerDir.isDirectory()) {
+//            File[] files = innerDir.listFiles();
+//            if(files != null){
+//                for (int i = 0; i < files.length; ++i) {
+//                    File file = files[i];
+//                    if (file.isDirectory()) {
+//                        Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+//                    } else {
+//                        DipProfile newProfile = CSVUtility.readProfileCSV(file, this);
+//                        if(newProfile != null){
+//                            pathToProfileHash.put(newProfile.getTitle(), newProfile);
+//                        }
+//                    }
+//                }
+//            }
+//            else{
+//                Log.d("BALLS", "NOT GOOD");
+//            }
+//        }
+//        else{
+//            innerDir.mkdirs();
+//            File[] files = innerDir.listFiles();
+//            if(files != null){
+//                for (int i = 0; i < files.length; ++i) {
+//                    File file = files[i];
+//                    if (file.isDirectory()) {
+//                        Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+//                    } else {
+//                        DipProfile newProfile = CSVUtility.readProfileCSV(file, this);
+//                        if(newProfile != null){
+//                            pathToProfileHash.put(newProfile.getTitle(), newProfile);
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     public void repopulateProgramHash() {
         pathToProgramHash = new HashMap<>();
-        File innerDir = new File(CONSTANTS.PROGRAMS_PATH_MAIN);
-        innerDir.mkdirs();
+        File innerDir = new File(this.getFilesDir(), CONSTANTS.PROGRAMS_PATH_MAIN);
+        innerDir.mkdir();
         innerDir.setWritable(true);
         innerDir.setReadable(true);
         if(innerDir.exists()) {
+            Log.d("TRYING CLOSE", "TRYING");
             File[] files = innerDir.listFiles();
             if(files != null){
                 for (int i = 0; i < files.length; ++i) {
@@ -467,6 +501,23 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
+//        else{
+//            innerDir.mkdirs();
+//            File[] files = innerDir.listFiles();
+//            if(files != null){
+//                for (int i = 0; i < files.length; ++i) {
+//                    File file = files[i];
+//                    if (file.isDirectory()) {
+//                        Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+//                    } else {
+//                        DipProgram newProgram = CSVUtility.readProgramCSV(file, this, pathToProfileHash);
+//                        if(newProgram != null){
+//                            pathToProgramHash.put(newProgram.getTitle(), newProgram);
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     @Override

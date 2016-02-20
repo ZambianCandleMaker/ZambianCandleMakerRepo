@@ -89,6 +89,16 @@ public class OperatorFragment extends Fragment {
     }
 
     @Override
+    public void onResume(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        dips_selection = sharedPref.getInt(DIPS_SELECTION_KEY, 0);
+        unit_selection = sharedPref.getInt(UNIT_SELECTION_KEY, 0);
+        vertical_selection = sharedPref.getInt(VERTICAL_SELECTION_KEY, 0);
+        rotational_selection = sharedPref.getInt(ROTATIONAL_SELECTION_KEY, 0);
+        super.onResume();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.operator_fragment, container, false);

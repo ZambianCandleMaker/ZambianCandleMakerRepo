@@ -7,12 +7,16 @@
         android:layout_height="50dp">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary">
             <TextView
                 android:id="@+id/saved_program_title"
                 android:text="@string/default_title"
                 android:layout_width="wrap_content"
-                android:layout_height="50dp" />
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:textStyle="bold|italic"
+                android:textColor="@android:color/white" />
             <TextView
                 android:id="@+id/saved_program_description"
                 android:text="@string/default_description"
@@ -20,7 +24,9 @@
                 android:layout_height="50dp"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/saved_program_title"
-                android:layout_marginLeft="20dp" />
+                android:layout_marginLeft="40dp"
+                android:textStyle="bold|italic"
+                android:textColor="@android:color/white" />
 
             <Button
                 android:layout_width="wrap_content"
