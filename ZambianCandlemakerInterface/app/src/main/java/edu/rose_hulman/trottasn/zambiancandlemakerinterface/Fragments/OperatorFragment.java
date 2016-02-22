@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
-import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
@@ -55,6 +54,8 @@ public class OperatorFragment extends Fragment {
     private ArrayAdapter<CharSequence> vertical_adapter_cm;
     private ArrayAdapter<CharSequence> vertical_adapter_mm;
     private ArrayAdapter<CharSequence> rotational_adapter;
+
+    private ArrayAdapter<CharSequence> prog_adapter;
 
     private Button vertJogButton;
     private Button rotJogButton;
@@ -126,6 +127,8 @@ public class OperatorFragment extends Fragment {
         String programHashString = sharedPref.getString(MainActivity.PROGRAM_HASH, "");
         Type progHashType = new TypeToken<HashMap<String, DipProgram>>(){}.getType();
         pathToProgramHash = gson.fromJson(programHashString, progHashType);
+        prog_adapter.clear();
+        prog_adapter.addAll(pathToProgramHash.keySet());
         super.onResume();
     }
 
@@ -225,12 +228,13 @@ public class OperatorFragment extends Fragment {
         dipsPerRevSpinner.setSelection(dips_selection);
 
         final Spinner progNameSpinner = (Spinner) view.findViewById(R.id.program_spinner);
-        ArrayAdapter<String> availableProgramsArray = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, new ArrayList<String>());
+
+        prog_adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, new ArrayList<String>());
         for(String progName : pathToProgramHash.keySet()){
-            availableProgramsArray.add(progName);
+            prog_adapter.add(progName);
         }
-        availableProgramsArray.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        progNameSpinner.setAdapter(availableProgramsArray);
+        prog_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        progNameSpinner.setAdapter(prog_adapter);
         progNameSpinner.setSelection(programSelection);
 
         progNameSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -249,7 +253,9 @@ public class OperatorFragment extends Fragment {
         programButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openProgramWarningDialog(pathToProgramHash.get(String.valueOf(progNameSpinner.getSelectedItem())));
+                if(progNameSpinner.getSelectedItem() != null){
+                    openProgramWarningDialog(pathToProgramHash.get(String.valueOf(progNameSpinner.getSelectedItem())));
+                }
             }
         });
 
