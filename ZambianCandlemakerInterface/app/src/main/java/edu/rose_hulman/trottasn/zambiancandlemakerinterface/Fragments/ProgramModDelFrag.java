@@ -125,9 +125,8 @@ public class ProgramModDelFrag extends Fragment implements ProgramEditFragment {
                         String nameKey = choppingBlockProg.getTitle();
                         pathToProgramHash.remove(nameKey);
                         mProgramsAdapter.removeProgram(choppingBlockPos);
-                        File specificFile = new File(getContext().getFilesDir(), CONSTANTS.PROGRAMS_PATH_MAIN + "/" + choppingBlockProg.getTitle() + ".csv");
+                        File specificFile = new File(getContext().getExternalFilesDir(null) + CONSTANTS.PROGRAMS_PATH_MAIN + "/" + choppingBlockProg.getTitle() + ".csv");
                         String specificFilePath = specificFile.getPath();
-                        Log.d("TAGGGG", specificFilePath);
                         if(specificFile.exists()) {
                             specificFile.setWritable(true);
                             specificFile.setReadable(true);

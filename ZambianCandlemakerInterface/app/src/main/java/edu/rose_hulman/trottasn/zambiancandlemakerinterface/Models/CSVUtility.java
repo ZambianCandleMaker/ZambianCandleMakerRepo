@@ -209,7 +209,7 @@ public class CSVUtility {
     }
 
     public static boolean writeProfileCSV(Map<String, String> typeToValueMap, List<TimePosPair> timePosPairs, Activity activity, String fileDir){
-        File finalFile = new File(fileDir, CONSTANTS.PROFILES_PATH_MAIN + "/" + typeToValueMap.get(PROFILE_TITLE_KEY) + ".csv");
+        File finalFile = new File(fileDir + CONSTANTS.PROFILES_PATH_MAIN + "/" + typeToValueMap.get(PROFILE_TITLE_KEY) + ".csv");
         finalFile.setWritable(true);
         final String filename = finalFile.toString();
         CharSequence contentTitle = activity.getString(R.string.app_name);

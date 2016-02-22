@@ -246,7 +246,7 @@ public class EditProfileFragment extends Fragment {
         Map<String, String> map = new HashMap<>();
         map.put(CSVUtility.PROFILE_TITLE_KEY, profile.getTitle());
         map.put(CSVUtility.PROFILE_DESCRIPTION_KEY, profile.getDescription());
-        CSVUtility.writeProfileCSV(map, profile.getPairList(),getActivity(), getContext().getFilesDir().getPath());
+        CSVUtility.writeProfileCSV(map, profile.getPairList(),getActivity(), getContext().getExternalFilesDir(null).getAbsolutePath());
     }
 
     private void resetCurrentProfile(){
