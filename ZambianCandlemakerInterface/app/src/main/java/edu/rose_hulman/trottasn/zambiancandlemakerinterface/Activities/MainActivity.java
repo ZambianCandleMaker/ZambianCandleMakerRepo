@@ -10,6 +10,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentContainer;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -173,12 +174,7 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_choose_program) {
-            return true;
-        }
-
-        else if (id == R.id.action_logout){
+        if (id == R.id.action_logout){
             this.canAllow = false;
             SharedPreferences.Editor editor = activityPrefs.edit();
             editor.putBoolean(PASSWORD_KEEPING_KEY, false);
@@ -196,7 +192,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         this.tempIdSave = item.getItemId();
-        this.canAllow = true;
+
         if(this.tempIdSave == R.id.nav_operator || this.canAllow){
             this.allowFragmentToReplace();
             return true;
@@ -207,7 +203,6 @@ public class MainActivity extends AppCompatActivity
 
     public void displayChangePasswordDialog(){
         final DialogFragment df = new DialogFragment() {
-
             @Override
             public Dialog onCreateDialog(Bundle b) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -222,12 +217,12 @@ public class MainActivity extends AppCompatActivity
                         //Need to check for invalidity first
                         String oldPassword = oldPasswordBox.getText().toString();
                         String newPassword = newPasswordBox.getText().toString();
-                        File passwordFile = new File(CONSTANTS.PASSWORD_FILE_LOCATION);
+                        File passwordFile = new File(getFilesDir().getPath() + CONSTANTS.ADMINISTRATOR_FILES + CONSTANTS.PASSWORD_FILE_LOCATION);
                         String line = "";
                         if(!passwordFile.exists()){
                             try {
                                 Log.d("PSWRD", "File Didnt Register");
-                                File passwordDir = new File(CONSTANTS.ADMINISTRATOR_FILES);
+                                File passwordDir = new File(getFilesDir().getPath() + CONSTANTS.ADMINISTRATOR_FILES);
                                 passwordDir.setWritable(true);
                                 passwordDir.mkdirs();
                                 passwordFile.createNewFile();
@@ -302,11 +297,11 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(DialogInterface dialog, int which) {
                         //Need to check for invalidity first
                         String password = passwordBox.getText().toString();
-                        File passwordFile = new File(CONSTANTS.PASSWORD_FILE_LOCATION);
+                        File passwordFile = new File(getFilesDir().getPath() +  CONSTANTS.ADMINISTRATOR_FILES + CONSTANTS.PASSWORD_FILE_LOCATION);
                         String line = "";
                         if(!passwordFile.exists()){
                             try {
-                                File passwordDir = new File(CONSTANTS.ADMINISTRATOR_FILES);
+                                File passwordDir = new File(getFilesDir().getPath() + CONSTANTS.ADMINISTRATOR_FILES);
                                 passwordDir.setWritable(true);
                                 passwordDir.mkdirs();
                                 passwordFile.createNewFile();
@@ -387,10 +382,7 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
-//        ViewGroup fragCont = ((ViewGroup)findViewById(R.id.fragment_container));
-//        if(fragCont != null){
-//            fragCont.removeAllViews();
-//        }
+
 
         if (switchTo != null){
             String backStateName =  switchTo.getClass().getName();
@@ -405,6 +397,33 @@ public class MainActivity extends AppCompatActivity
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 ft.addToBackStack(backStateName);
                 ft.commit();
+            }
+            else{
+                FragmentTransaction ft = manager.beginTransaction();
+                Fragment prevFrag = manager.findFragmentByTag(fragmentTag);
+                Log.d("FRAG", "IN ELSE");
+                if(prevFrag != null){
+//                    Log.d("FRAG", "IN IF");
+//                    while(true) {
+//                        if (manager.getBackStackEntryCount() > 0) {
+//                            String topFragName = manager.getBackStackEntryAt(0).getName();
+//                            manager.popBackStackImmediate();
+//                            if (topFragName.equals(fragmentTag)) {
+//                                break;
+//                            }
+//                            Log.d("POPPING", "POPPED FRAG NOT EQUAL TO INTENDED");
+//                        } else {
+//                            break;
+//                        }
+//                    }
+                    Log.d("FRAG", "THROUGH WHILE BEFORE REPLACE");
+//                    ft.remove(prevFrag);
+                    ft.detach(prevFrag);
+                    ft.attach(prevFrag);
+                    ft.replace(R.id.fragment_container, prevFrag, fragmentTag);
+                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                    ft.commit();
+                }
             }
         };
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -440,42 +459,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-//        if(innerDir.exists() && innerDir.isDirectory()) {
-//            File[] files = innerDir.listFiles();
-//            if(files != null){
-//                for (int i = 0; i < files.length; ++i) {
-//                    File file = files[i];
-//                    if (file.isDirectory()) {
-//                        Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
-//                    } else {
-//                        DipProfile newProfile = CSVUtility.readProfileCSV(file, this);
-//                        if(newProfile != null){
-//                            pathToProfileHash.put(newProfile.getTitle(), newProfile);
-//                        }
-//                    }
-//                }
-//            }
-//            else{
-//                Log.d("BALLS", "NOT GOOD");
-//            }
-//        }
-//        else{
-//            innerDir.mkdirs();
-//            File[] files = innerDir.listFiles();
-//            if(files != null){
-//                for (int i = 0; i < files.length; ++i) {
-//                    File file = files[i];
-//                    if (file.isDirectory()) {
-//                        Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
-//                    } else {
-//                        DipProfile newProfile = CSVUtility.readProfileCSV(file, this);
-//                        if(newProfile != null){
-//                            pathToProfileHash.put(newProfile.getTitle(), newProfile);
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
 
     public void repopulateProgramHash() {
@@ -501,23 +484,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-//        else{
-//            innerDir.mkdirs();
-//            File[] files = innerDir.listFiles();
-//            if(files != null){
-//                for (int i = 0; i < files.length; ++i) {
-//                    File file = files[i];
-//                    if (file.isDirectory()) {
-//                        Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
-//                    } else {
-//                        DipProgram newProgram = CSVUtility.readProgramCSV(file, this, pathToProfileHash);
-//                        if(newProgram != null){
-//                            pathToProgramHash.put(newProgram.getTitle(), newProgram);
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
 
     @Override

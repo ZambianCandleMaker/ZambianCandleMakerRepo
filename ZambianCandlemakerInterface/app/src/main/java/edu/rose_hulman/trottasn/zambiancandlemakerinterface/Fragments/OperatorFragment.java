@@ -23,8 +23,19 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import org.w3c.dom.Text;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class OperatorFragment extends Fragment {
@@ -32,6 +43,7 @@ public class OperatorFragment extends Fragment {
     private static final String ROTATIONAL_SELECTION_KEY = "ROTATIONAL_SELECTION";
     private static final String DIPS_SELECTION_KEY = "DIPS_SELECTION";
     private static final String UNIT_SELECTION_KEY = "UNIT_SELECTION";
+    private static final String PROGRAM_SELECTION_KEY = "PROGRAM_SELECTION";
     private static final int MAX_DIPS_PER_REV = 25;
     private static final int MIN_DIPS_PER_REV = 1;
     private String vertical_units;
@@ -52,8 +64,12 @@ public class OperatorFragment extends Fragment {
     private Button manualVertDown;
     private Button manualRotLeft;
     private Button manualRotRight;
+    private Button programButton;
+
     private Handler mHandler;
     private String mDirection;
+    private Map<String, DipProgram> pathToProgramHash;
+    private int programSelection;
 
     public OperatorFragment() {
         // Required empty public constructor
@@ -75,6 +91,11 @@ public class OperatorFragment extends Fragment {
         unit_selection = sharedPref.getInt(UNIT_SELECTION_KEY, 0);
         vertical_selection = sharedPref.getInt(VERTICAL_SELECTION_KEY, 0);
         rotational_selection = sharedPref.getInt(ROTATIONAL_SELECTION_KEY, 0);
+        programSelection = sharedPref.getInt(PROGRAM_SELECTION_KEY, 0);
+        Gson gson = new Gson();
+        String programHashString = sharedPref.getString(MainActivity.PROGRAM_HASH, "");
+        Type progHashType = new TypeToken<HashMap<String, DipProgram>>(){}.getType();
+        pathToProgramHash = gson.fromJson(programHashString, progHashType);
     }
 
     @Override
@@ -86,6 +107,11 @@ public class OperatorFragment extends Fragment {
         editor.putInt(ROTATIONAL_SELECTION_KEY, rotational_selection);
         editor.putInt(DIPS_SELECTION_KEY, dips_selection);
         editor.putInt(UNIT_SELECTION_KEY, unit_selection);
+        editor.putInt(PROGRAM_SELECTION_KEY, programSelection);
+        Gson gson = new Gson();
+        String pathToProgramHashJson = gson.toJson(pathToProgramHash);
+        editor.putString(MainActivity.PROGRAM_HASH, pathToProgramHashJson);
+        editor.apply();
     }
 
     @Override
@@ -95,6 +121,11 @@ public class OperatorFragment extends Fragment {
         unit_selection = sharedPref.getInt(UNIT_SELECTION_KEY, 0);
         vertical_selection = sharedPref.getInt(VERTICAL_SELECTION_KEY, 0);
         rotational_selection = sharedPref.getInt(ROTATIONAL_SELECTION_KEY, 0);
+        programSelection = sharedPref.getInt(PROGRAM_SELECTION_KEY, 0);
+        Gson gson = new Gson();
+        String programHashString = sharedPref.getString(MainActivity.PROGRAM_HASH, "");
+        Type progHashType = new TypeToken<HashMap<String, DipProgram>>(){}.getType();
+        pathToProgramHash = gson.fromJson(programHashString, progHashType);
         super.onResume();
     }
 
@@ -169,6 +200,7 @@ public class OperatorFragment extends Fragment {
                 unit_selection = 0;
             }
         });
+
         unitSpinner.setSelection(unit_selection);
 
         // ArrayAdapter to be used when millimeters are selected on the unit spinner
@@ -191,6 +223,35 @@ public class OperatorFragment extends Fragment {
         final Spinner dipsPerRevSpinner = (Spinner) view.findViewById(R.id.dips_per_rev_spinner);
         dipsPerRevSpinner.setAdapter(dips_per_rev_array);
         dipsPerRevSpinner.setSelection(dips_selection);
+
+        final Spinner progNameSpinner = (Spinner) view.findViewById(R.id.program_spinner);
+        ArrayAdapter<String> availableProgramsArray = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, new ArrayList<String>());
+        for(String progName : pathToProgramHash.keySet()){
+            availableProgramsArray.add(progName);
+        }
+        availableProgramsArray.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        progNameSpinner.setAdapter(availableProgramsArray);
+        progNameSpinner.setSelection(programSelection);
+
+        progNameSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                programSelection = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //Nothing
+            }
+        });
+
+        programButton = (Button) view.findViewById(R.id.apply_program_button);
+        programButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openProgramWarningDialog(pathToProgramHash.get(String.valueOf(progNameSpinner.getSelectedItem())));
+            }
+        });
 
         vertJogButton = (Button) view.findViewById(R.id.apply_vert_jog_button);
         rotJogButton = (Button) view.findViewById(R.id.apply_rot_jog_button);
@@ -304,6 +365,34 @@ public class OperatorFragment extends Fragment {
             Log.d("TESTING_RUNNABLE", "STOPPING");
         }
         return true;
+    }
+
+    public void openProgramWarningDialog(final DipProgram dipProgram){
+        DialogFragment df = new DialogFragment() {
+            @Override
+            public Dialog onCreateDialog(Bundle b) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setIcon(android.R.drawable.ic_menu_send);
+                builder.setTitle(getResources().getString(R.string.are_you_sure_program));
+                View view = getActivity().getLayoutInflater().inflate(R.layout.delete_program_dialog, null, false);
+                TextView titleText = (TextView) view.findViewById(R.id.program_title_delete_dialog);
+                titleText.setText(dipProgram.getTitle());
+                TextView descText = (TextView) view.findViewById(R.id.program_desc_delete_dialog);
+                descText.setText(dipProgram.getDescription());
+                builder.setView(view);
+
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Call arduino message code
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, null);
+                return builder.create();
+            }
+        };
+
+        df.show(getFragmentManager(), "");
     }
 
     public void sendCautionaryPauseDialog(){

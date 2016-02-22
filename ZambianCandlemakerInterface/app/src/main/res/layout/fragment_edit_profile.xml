@@ -11,19 +11,20 @@
     tools:context="edu.rose_hulman.trottasn.zambiancandlemakerinterface.Fragments.EditProfileFragment">
 
     <com.jjoe64.graphview.GraphView
-        android:layout_toRightOf="@+id/recycler_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/edit_graph"
         app:seriesType = "line"
         app:seriesColor = "@color/graphSeriesLine"
-        android:layout_below="@+id/confirmationLayout" />
+        android:layout_below="@+id/confirmationLayout"
+        android:layout_toEndOf="@+id/recycler_layout" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/confirmationLayout"
-        android:layout_alignStart="@id/edit_graph">
+        android:layout_alignStart="@id/edit_graph"
+        android:layout_alignEnd="@+id/edit_graph">
 
         <TextView
             android:layout_width="match_parent"
@@ -32,7 +33,10 @@
             android:textStyle="bold"
             android:id="@+id/edit_point_title"
             android:paddingBottom="10dp"
-           />
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/edit_depth_title"
+            android:layout_alignEnd="@+id/insert_point_button" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="50dp"
@@ -86,40 +90,43 @@
             android:layout_height="wrap_content"
             android:text="@string/confirm"
             android:id="@+id/insert_point_button"
+            android:background="@color/colorPrimary"
             android:layout_alignTop="@+id/edit_depth_text"
-            android:layout_alignParentEnd="true"
-            android:background="@color/colorPrimary" />
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
 
     <RelativeLayout
         android:id="@+id/recycler_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent">
+        android:layout_width="200dp"
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/profile_point_time_title"
             android:text="@string/time"
             android:textStyle="bold"
             android:layout_width="100dp"
-            android:layout_height="20dp" />
+            android:layout_height="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true" />
         <TextView
             android:id="@+id/profile_point_depth_title"
             android:text="@string/depth"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="20dp"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/profile_point_time_title"
             android:textStyle="bold"
-            android:layout_marginLeft="20dp" />
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/save_profile_button"
+            android:layout_alignParentRight="true" />
 
         <android.support.v7.widget.RecyclerView
         android:id="@+id/profile_point_recycler"
         android:layout_width="200dp"
         android:layout_height="fill_parent"
-        android:layout_above="@+id/save_profile_button"
             android:layout_below="@+id/profile_point_time_title"
-            />
+            android:layout_above="@+id/save_profile_button"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -128,8 +135,9 @@
         android:textSize="10dp"
         android:id="@+id/save_profile_button"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:background="@color/colorPrimary" />
+        android:layout_alignParentStart="false"
+        android:background="@color/colorPrimary"
+        android:layout_alignParentLeft="true" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -138,9 +146,10 @@
         android:text="Reset Profile"
         android:textSize="10dp"
         android:id="@+id/reset_profile_button"
+        android:background="@color/colorPrimary"
+        android:layout_below="@+id/profile_point_recycler"
         android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/profile_point_time_title"
-        android:background="@color/colorPrimary" />
+        android:layout_alignParentRight="true" />
     </RelativeLayout>
 
 </RelativeLayout>

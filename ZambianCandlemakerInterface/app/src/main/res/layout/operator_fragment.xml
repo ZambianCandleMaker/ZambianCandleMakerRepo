@@ -8,7 +8,6 @@
         android:layout_height="wrap_content"
         android:layout_width="225dp"
         android:id="@+id/immediate_buttons"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginLeft="50dp">
         <Button
@@ -18,7 +17,9 @@
             android:background="@drawable/ic_right_rotate"
             android:layout_alignParentEnd="true"
             android:backgroundTint="@android:color/transparent"
-            android:backgroundTintMode="src_over" />
+            android:backgroundTintMode="src_over"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true" />
 
         <Button
             android:layout_width="75dp"
@@ -38,17 +39,19 @@
             android:layout_alignTop="@+id/rot_right"
             android:layout_toStartOf="@+id/rot_right"
             android:backgroundTint="@android:color/transparent"
-            android:backgroundTintMode="src_over" />
+            android:backgroundTintMode="src_over"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/rot_right" />
 
         <Button
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:id="@+id/vert_down"
             android:background="@drawable/ic_down_jog"
-            android:layout_below="@+id/rot_left"
-            android:layout_alignStart="@+id/rot_left"
             android:backgroundTint="@android:color/transparent"
-            android:backgroundTintMode="src_over" />
+            android:backgroundTintMode="src_over"
+            android:layout_below="@+id/rot_right"
+            android:layout_toStartOf="@+id/vert_up" />
 
         <Button
             android:layout_width="75dp"
@@ -59,6 +62,22 @@
             android:layout_alignParentEnd="true"
             android:backgroundTint="@android:color/transparent"
             android:backgroundTintMode="src_over" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="@string/efficiency_mode"
+            android:id="@+id/e_mode_toggle"
+            android:checked="true"
+            android:textOff="@string/efficiency_off"
+            android:textOn="@string/efficiency_on"
+            android:gravity="center_vertical|center_horizontal"
+            android:backgroundTint="@color/colorPrimary"
+            android:textStyle="bold|italic"
+            android:foregroundTint="@color/colorAccent"
+            android:layout_below="@+id/vert_down"
+            android:layout_alignParentEnd="true" />
+
     </RelativeLayout>
 
     <LinearLayout
@@ -76,7 +95,7 @@
             android:layout_weight="1">
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:text="@string/apply"
                 android:background="@color/colorPrimary"
                 android:id="@+id/apply_vert_jog_button"
@@ -114,7 +133,7 @@
             android:layout_weight="1">
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:text="@string/apply"
                 android:background="@color/colorPrimary"
                 android:id="@+id/apply_rot_jog_button"
@@ -150,8 +169,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginBottom="10dp">
+            android:layout_weight="1">
             <Spinner
                 android:layout_width="75dp"
                 android:layout_height="50dp"
@@ -173,7 +191,7 @@
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:text="@string/apply"
                 android:background="@color/colorPrimary"
                 android:id="@+id/apply_dips_button"
@@ -182,21 +200,38 @@
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp">
-            <ToggleButton
+            android:layout_height="wrap_content">
+
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/program_spinner"
+                android:spinnerMode="dialog"
+                android:layout_marginRight="10dp"
+                android:layout_below="@+id/current_program"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/apply_program_button" />
+
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:text="@string/efficiency_mode"
-                android:id="@+id/e_mode_toggle"
-                android:checked="true"
-                android:textOff="@string/efficiency_off"
-                android:textOn="@string/efficiency_on"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="false"
-                android:gravity="center_vertical|center_horizontal"
-                android:backgroundTint="@color/colorPrimary"
-                android:textStyle="bold|italic"
-                android:foregroundTint="@color/colorAccent" />
+                android:text="Apply"
+                android:id="@+id/apply_program_button"
+                android:background="@color/colorPrimary"
+                android:layout_alignTop="@+id/program_spinner"
+                android:layout_alignParentEnd="true"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Current Program"
+                android:id="@+id/current_program"
+                android:textColor="@color/colorPrimary"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true" />
+
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>

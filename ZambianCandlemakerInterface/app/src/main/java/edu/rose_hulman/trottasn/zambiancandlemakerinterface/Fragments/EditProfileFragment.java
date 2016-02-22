@@ -169,8 +169,7 @@ public class EditProfileFragment extends Fragment {
 //                    return super.formatLabel(value/1000, isValueX);
                     return formatter.format(value/1000.0);
                 } else {
-                    // show currency for y values
-                    return super.formatLabel(Math.abs(value-currentProfile.getMaxYCoordinate()), isValueX);
+                    return String.valueOf((int)Math.abs(value-currentProfile.getMaxYCoordinate()));
                 }
             }
         });
@@ -305,9 +304,6 @@ public class EditProfileFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        MenuItem item = menu.findItem(R.id.action_choose_program);
-        item.setVisible(false);
-
         MenuItem choose_profile_item = menu.findItem(R.id.action_choose_profile);
         choose_profile_item.setVisible(true);
 
@@ -365,7 +361,7 @@ public class EditProfileFragment extends Fragment {
                 View view = getActivity().getLayoutInflater().inflate(R.layout.save_profile_dialog,null,false);
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                profileList = new ArrayList<String>(Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
+                profileList = new ArrayList<>(Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
                 final Spinner dropdown = (Spinner) view.findViewById(R.id.save_profile_spinner);
                 final EditText profileName = (EditText) view.findViewById(R.id.new_profile_name);
                 final CheckBox confirmationCheckbox = (CheckBox) view.findViewById(R.id.confirmation_checkbox);
@@ -494,7 +490,7 @@ public class EditProfileFragment extends Fragment {
 
                 final View view = getActivity().getLayoutInflater().inflate(R.layout.profile_choose_dialog,null,false);
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                profileList = new ArrayList<String>(Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
+                profileList = new ArrayList<>(Arrays.asList(pathToProfileHash.keySet().toArray(new String[pathToProfileHash.size()])));
                 final Spinner dropdown = (Spinner) view.findViewById(R.id.profile_choose_spinner);
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,profileList);
