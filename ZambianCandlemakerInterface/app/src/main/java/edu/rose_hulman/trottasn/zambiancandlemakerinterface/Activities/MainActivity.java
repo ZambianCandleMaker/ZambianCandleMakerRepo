@@ -193,6 +193,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         this.tempIdSave = item.getItemId();
 
+        this.canAllow = true;
         if(this.tempIdSave == R.id.nav_operator || this.canAllow){
             this.allowFragmentToReplace();
             return true;
