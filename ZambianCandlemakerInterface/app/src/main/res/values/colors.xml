@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#990011</color>
+    <color name="colorPrimary">#3399FF</color>
     <color name="colorPrimaryDark">#111111</color>
     <color name="colorAccent">#111111</color>
     <color name="headerBarCenter">#111111</color>
-    <color name="headerBarEnd">#990011</color>
+    <color name="headerBarEnd">#3399FF</color>
     <color name="headerBarStart">#111111</color>
-    <color name="graphSeriesLine">#990011</color>
-    <color name="colorGray">#555555</color>
+    <color name="graphSeriesLine">#3399FF</color>
+    <color name="colorGray">#AAAAAA</color>
 </resources>

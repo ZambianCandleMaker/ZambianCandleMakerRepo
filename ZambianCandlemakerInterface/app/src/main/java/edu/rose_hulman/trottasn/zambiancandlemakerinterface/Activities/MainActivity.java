@@ -131,9 +131,11 @@ public class MainActivity extends AppCompatActivity
         });
 
         if(savedInstanceState == null){
+            Log.d("START", "Here we go...");
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             OperatorFragment newFrag = new OperatorFragment();
-            ft.replace(R.id.fragment_container, newFrag, newFrag.getClass().getName());
+            ft.add(R.id.fragment_container, newFrag);
+//            ft.addToBackStack(OperatorFragment.class.getName());
             ft.commit();
         }
     }
@@ -162,7 +164,9 @@ public class MainActivity extends AppCompatActivity
                 item.setChecked(false);
             }
         }
-        super.onBackPressed();
+        if(getSupportFragmentManager().getBackStackEntryCount() > 0){
+            super.onBackPressed();
+        }
     }
 
     /*
@@ -343,16 +347,13 @@ public class MainActivity extends AppCompatActivity
                         String newPassword = newPasswordBox.getText().toString();
                         String newPasswordConfirm = newPasswordBoxTwo.getText().toString();
 
-                        if(!oldPasswordConfirm.equals(oldPassword)){
+                        if (!oldPasswordConfirm.equals(oldPassword)) {
                             Toast.makeText(getActivity(), "Old Passwords Don't Match. Please Try Again.", Toast.LENGTH_SHORT).show();
                             displayTypicalChangePasswordDialog();
-                        }
-                        else if(!newPasswordConfirm.equals(newPassword)){
+                        } else if (!newPasswordConfirm.equals(newPassword)) {
                             Toast.makeText(getActivity(), "New Passwords Don't Match. Please Try Again", Toast.LENGTH_SHORT).show();
                             displayTypicalChangePasswordDialog();
-                        }
-
-                        else{
+                        } else {
                             File passwordFile = new File(passwordFilepath);
                             String line = "";
                             try {
@@ -384,20 +385,16 @@ public class MainActivity extends AppCompatActivity
                                         Log.e("ERR_FILE", "ERROR, file doesn't exist");
                                         e.printStackTrace();
                                     }
-                                }
-                                else if (!oldPassword.equals(line.trim())) {
+                                } else if (!oldPassword.equals(line.trim())) {
                                     Toast.makeText(MainActivity.this, "Sorry, wrong password!", Toast.LENGTH_SHORT).show();
                                     displayChangePasswordDialog();
-                                }
-                                else {
+                                } else {
                                     Log.e("ERROR", "Unpredicted action for password save");
                                 }
                                 bufferedReader.close();
-                            }
-                            catch (FileNotFoundException ex) {
+                            } catch (FileNotFoundException ex) {
                                 Log.e("PSWRD", "Unable to access password location");
-                            }
-                            catch (IOException ex) {
+                            } catch (IOException ex) {
                                 Log.e("PSWR", "Found password, but unable to read password");
                             }
                         }
@@ -441,7 +438,7 @@ public class MainActivity extends AppCompatActivity
                         File passwordFile = new File(passwordFilepath);
 
                         String line = "";
-                        if(!passwordFile.exists()){
+                        if (!passwordFile.exists()) {
                             MediaScannerConnection.scanFile(getContext(), new String[]{adminFilepath}, null, new MediaScannerConnection.OnScanCompletedListener() {
                                 public void onScanCompleted(String path, Uri uri) {
                                     Log.i("SCAN", adminFilepath);
@@ -454,13 +451,12 @@ public class MainActivity extends AppCompatActivity
                             });
                             Toast.makeText(MainActivity.this, "Administrator needed to initialize password! Sorry.", Toast.LENGTH_LONG).show();
                             Log.e("PASS", "Created new password location, Administrator needed to initialize");
-                        }
-                        else{
+                        } else {
                             try {
                                 FileReader fileReader = new FileReader(passwordFile);
                                 BufferedReader bufferedReader = new BufferedReader(fileReader);
                                 line = bufferedReader.readLine();
-                                if(line == null){
+                                if (line == null) {
                                     MediaScannerConnection.scanFile(getContext(), new String[]{adminFilepath}, null, new MediaScannerConnection.OnScanCompletedListener() {
                                         public void onScanCompleted(String path, Uri uri) {
                                             Log.i("SCAN", adminFilepath);
@@ -473,9 +469,7 @@ public class MainActivity extends AppCompatActivity
                                     });
                                     Toast.makeText(MainActivity.this, "Administrator Needs to Initialize Password", Toast.LENGTH_LONG).show();
                                     displayPasswordDialog();
-                                }
-
-                                else if(password.equals(line.trim())){
+                                } else if (password.equals(line.trim())) {
                                     MediaScannerConnection.scanFile(getContext(), new String[]{adminFilepath}, null, new MediaScannerConnection.OnScanCompletedListener() {
                                         public void onScanCompleted(String path, Uri uri) {
                                             Log.i("SCAN", adminFilepath);
@@ -489,9 +483,7 @@ public class MainActivity extends AppCompatActivity
                                     canAllow = true;
                                     activityPrefs.edit().putBoolean(PASSWORD_KEEPING_KEY, true);
                                     allowFragmentToReplace();
-                                }
-
-                                else{
+                                } else {
                                     MediaScannerConnection.scanFile(getContext(), new String[]{adminFilepath}, null, new MediaScannerConnection.OnScanCompletedListener() {
                                         public void onScanCompleted(String path, Uri uri) {
                                             Log.i("SCAN", adminFilepath);
@@ -507,11 +499,9 @@ public class MainActivity extends AppCompatActivity
                                 }
 
                                 bufferedReader.close();
-                            }
-                            catch(FileNotFoundException ex) {
+                            } catch (FileNotFoundException ex) {
                                 Log.e("PASS", "Unable to access password location");
-                            }
-                            catch(IOException ex) {
+                            } catch (IOException ex) {
                                 Log.e("PASS", "Found password, but unable to read password");
                             }
                         }
@@ -557,45 +547,50 @@ public class MainActivity extends AppCompatActivity
 
         if (switchTo != null){
             String backStateName =  switchTo.getClass().getName();
-            String fragmentTag = backStateName;
-
             FragmentManager manager = getSupportFragmentManager();
-            boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
-
-            if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null){ //fragment not in back stack, create it.
-                FragmentTransaction ft = manager.beginTransaction();
-                ft.replace(R.id.fragment_container, switchTo, fragmentTag);
-                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                ft.addToBackStack(backStateName);
-                ft.commit();
+            for(int i = 1; i < manager.getBackStackEntryCount(); i++){
+                manager.popBackStackImmediate();
             }
-            else{
-                FragmentTransaction ft = manager.beginTransaction();
-                Fragment prevFrag = manager.findFragmentByTag(fragmentTag);
-                Log.d("FRAG", "IN ELSE");
-                if(prevFrag != null){
-//                    Log.d("FRAG", "IN IF");
-//                    while(true) {
-//                        if (manager.getBackStackEntryCount() > 0) {
-//                            String topFragName = manager.getBackStackEntryAt(0).getName();
-//                            manager.popBackStackImmediate();
-//                            if (topFragName.equals(fragmentTag)) {
-//                                break;
-//                            }
-//                            Log.d("POPPING", "POPPED FRAG NOT EQUAL TO INTENDED");
-//                        } else {
-//                            break;
-//                        }
-//                    }
-                    Log.d("FRAG", "THROUGH WHILE BEFORE REPLACE");
-//                    ft.remove(prevFrag);
-                    ft.detach(prevFrag);
-                    ft.attach(prevFrag);
-                    ft.replace(R.id.fragment_container, prevFrag, fragmentTag);
-                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                    ft.commit();
-                }
-            }
+            FragmentTransaction ft = manager.beginTransaction();
+            manager.popBackStack();
+            ft.replace(R.id.fragment_container, switchTo).addToBackStack(null).commit();
+//            FragmentManager manager = getSupportFragmentManager();
+//            boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
+//
+//            if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null){ //fragment not in back stack, create it.
+//                FragmentTransaction ft = manager.beginTransaction();
+//                ft.replace(R.id.fragment_container, switchTo, fragmentTag);
+//                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//                ft.addToBackStack(backStateName);
+//                ft.commit();
+//            }
+//            else{
+//                FragmentTransaction ft = manager.beginTransaction();
+//                Fragment prevFrag = manager.findFragmentByTag(fragmentTag);
+//                Log.d("FRAG", "IN ELSE");
+//                if(prevFrag != null){
+////                    Log.d("FRAG", "IN IF");
+////                    while(true) {
+////                        if (manager.getBackStackEntryCount() > 0) {
+////                            String topFragName = manager.getBackStackEntryAt(0).getName();
+////                            manager.popBackStackImmediate();
+////                            if (topFragName.equals(fragmentTag)) {
+////                                break;
+////                            }
+////                            Log.d("POPPING", "POPPED FRAG NOT EQUAL TO INTENDED");
+////                        } else {
+////                            break;
+////                        }
+////                    }
+//                    Log.d("FRAG", "THROUGH WHILE BEFORE REPLACE");
+////                    ft.remove(prevFrag);
+//                    ft.detach(prevFrag);
+//                    ft.attach(prevFrag);
+//                    ft.replace(R.id.fragment_container, prevFrag, fragmentTag);
+//                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//                    ft.commit();
+//                }
+//            }
         };
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -698,10 +693,7 @@ public class MainActivity extends AppCompatActivity
         Fragment adminFrag = AdminProfileChooserFragment.newInstance(dipProgram);
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        if(fm.getBackStackEntryCount() == 0 || (fm.getBackStackEntryCount() != 0 && !fm.getBackStackEntryAt(0).getName().equals(getString(R.string.admin_mod_del_frag_name)))){
-            ft.addToBackStack(getString(R.string.admin_program_frag_name));
-        }
-        ft.replace(R.id.fragment_container, adminFrag);
-        ft.commit();
+        fm.popBackStack();
+        ft.replace(R.id.fragment_container, adminFrag).addToBackStack(null).commit();
     }
 }
