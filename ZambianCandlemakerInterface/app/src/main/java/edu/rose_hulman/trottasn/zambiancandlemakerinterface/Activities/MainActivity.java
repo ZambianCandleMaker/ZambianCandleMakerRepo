@@ -548,7 +548,8 @@ public class MainActivity extends AppCompatActivity
         if (switchTo != null){
             String backStateName =  switchTo.getClass().getName();
             FragmentManager manager = getSupportFragmentManager();
-            for(int i = 1; i < manager.getBackStackEntryCount(); i++){
+            int count = manager.getBackStackEntryCount(); // since popping changes the count in the loop
+            for(int i = 1; i < count; i++){
                 manager.popBackStackImmediate();
             }
             FragmentTransaction ft = manager.beginTransaction();
