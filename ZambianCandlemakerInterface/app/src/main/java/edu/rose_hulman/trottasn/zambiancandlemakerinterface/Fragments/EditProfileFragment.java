@@ -246,7 +246,7 @@ public class EditProfileFragment extends Fragment {
         Map<String, String> map = new HashMap<>();
         map.put(CSVUtility.PROFILE_TITLE_KEY, profile.getTitle());
         map.put(CSVUtility.PROFILE_DESCRIPTION_KEY, profile.getDescription());
-        CSVUtility.writeProfileCSV(map, profile.getPairList(),getActivity(), getContext().getExternalFilesDir(null).getAbsolutePath());
+        CSVUtility.writeProfileCSV(map, profile.getPairList(),getActivity(), getContext().getFilesDir().getAbsolutePath());
     }
 
     private void resetCurrentProfile(){
@@ -512,8 +512,6 @@ public class EditProfileFragment extends Fragment {
 
                         currentProfile = new DipProfile(pathToProfileHash.get(dropdown.getSelectedItem().toString()));
                         resetCurrentProfile();
-
-
 
                     }
 

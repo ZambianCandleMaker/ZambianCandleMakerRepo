@@ -38,6 +38,7 @@ import java.util.Map;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.MessagingUtility;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 
 public class OperatorFragment extends Fragment {
@@ -439,7 +440,8 @@ public class OperatorFragment extends Fragment {
     }
 
     private void performSoftPause(){
-        Log.d("SOFT_PAUSE", "A Soft-Pause has been attempted!");
+        String messageToSend = "<SFTP:>";
+        MessagingUtility.sendMessageAndArchive(messageToSend, getActivity());
     }
 
     @Override

@@ -73,4 +73,5 @@
     <string name="available_programs">Available Programs:</string>
     <string name="are_you_sure_program">Are You Sure You Want to Begin This Program?</string>
     <string name="initialize_admin_pass">"Initialize Administrator Password: "</string>
+    <string name="waiting_message_sending">Waiting on Message Sending</string>
 </resources>

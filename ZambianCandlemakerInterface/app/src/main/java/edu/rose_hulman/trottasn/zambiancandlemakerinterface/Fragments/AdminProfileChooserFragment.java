@@ -243,7 +243,7 @@ public class AdminProfileChooserFragment extends Fragment implements AvailablePr
                         DipProgram newProgram = new DipProgram();
                         newProgram.assignFromReading(mFieldValuePairs, dipProfs);
                         pathToProgramHash.put(mFieldValuePairs.get(CSVUtility.PROGRAM_TITLE_KEY), newProgram);
-                        CSVUtility.writeProgramCSV(mFieldValuePairs, selectedProfiles, getActivity(), getContext().getExternalFilesDir(null).getAbsolutePath());
+                        CSVUtility.writeProgramCSV(mFieldValuePairs, selectedProfiles, getActivity(), getContext().getFilesDir().getAbsolutePath());
                         SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
                         Gson gson = new Gson();
                         String pathToProfileHashJson = gson.toJson(pathToProfileHash);

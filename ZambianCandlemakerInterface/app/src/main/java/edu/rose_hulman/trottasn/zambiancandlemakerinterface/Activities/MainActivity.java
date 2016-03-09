@@ -122,13 +122,19 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Log.d("FILES", "FILESDIR = " + getExternalFilesDir(null).getAbsolutePath());
+        File mainDir = getFilesDir();
+        if(mainDir == null){
+            Log.d("NOT_EXPECTED", "mainDir is not working");
+        }
+        else{
+            Log.d("FILES", "FILESDIR = " + getFilesDir().getAbsolutePath());
 
-        MediaScannerConnection.scanFile(this, new String[]{getExternalFilesDir(null).getAbsolutePath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-            public void onScanCompleted(String path, Uri uri) {
-                Log.i("SCAN", "Initial Scan");
-            }
-        });
+            MediaScannerConnection.scanFile(this, new String[]{getFilesDir().getAbsolutePath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+                public void onScanCompleted(String path, Uri uri) {
+                    Log.i("SCAN", "Initial Scan");
+                }
+            });
+        }
 
         if(savedInstanceState == null){
             Log.d("START", "Here we go...");
@@ -214,7 +220,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void displayChangePasswordDialog(){
-        final String adminFilepath = getExternalFilesDir(null).getAbsolutePath() + CONSTANTS.ADMINISTRATOR_FILES;
+        final String adminFilepath = getFilesDir().getAbsolutePath() + CONSTANTS.ADMINISTRATOR_FILES;
         Log.d("CONSTANT_CHECK", adminFilepath);
         final String passwordFilepath = adminFilepath + CONSTANTS.PASSWORD_FILE_LOCATION;
         Log.d("CONSTANT_CHECK", passwordFilepath);
@@ -256,7 +262,7 @@ public class MainActivity extends AppCompatActivity
                 builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        final String adminFilepath = getExternalFilesDir(null).getAbsolutePath() + CONSTANTS.ADMINISTRATOR_FILES;
+                        final String adminFilepath = getFilesDir().getAbsolutePath() + CONSTANTS.ADMINISTRATOR_FILES;
                         Log.d("CONSTANT_CHECK", adminFilepath);
                         final String passwordFilepath = adminFilepath + CONSTANTS.PASSWORD_FILE_LOCATION;
                         Log.d("CONSTANT_CHECK", passwordFilepath);
@@ -335,7 +341,7 @@ public class MainActivity extends AppCompatActivity
                 builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        final String adminFilepath = getExternalFilesDir(null).getAbsolutePath() + CONSTANTS.ADMINISTRATOR_FILES;
+                        final String adminFilepath = getFilesDir().getAbsolutePath() + CONSTANTS.ADMINISTRATOR_FILES;
                         Log.d("CONSTANT_CHECK", adminFilepath);
                         final String passwordFilepath = adminFilepath + CONSTANTS.PASSWORD_FILE_LOCATION;
                         Log.d("CONSTANT_CHECK", passwordFilepath);
@@ -422,7 +428,7 @@ public class MainActivity extends AppCompatActivity
                 View view = getActivity().getLayoutInflater().inflate(R.layout.semisecure_login_between_fragments, null, false);
                 final EditText passwordBox = (EditText)view.findViewById(R.id.password_edit_text);
 
-                final String adminFilepath = getExternalFilesDir(null).getAbsolutePath() + CONSTANTS.ADMINISTRATOR_FILES;
+                final String adminFilepath = getFilesDir().getAbsolutePath() + CONSTANTS.ADMINISTRATOR_FILES;
                 Log.d("CONSTANT_CHECK", adminFilepath);
                 final String passwordFilepath = adminFilepath + CONSTANTS.PASSWORD_FILE_LOCATION;
                 Log.d("CONSTANT_CHECK", passwordFilepath);
@@ -609,20 +615,29 @@ public class MainActivity extends AppCompatActivity
      */
     public void repopulateProfileHash() {
         pathToProfileHash = new HashMap<>();
-        File innerDir = new File(this.getExternalFilesDir(null).getAbsolutePath() + CONSTANTS.PROFILES_PATH_MAIN);
-        innerDir.mkdir();
-        innerDir.setWritable(true);
-        innerDir.setReadable(true);
-        File[] files = innerDir.listFiles();
-        Log.d("TRYING", "TRYING");
-        for (int i = 0; i < files.length; ++i) {
-            File file = files[i];
-            if (file.isDirectory()) {
-                Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
-            } else {
-                DipProfile newProfile = CSVUtility.readProfileCSV(file, this);
-                if(newProfile != null){
-                    pathToProfileHash.put(newProfile.getTitle(), newProfile);
+        File mainDir = this.getFilesDir();
+        if(mainDir == null){
+            Log.d("NOT_EXPECTED", "Main Dir is not working properly.");
+        }
+        else{
+            if(!mainDir.exists()){
+                mainDir.mkdirs();
+            }
+            File innerDir = new File(mainDir.getAbsolutePath() + CONSTANTS.PROFILES_PATH_MAIN);
+            innerDir.mkdir();
+            innerDir.setWritable(true);
+            innerDir.setReadable(true);
+            File[] files = innerDir.listFiles();
+            Log.d("TRYING", "TRYING");
+            for (int i = 0; i < files.length; ++i) {
+                File file = files[i];
+                if (file.isDirectory()) {
+                    Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+                } else {
+                    DipProfile newProfile = CSVUtility.readProfileCSV(file, this);
+                    if(newProfile != null){
+                        pathToProfileHash.put(newProfile.getTitle(), newProfile);
+                    }
                 }
             }
         }
@@ -630,22 +645,31 @@ public class MainActivity extends AppCompatActivity
 
     public void repopulateProgramHash() {
         pathToProgramHash = new HashMap<>();
-        File innerDir = new File(this.getExternalFilesDir(null).getAbsolutePath() + CONSTANTS.PROGRAMS_PATH_MAIN);
-        innerDir.mkdir();
-        innerDir.setWritable(true);
-        innerDir.setReadable(true);
-        if(innerDir.exists()) {
-            Log.d("TRYING CLOSE", "TRYING");
-            File[] files = innerDir.listFiles();
-            if(files != null){
-                for (int i = 0; i < files.length; ++i) {
-                    File file = files[i];
-                    if (file.isDirectory()) {
-                        Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
-                    } else {
-                        DipProgram newProgram = CSVUtility.readProgramCSV(file, this, pathToProfileHash);
-                        if(newProgram != null){
-                            pathToProgramHash.put(newProgram.getTitle(), newProgram);
+        File mainDir = this.getFilesDir();
+        if(mainDir == null){
+            Log.d("NOT_EXPECTED", "Main Dir is not working properly.");
+        }
+        else{
+            if(!mainDir.exists()){
+                mainDir.mkdirs();
+            }
+            File innerDir = new File(mainDir.getAbsolutePath() + CONSTANTS.PROGRAMS_PATH_MAIN);
+            innerDir.mkdir();
+            innerDir.setWritable(true);
+            innerDir.setReadable(true);
+            if(innerDir.exists()) {
+                Log.d("TRYING CLOSE", "TRYING");
+                File[] files = innerDir.listFiles();
+                if(files != null){
+                    for (int i = 0; i < files.length; ++i) {
+                        File file = files[i];
+                        if (file.isDirectory()) {
+                            Log.d("NO_DIRECTORIES_ALLOWED", "There should not be a directory in this folder");
+                        } else {
+                            DipProgram newProgram = CSVUtility.readProgramCSV(file, this, pathToProfileHash);
+                            if(newProgram != null){
+                                pathToProgramHash.put(newProgram.getTitle(), newProgram);
+                            }
                         }
                     }
                 }
