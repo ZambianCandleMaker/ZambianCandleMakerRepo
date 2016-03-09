@@ -132,7 +132,7 @@ public class DipProfile implements Parcelable{
     }
 
     public List<TimePosPair> getPairList() {
-        if(this.pairList == null) addPair(0,0);
+        if(this.pairList == null) addPair(0, 0);
         return this.pairList;
     }
 
@@ -217,5 +217,20 @@ public class DipProfile implements Parcelable{
         }
         pairList.addAll(timePosPairs);
         return true;
+    }
+
+    public String getRepresentation(){
+        //This could be turned into the Visitor Pattern if I had more time
+        String retString = "<";
+        int i = 0;
+        for(TimePosPair timePosPair : this.pairList){
+            retString += timePosPair.getRepresentation();
+            if(i != (this.pairList.size() - 1)){
+                retString += ",";
+            }
+            i++;
+        }
+        retString += ">";
+        return retString;
     }
 }

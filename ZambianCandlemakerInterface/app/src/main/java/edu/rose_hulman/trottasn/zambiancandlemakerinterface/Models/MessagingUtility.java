@@ -41,22 +41,22 @@ public class MessagingUtility {
         });
         try {
             PrintWriter newWriter = new PrintWriter(new FileWriter(finalFile, true));
-            newWriter.append(message);
+            newWriter.append(message + "\n");
             newWriter.close();
 
-            FileReader fileReader = new FileReader(filename);
-
-            // Always wrap FileReader in BufferedReader.
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            String line = "";
-            Log.d("PMT", "Previous Messages Follow: ");
-            while((line = bufferedReader.readLine()) != null) {
-                Log.d("PMT", line);
-            }
-
-            // Always close files.
-            bufferedReader.close();
+//            FileReader fileReader = new FileReader(filename);
+//
+//            // Always wrap FileReader in BufferedReader.
+//            BufferedReader bufferedReader = new BufferedReader(fileReader);
+//
+//            String line = "";
+//            Log.d("PMT", "Previous Messages Follow: ");
+//            while((line = bufferedReader.readLine()) != null) {
+//                Log.d("PMT", line);
+//            }
+//
+//            // Always close files.
+//            bufferedReader.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

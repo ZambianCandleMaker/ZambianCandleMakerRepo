@@ -58,4 +58,8 @@ public class TimePosPair implements Parcelable {
         dest.writeInt(position);
         dest.writeInt(time);
     }
+
+    public String getRepresentation(){
+        return String.valueOf(this.time) + ":" + String.valueOf(this.position);
+    }
 }

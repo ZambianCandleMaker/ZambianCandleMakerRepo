@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Activities.MainActivity;
+import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProfile;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.DipProgram;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.Models.MessagingUtility;
 import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
@@ -186,7 +187,15 @@ public class OperatorFragment extends Fragment {
         adapter_mm.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.vertical_adapter_mm = adapter_mm;
         final Spinner vertJogSpinner = (Spinner) view.findViewById(R.id.vert_spinner);
-        vertJogSpinner.setSelection(vertical_selection);
+        if (unit_selection == 0) {
+            vertJogSpinner.setAdapter(vertical_adapter_cm);
+        } else if (unit_selection == 1) {
+            vertJogSpinner.setAdapter(vertical_adapter_mm);
+        }
+        if(vertJogSpinner.getAdapter().getCount() > this.vertical_selection){
+            vertJogSpinner.setSelection(this.vertical_selection);
+        }
+
 
         final Spinner unitSpinner = (Spinner) view.findViewById(R.id.unit_spinner);
         ArrayAdapter<CharSequence> adapter_units = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, new ArrayList<CharSequence>());
@@ -214,8 +223,9 @@ public class OperatorFragment extends Fragment {
                 unit_selection = 0;
             }
         });
-
-        unitSpinner.setSelection(unit_selection);
+        if(unitSpinner.getAdapter().getCount() > unit_selection){
+            unitSpinner.setSelection(unit_selection);
+        }
 
         // ArrayAdapter to be used when millimeters are selected on the unit spinner
         ArrayAdapter<CharSequence> adapter_rot = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, new ArrayList<CharSequence>());
@@ -226,7 +236,9 @@ public class OperatorFragment extends Fragment {
         this.rotational_adapter = adapter_rot;
         final Spinner rotJogSpinner = (Spinner) view.findViewById(R.id.rot_spinner);
         rotJogSpinner.setAdapter(this.rotational_adapter);
-        rotJogSpinner.setSelection(rotational_selection);
+        if(rotJogSpinner.getAdapter().getCount() > this.rotational_selection){
+            rotJogSpinner.setSelection(rotational_selection);
+        }
 
         // ArrayAdapter to be used for the number of dips per revolution spinner
         ArrayAdapter<CharSequence> dips_per_rev_array = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, new ArrayList<CharSequence>());
@@ -236,7 +248,9 @@ public class OperatorFragment extends Fragment {
         dips_per_rev_array.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         final Spinner dipsPerRevSpinner = (Spinner) view.findViewById(R.id.dips_per_rev_spinner);
         dipsPerRevSpinner.setAdapter(dips_per_rev_array);
-        dipsPerRevSpinner.setSelection(dips_selection);
+        if(dipsPerRevSpinner.getAdapter().getCount() > this.dips_selection){
+            dipsPerRevSpinner.setSelection(dips_selection);
+        }
 
         final Spinner progNameSpinner = (Spinner) view.findViewById(R.id.program_spinner);
 
@@ -246,7 +260,9 @@ public class OperatorFragment extends Fragment {
         }
         prog_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         progNameSpinner.setAdapter(prog_adapter);
-        progNameSpinner.setSelection(programSelection);
+        if(progNameSpinner.getAdapter().getCount() > programSelection){
+            progNameSpinner.setSelection(programSelection);
+        }
 
         progNameSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -402,6 +418,12 @@ public class OperatorFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //Call arduino message code
+                        String programName = prog_adapter.getItem(programSelection).toString();
+                        DipProgram selectedProgram = pathToProgramHash.get(programName);
+                        if (!selectedProgram.getProfileList().isEmpty()) {
+                            DipProfile firstProfile = selectedProgram.getProfileList().get(0);
+                            MessagingUtility.sendMessageAndArchive(firstProfile.getRepresentation(), getActivity());
+                        }
                     }
                 });
                 builder.setNegativeButton(android.R.string.cancel, null);
