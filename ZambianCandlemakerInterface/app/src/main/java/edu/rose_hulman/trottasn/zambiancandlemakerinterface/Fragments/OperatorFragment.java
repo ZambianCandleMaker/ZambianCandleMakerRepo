@@ -50,6 +50,8 @@ public class OperatorFragment extends Fragment {
     private static final String PROGRAM_SELECTION_KEY = "PROGRAM_SELECTION";
     private static final int MAX_DIPS_PER_REV = 25;
     private static final int MIN_DIPS_PER_REV = 1;
+    private static final int ONE_MM = 1;
+    private static final int ONE_DEGREE = 1;
     private String vertical_units;
     private int vertical_selection;
     private int rotational_selection;
@@ -155,16 +157,20 @@ public class OperatorFragment extends Fragment {
             @Override public void run() {
                 switch(mDirection) {
                     case "LEFT":
-                        Log.d("TESTING_RUNNABLE", "LEFT");
+                        String messageToSendLeft = "<JOGR:" + -ONE_MM + ">";
+                        MessagingUtility.sendMessage(messageToSendLeft);
                         break;
                     case "RIGHT":
-                        Log.d("TESTING_RUNNABLE", "RIGHT");
+                        String messageToSendRight = "<JOGR:" + ONE_MM + ">";
+                        MessagingUtility.sendMessage(messageToSendRight);
                         break;
                     case "UP":
-                        Log.d("TESTING_RUNNABLE", "UP");
+                        String messageToSendUp = "<JOGV:" + -ONE_DEGREE + ">";
+                        MessagingUtility.sendMessage(messageToSendUp);
                         break;
                     case "DOWN":
-                        Log.d("TESTING_RUNNABLE", "DOWN");
+                        String messageToSendDown = "<JOGV:" + ONE_DEGREE + ">";
+                        MessagingUtility.sendMessage(messageToSendDown);
                         break;
                 }
                 mHandler.postDelayed(this, 100);
@@ -299,6 +305,12 @@ public class OperatorFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 vertical_selection = Integer.parseInt(vertJogSpinner.getSelectedItem().toString());
+                int value = vertical_selection;
+                if(unit_selection == 0){
+                    value = vertical_selection * 10;
+                }
+                String messageToSendVert = "<JOGV:" + String.valueOf(value) + ">";
+                MessagingUtility.sendMessageAndArchive(messageToSendVert, getActivity());
                 Toast.makeText(getContext(), R.string.applying_vert_jog, Toast.LENGTH_SHORT).show();
             }
         });
@@ -307,6 +319,9 @@ public class OperatorFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 rotational_selection = Integer.parseInt(rotJogSpinner.getSelectedItem().toString());
+                int value = Integer.parseInt(rotJogSpinner.getSelectedItem().toString());
+                String messageToSendRot = "<JOGR:" + String.valueOf(value) + ">";
+                MessagingUtility.sendMessageAndArchive(messageToSendRot, getActivity());
                 Toast.makeText(getContext(), R.string.applying_rot_jog, Toast.LENGTH_SHORT).show();
             }
         });
@@ -315,6 +330,9 @@ public class OperatorFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 dips_selection = Integer.parseInt(dipsPerRevSpinner.getSelectedItem().toString());
+                int value = Integer.parseInt(dipsPerRevSpinner.getSelectedItem().toString());
+                String messageToSendDips = "<DIPR:" + String.valueOf(value) + ">";
+                MessagingUtility.sendMessageAndArchive(messageToSendDips, getActivity());
                 Toast.makeText(getContext(), R.string.applying_dips_per, Toast.LENGTH_SHORT).show();
             }
         });
@@ -423,6 +441,16 @@ public class OperatorFragment extends Fragment {
                         if (!selectedProgram.getProfileList().isEmpty()) {
                             DipProfile firstProfile = selectedProgram.getProfileList().get(0);
                             MessagingUtility.sendMessageAndArchive(firstProfile.getRepresentation(), getActivity());
+                            String messageToSendTimeDel = "<TMDY:" + String.valueOf(selectedProgram.getTimeDelay()) + ">";
+                            MessagingUtility.sendMessageAndArchive(messageToSendTimeDel, getActivity());
+                            String messageToSendACMR = "<ACMR:" + String.valueOf(selectedProgram.getMaxAccelRot()) + ">";
+                            MessagingUtility.sendMessageAndArchive(messageToSendACMR, getActivity());
+                            String messageToSendACMV = "<ACMV:" + String.valueOf(selectedProgram.getMaxAccelVert()) + ">";
+                            MessagingUtility.sendMessageAndArchive(messageToSendACMV, getActivity());
+                            String messageToSendJGSR = "<JGSR:" + String.valueOf(selectedProgram.getMaxVelRot()) + ">";
+                            MessagingUtility.sendMessageAndArchive(messageToSendJGSR, getActivity());
+                            String messageToSendJGSV = "<JGSV:" + String.valueOf(selectedProgram.getMaxVelVert()) + ">";
+                            MessagingUtility.sendMessageAndArchive(messageToSendJGSV, getActivity());
                         }
                     }
                 });

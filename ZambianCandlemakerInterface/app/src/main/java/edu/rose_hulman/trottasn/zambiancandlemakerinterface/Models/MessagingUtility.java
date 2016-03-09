@@ -64,4 +64,7 @@ public class MessagingUtility {
         }
         progDialog.dismiss();
     }
+    public static void sendMessage(String message){
+        Log.d("SENT", message);
+    }
 }
