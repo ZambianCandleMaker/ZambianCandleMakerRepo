@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +27,6 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import org.w3c.dom.Text;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -158,19 +155,19 @@ public class OperatorFragment extends Fragment {
                 switch(mDirection) {
                     case "LEFT":
                         String messageToSendLeft = "<JOGR:" + -ONE_MM + ">";
-                        MessagingUtility.sendMessage(messageToSendLeft);
+                        MessagingUtility.sendMessage(messageToSendLeft, getActivity());
                         break;
                     case "RIGHT":
                         String messageToSendRight = "<JOGR:" + ONE_MM + ">";
-                        MessagingUtility.sendMessage(messageToSendRight);
+                        MessagingUtility.sendMessage(messageToSendRight, getActivity());
                         break;
                     case "UP":
                         String messageToSendUp = "<JOGV:" + -ONE_DEGREE + ">";
-                        MessagingUtility.sendMessage(messageToSendUp);
+                        MessagingUtility.sendMessage(messageToSendUp, getActivity());
                         break;
                     case "DOWN":
                         String messageToSendDown = "<JOGV:" + ONE_DEGREE + ">";
-                        MessagingUtility.sendMessage(messageToSendDown);
+                        MessagingUtility.sendMessage(messageToSendDown, getActivity());
                         break;
                 }
                 mHandler.postDelayed(this, 100);
