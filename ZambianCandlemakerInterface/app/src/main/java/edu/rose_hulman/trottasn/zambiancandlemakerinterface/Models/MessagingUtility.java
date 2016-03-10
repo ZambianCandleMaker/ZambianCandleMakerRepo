@@ -21,6 +21,8 @@ import edu.rose_hulman.trottasn.zambiancandlemakerinterface.R;
 public class MessagingUtility {
     public static void sendMessageAndArchive(String message, Activity sendingActivity){
         Log.d("SENTARCH", message);
+        Toast.makeText(sendingActivity, String.format("Sending [%s]", message), Toast.LENGTH_SHORT).show();
+
         File finalFile = new File(sendingActivity.getFilesDir().getAbsolutePath(), "archived_messages.txt");
         finalFile.setWritable(true);
         final String filename = finalFile.toString();
